@@ -594,7 +594,7 @@ Abhängigkeiten: Phase 1
 Link-Knopf. Die Farbschema-Einstellung zieht auf `ChoiceGroup` um.
 
 **Aufgaben**:
-- [ ] Domäne, TDD:
+- [x] Domäne, TDD:
   - `WishLink.parse`: `''` → kein Link; `'amazon.de/x'` → `https://amazon.de/x`;
     `'http://a.de'` bleibt `http`; `'javascript:alert(1)'`, `'mailto:a@b.de'`, `'foo'`,
     `'https://'` → `invalid`; `siteName` von `https://www.amazon.de/x` → `amazon.de`
@@ -612,27 +612,27 @@ Link-Knopf. Die Farbschema-Einstellung zieht auf `ChoiceGroup` um.
     `wishlistId` und `gifted`
   - `sortWishes`: unbedingt → gern → nett → ohne, innerhalb einer Stufe alphabetisch, bei
     gleichem Namen nach ID
-- [ ] `WishLink.ts`, `Description.ts`, `Price.ts`, `Rating.ts`, `WishDetails.ts`,
+- [x] `WishLink.ts`, `Description.ts`, `Price.ts`, `Rating.ts`, `WishDetails.ts`,
       `Wish.ts`, `wishOrder.ts` (vorerst nur `sortWishes`), `WishRepository.ts`
-- [ ] `fakes/InMemoryWishRepository.ts`
-- [ ] Use Cases, TDD:
+- [x] `fakes/InMemoryWishRepository.ts`
+- [x] Use Cases, TDD:
   - `CreateWish.execute(wishlistId, details)` speichert einen offenen Wunsch und gibt die
     ID zurück. Unbekannte Liste → `WishlistNotFound`.
   - `WatchWishesOfWishlist.execute(wishlistId, onChange)` liefert sortiert, nur Wünsche
     dieser Liste
   - `WatchWish.execute(id, onChange)` liefert den Wunsch bzw. `undefined`
-- [ ] `localStorage/LocalStorageWishRepository.ts` (Schlüssel `wunschliste.wishes`, Record
+- [x] `localStorage/LocalStorageWishRepository.ts` (Schlüssel `wunschliste.wishes`, Record
       `{ id, wishlistId, name, link?, description?, priceInCents?, rating?, gifted }`) und
       Integrationstest wie in Phase 1, zusätzlich: `watchByWishlist` liefert nur Wünsche
       der Liste; ein Record mit ungültigem Preis wird übersprungen. Wiederhergestellt wird
       über `Name.parse`, `WishLink.parse`, `Price.ofCents` usw.
-- [ ] `createWishlistModule` um Wünsche erweitern
-- [ ] `src/shared/ui/ChoiceGroup.svelte` aus `ColorSchemeSettings.svelte` herauslösen,
+- [x] `createWishlistModule` um Wünsche erweitern
+- [x] `src/shared/ui/ChoiceGroup.svelte` aus `ColorSchemeSettings.svelte` herauslösen,
       `ColorSchemeSettings` nutzt sie. `e2e/colorScheme.spec.ts` bleibt unverändert grün.
-- [ ] `ui/wishTexts.ts` mit Test `wishTexts.test.ts`: `formatPrice(Price.ofCents(4999))` →
+- [x] `ui/wishTexts.ts` mit Test `wishTexts.test.ts`: `formatPrice(Price.ofCents(4999))` →
       `'49,99 €'` (mit geschütztem Leerzeichen, wie `Intl` es liefert), `ratingLabel`,
       `ratingStars`, `problemMessage` für jedes Problem aus der Tabelle
-- [ ] `ui/WishForm.svelte`: Felder „Name“ (`autocapitalize="sentences"`), „Link“
+- [x] `ui/WishForm.svelte`: Felder „Name“ (`autocapitalize="sentences"`), „Link“
       (`type="url"`, `autocapitalize="off"`, `autocorrect="off"`), „Beschreibung“
       (`textarea`), „Preis in Euro“ (`inputmode="decimal"`), `ChoiceGroup` „Wie sehr
       gewünscht?“ mit unbedingt / gern / nett / keine Angabe (Vorauswahl keine Angabe).
@@ -642,21 +642,21 @@ Link-Knopf. Die Farbschema-Einstellung zieht auf `ChoiceGroup` um.
       Startwerte, `onsubmit(details)`, `cancelFallback` (Hash der Elternseite), Snippet für
       Zusatzinhalt am Ende (Löschknopf in Phase 3). `ActionBar` mit [💾 Speichern] und
       [✕ Abbrechen] (`goBack(cancelFallback)`).
-- [ ] `ui/CreateWishPage.svelte`: prüft per `Watched`, ob die Liste existiert (sonst
+- [x] `ui/CreateWishPage.svelte`: prüft per `Watched`, ob die Liste existiert (sonst
       `NotFound`), Elternseite ist die Liste.
       Erfolg → `replaceWith` zur Detailseite des neuen Wunsches.
-- [ ] `ui/WishSummary.svelte`: `★★★ unbedingt · 49,99 €`, Sterne `aria-hidden`, fehlende
+- [x] `ui/WishSummary.svelte`: `★★★ unbedingt · 49,99 €`, Sterne `aria-hidden`, fehlende
       Teile samt Trennpunkt weggelassen
-- [ ] `ui/WishlistPage.svelte`: Kopf-Knopf [+] „Wunsch erstellen“, Liste der Wünsche als
+- [x] `ui/WishlistPage.svelte`: Kopf-Knopf [+] „Wunsch erstellen“, Liste der Wünsche als
       `<ul>`, je Eintrag **ein** Link auf `#/wunsch/<id>` mit Name und `WishSummary`.
       Leerer Zustand mit [+ Wunsch erstellen]. In dieser Phase werden alle Wünsche
       angezeigt, der Filter folgt in Phase 4.
-- [ ] `ui/WishPage.svelte`: `Watched` über `WatchWish`, `PageHeader` mit dem Namen,
+- [x] `ui/WishPage.svelte`: `Watched` über `WatchWish`, `PageHeader` mit dem Namen,
       `WishSummary`, Link-Knopf `a.button` „Zum Angebot auf {siteName}“ mit Lucide
       `ExternalLink` (`target="_blank"`, `rel="noopener"`), Beschreibung mit
       `white-space: pre-line`. Die `ActionBar` kommt erst in Phase 3 mit [✏ Bearbeiten]
       dazu. Unbekannte ID → „Diesen Wunsch gibt es nicht mehr.“
-- [ ] `e2e/wishes.spec.ts`:
+- [x] `e2e/wishes.spec.ts`:
   - Wunsch mit allen Feldern anlegen (Preis `49,99`, Link `amazon.de/helm`, „unbedingt“)
     → Detailseite, h1 fokussiert, `★★★ unbedingt · 49,99 €` sichtbar, Link
     „Zum Angebot auf amazon.de“ hat `href="https://amazon.de/helm"` und
@@ -670,14 +670,14 @@ Link-Knopf. Die Farbschema-Einstellung zieht auf `ChoiceGroup` um.
   - `#/liste/<id>/wunsch/neu` direkt aufrufen (Seed), „Abbrechen“ → Listenseite, die App
     bleibt offen
   - `#/wunsch/gibtsnicht` → „Diesen Wunsch gibt es nicht mehr.“
-- [ ] `e2e/accessibility.spec.ts`: Listenseite mit Wünschen, Detailseite mit Link und
+- [x] `e2e/accessibility.spec.ts`: Listenseite mit Wünschen, Detailseite mit Link und
       Beschreibung, „Wunsch erstellen“ mit angezeigten Fehlern
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` grün inklusive aller neuen Domänen-, Use-Case-, Adapter- und
+- [x] `npm run test:unit` grün inklusive aller neuen Domänen-, Use-Case-, Adapter- und
       `wishTexts`-Tests
-- [ ] `npm run lint` grün
-- [ ] `npm test` grün inklusive `wishes.spec.ts` und `colorScheme.spec.ts`
+- [x] `npm run lint` grün
+- [x] `npm test` grün inklusive `wishes.spec.ts` und `colorScheme.spec.ts`
 
 **Manuelle Verifikation**:
 - [ ] iPhone: Beim Tippen in „Preis in Euro“ erscheint die Zifferntastatur mit Komma
@@ -831,6 +831,16 @@ Phase 1:
   weil `tooLong` für Name und Beschreibung verschiedene Sätze braucht.
 - Die Fakes nutzen die gemeinsame Hilfsklasse `application/fakes/ObservableMap.ts`, der
   Adaptertest `localStorage/testStorage.ts` (`MapStorage`, `storageEventFor`).
+
+Phase 2:
+- `WishLink` prüft mit `new URL` in `try`, nicht mit `URL.parse`, weil `URL.parse` erst ab
+  Safari 18 existiert.
+- `WishForm` nimmt Startwerte als `initialInput: WishDetailsInput` (Zeichenketten), damit
+  Phase 3 die Felder direkt vorbelegen kann.
+- Die Fehlertexte stehen als eine Tabelle je Feld in `wishTexts.ts`
+  (`LINK_PROBLEM_MESSAGES`, `DESCRIPTION_PROBLEM_MESSAGES`, `PRICE_PROBLEM_MESSAGES`).
+- `e2e/seed.ts` schreibt nur die übergebenen Schlüssel, damit ein Seed im
+  `beforeEach` einen spezielleren Seed im Test nicht blockiert.
 
 ## Verweise
 

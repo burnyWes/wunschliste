@@ -15,11 +15,16 @@ export type WishRecord = {
 
 export type SeedData = { wishlists?: WishlistRecord[]; wishes?: WishRecord[] };
 
-export async function seed(page: Page, { wishlists = [], wishes = [] }: SeedData): Promise<void> {
-  const entries: [string, string][] = [
-    ['wunschliste.wishlists', JSON.stringify(wishlists)],
-    ['wunschliste.wishes', JSON.stringify(wishes)],
-  ];
+const STORAGE_KEYS: Record<keyof SeedData, string> = {
+  wishlists: 'wunschliste.wishlists',
+  wishes: 'wunschliste.wishes',
+};
+
+export async function seed(page: Page, data: SeedData): Promise<void> {
+  const entries = Object.entries(data).map(([name, records]) => [
+    STORAGE_KEYS[name as keyof SeedData],
+    JSON.stringify(records),
+  ]);
   await page.addInitScript((initialEntries) => {
     for (const [key, value] of initialEntries) {
       if (localStorage.getItem(key) === null) {
