@@ -353,9 +353,9 @@ es nur noch auf den Hauptseiten.
 - [x] `npm run lint` und `npm run test:architecture` grün.
 
 **Manuelle Verifikation** (iPhone, Home-Bildschirm-App, VoiceOver):
-- [ ] „Wunschliste erstellen, Taste“, „Geburtstag, Taste“ und „Zurück zu Geburtstag,
+- [x] „Wunschliste erstellen, Taste“, „Geburtstag, Taste“ und „Zurück zu Geburtstag,
   Taste“ werden so angesagt, „Zum Angebot auf …“ weiterhin als Link.
-- [ ] Die Zurück-Wischgeste vom linken Rand bzw. VoiceOvers Zwei-Finger-Z verlässt die
+- [x] Die Zurück-Wischgeste vom linken Rand bzw. VoiceOvers Zwei-Finger-Z verlässt die
   App nicht und springt nicht auf eine frühere Seite.
 
 ### Phase 2: Fokus und Ansagen
