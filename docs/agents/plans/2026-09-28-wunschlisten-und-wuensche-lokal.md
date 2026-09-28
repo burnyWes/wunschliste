@@ -580,9 +580,9 @@ Die Listenseite zeigt vorerst nur den Kopf und „Noch keine offenen Wünsche.�
       `colorScheme.spec.ts` und aller axe-Kombinationen
 
 **Manuelle Verifikation**:
-- [ ] iPhone mit VoiceOver: Übersicht → „Wunschliste erstellen, Link“ → Formular → Name →
+- [x] iPhone mit VoiceOver: Übersicht → „Wunschliste erstellen, Link“ → Formular → Name →
       „Erstellen“ → VoiceOver liest „Geburtstag 2027, Überschrift“
-- [ ] iOS-Textgröße auf Maximum: Die Leiste mit [+ Erstellen] liegt am unteren Rand, wird
+- [x] iOS-Textgröße auf Maximum: Die Leiste mit [+ Erstellen] liegt am unteren Rand, wird
       nicht vom Home-Indikator verdeckt und verdeckt keinen Inhalt. Der Kopf [+] bricht
       sauber um.
 
