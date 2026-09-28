@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { seed, storedRecords, type SeedData, type WishRecord } from './seed';
+import { historyLength, seed, storedRecords, type SeedData, type WishRecord } from './seed';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
 const field = (page: Page, name: string) => page.getByRole('textbox', { name, exact: true });
@@ -30,15 +30,15 @@ test.beforeEach(async ({ page }) => {
 
 test('renames a wishlist and goes back to it', async ({ page }) => {
   await page.goto('./');
-  await page.getByRole('link', { name: 'Geburtstag' }).click();
-  await page.getByRole('link', { name: 'Wunschliste bearbeiten' }).click();
+  await page.getByRole('button', { name: 'Geburtstag' }).click();
+  await page.getByRole('button', { name: 'Wunschliste bearbeiten' }).click();
 
   await field(page, 'Name').fill('Zeltlager');
   await page.getByRole('button', { name: 'Speichern' }).click();
 
   await expect(pageHeading(page, 'Zeltlager')).toBeVisible();
 
-  await page.goBack();
+  await page.getByRole('button', { name: 'Zurück zu Wunschlisten' }).click();
 
   await expect(pageHeading(page, 'Wunschlisten')).toBeVisible();
   await expect(page.getByRole('main').getByRole('listitem')).toHaveText([
@@ -49,7 +49,7 @@ test('renames a wishlist and goes back to it', async ({ page }) => {
 
 test('returns to the fulfilled filter after saving', async ({ page }) => {
   await page.goto('./#/liste/birthday/erfuellt');
-  await page.getByRole('link', { name: 'Wunschliste bearbeiten' }).click();
+  await page.getByRole('button', { name: 'Wunschliste bearbeiten' }).click();
 
   await page.getByRole('button', { name: 'Speichern' }).click();
 
@@ -58,8 +58,9 @@ test('returns to the fulfilled filter after saving', async ({ page }) => {
 
 test('asks before deleting a wishlist with its wishes', async ({ page }) => {
   await page.goto('./');
-  await page.getByRole('link', { name: 'Geburtstag' }).click();
-  await page.getByRole('link', { name: 'Wunschliste bearbeiten' }).click();
+  const startLength = await historyLength(page);
+  await page.getByRole('button', { name: 'Geburtstag' }).click();
+  await page.getByRole('button', { name: 'Wunschliste bearbeiten' }).click();
   const deleteButton = page.getByRole('button', { name: 'Wunschliste löschen' });
 
   await deleteButton.focus();
@@ -90,16 +91,13 @@ test('asks before deleting a wishlist with its wishes', async ({ page }) => {
   await expect(page.getByRole('main').getByRole('listitem')).toHaveText(['Weihnachten']);
   const remainingWishes = await storedRecords<WishRecord>(page, 'wunschliste.wishes');
   expect(remainingWishes.map(({ id }) => id)).toEqual(['sledge']);
-
-  await page.goBack();
-
-  await expect(page.getByText('Diese Wunschliste gibt es nicht mehr.')).toBeVisible();
+  expect(await historyLength(page)).toBe(startLength);
 });
 
 test('removes price and rating from a wish', async ({ page }) => {
   await page.goto('./#/liste/birthday');
-  await page.getByRole('link', { name: /^Fahrradhelm/ }).click();
-  await page.getByRole('link', { name: 'Bearbeiten' }).click();
+  await page.getByRole('button', { name: /^Fahrradhelm/ }).click();
+  await page.getByRole('button', { name: 'Bearbeiten' }).click();
 
   await expect(field(page, 'Preis in Euro')).toHaveValue('49,99');
   await field(page, 'Preis in Euro').fill('');
@@ -114,8 +112,8 @@ test('removes price and rating from a wish', async ({ page }) => {
 
 test('deletes a wish', async ({ page }) => {
   await page.goto('./#/liste/birthday');
-  await page.getByRole('link', { name: /^Fahrradhelm/ }).click();
-  await page.getByRole('link', { name: 'Bearbeiten' }).click();
+  await page.getByRole('button', { name: /^Fahrradhelm/ }).click();
+  await page.getByRole('button', { name: 'Bearbeiten' }).click();
 
   await page.getByRole('button', { name: 'Wunsch löschen' }).click();
   await expect(dialog(page)).toContainText('„Fahrradhelm“ wird gelöscht.');

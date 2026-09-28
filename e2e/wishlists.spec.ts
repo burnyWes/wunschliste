@@ -1,11 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
-import { seed } from './seed';
+import { historyLength, storedRecords } from './seed';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
-const mainNavigation = (page: Page) => page.getByRole('navigation', { name: 'Hauptnavigation' });
 
 async function createWishlist(page: Page, name: string): Promise<void> {
-  await page.getByRole('link', { name: 'Wunschliste erstellen' }).first().click();
+  await page.getByRole('button', { name: 'Wunschliste erstellen' }).first().click();
   await page.getByRole('textbox', { name: 'Name' }).fill(name);
   await page.getByRole('button', { name: 'Erstellen' }).click();
   await expect(pageHeading(page, name)).toBeVisible();
@@ -15,7 +14,11 @@ test('opens the form from the empty overview with its heading focused', async ({
   await page.goto('./');
 
   await expect(page.getByText('Noch keine Wunschlisten.')).toBeVisible();
-  await page.getByRole('main').getByRole('link', { name: 'Wunschliste erstellen' }).last().click();
+  await page
+    .getByRole('main')
+    .getByRole('button', { name: 'Wunschliste erstellen' })
+    .last()
+    .click();
 
   await expect(page).toHaveURL(/#\/liste\/neu$/);
   await expect(pageHeading(page, 'Wunschliste erstellen')).toBeFocused();
@@ -34,23 +37,36 @@ test('points out a missing name at the focused field', async ({ page }) => {
 
 test('replaces the form with the new wishlist', async ({ page }) => {
   await page.goto('./');
+  const startLength = await historyLength(page);
 
   await createWishlist(page, 'Geburtstag 2027');
 
   await expect(pageHeading(page, 'Geburtstag 2027')).toBeFocused();
   await expect(page).toHaveTitle('Geburtstag 2027 – Wunschliste');
+  expect(await historyLength(page)).toBe(startLength);
 
-  await page.goBack();
+  await page.getByRole('button', { name: 'Zurück zu Wunschlisten' }).click();
 
   await expect(pageHeading(page, 'Wunschlisten')).toBeVisible();
+});
+
+test('goes back to the overview on cancel without creating anything', async ({ page }) => {
+  await page.goto('./#/liste/neu');
+  await page.getByRole('textbox', { name: 'Name' }).fill('Verworfen');
+
+  await page.getByRole('button', { name: 'Abbrechen' }).click();
+
+  await expect(page).toHaveURL(/#\/$/);
+  await expect(pageHeading(page, 'Wunschlisten')).toBeVisible();
+  expect(await storedRecords(page, 'wunschliste.wishlists')).toEqual([]);
 });
 
 test('lists wishlists alphabetically and keeps them after a restart', async ({ page }) => {
   await page.goto('./');
   await createWishlist(page, 'Weihnachten');
-  await page.goBack();
+  await page.getByRole('button', { name: 'Zurück zu Wunschlisten' }).click();
   await createWishlist(page, 'Geburtstag 2027');
-  await page.goBack();
+  await page.getByRole('button', { name: 'Zurück zu Wunschlisten' }).click();
 
   const wishlistLinks = page.getByRole('main').getByRole('listitem');
   await expect(wishlistLinks).toHaveText(['Geburtstag 2027', 'Weihnachten']);
@@ -60,25 +76,14 @@ test('lists wishlists alphabetically and keeps them after a restart', async ({ p
   await expect(wishlistLinks).toHaveText(['Geburtstag 2027', 'Weihnachten']);
 });
 
-test('explains an unknown wishlist and links to the overview', async ({ page }) => {
+test('explains an unknown wishlist and leads to the overview', async ({ page }) => {
   await page.goto('./#/liste/gibtsnicht');
 
   await expect(page.getByText('Diese Wunschliste gibt es nicht mehr.')).toBeVisible();
-  await page.getByRole('link', { name: 'Zur Übersicht' }).click();
+  await page.getByRole('button', { name: 'Zur Übersicht' }).click();
 
   await expect(page).toHaveURL(/#\/$/);
   await expect(pageHeading(page, 'Wunschlisten')).toBeVisible();
-});
-
-test('keeps the wishlists navigation marked on a wishlist page', async ({ page }) => {
-  await seed(page, { wishlists: [{ id: 'b', name: 'Geburtstag' }] });
-  await page.goto('./#/liste/b');
-
-  await expect(pageHeading(page, 'Geburtstag')).toBeVisible();
-  await expect(mainNavigation(page).getByRole('link', { name: 'Wunschlisten' })).toHaveAttribute(
-    'aria-current',
-    'true',
-  );
 });
 
 test('shows a wishlist created in another tab without reloading', async ({ page, context }) => {
@@ -88,5 +93,5 @@ test('shows a wishlist created in another tab without reloading', async ({ page,
 
   await createWishlist(otherTab, 'Ostern');
 
-  await expect(page.getByRole('main').getByRole('link', { name: 'Ostern' })).toBeVisible();
+  await expect(page.getByRole('main').getByRole('button', { name: 'Ostern' })).toBeVisible();
 });

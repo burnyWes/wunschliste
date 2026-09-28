@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ChevronRight, Pencil, Plus } from '@lucide/svelte';
-  import { replaceWith } from '../../../shared/ui/navigation';
+  import { navigateTo } from '../../../shared/ui/navigation';
   import PageHeader from '../../../shared/ui/PageHeader.svelte';
   import { Watched } from '../../../shared/ui/watched.svelte';
   import type { WishlistId } from '../../domain/ids';
@@ -9,6 +9,7 @@
   import { wishesMatching, type WishFilter } from '../../domain/wishOrder';
   import NotFound from './NotFound.svelte';
   import { hashOf } from './wishlistAddresses';
+  import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
   import WishSummary from './WishSummary.svelte';
 
@@ -27,12 +28,14 @@
   $effect(() => watchWishlist.execute(wishlistId, (reported) => wishlist.show(reported)));
   $effect(() => watchWishesOfWishlist.execute(wishlistId, (reported) => (wishes = reported)));
 
+  $effect(() => wishlistFilterMemory.remember(wishlistId, filter));
+
   const createWishHash = $derived(hashOf({ page: 'createWish', wishlistId }));
   const shownWishes = $derived(wishes && wishesMatching(wishes, filter));
   const emptyText = $derived(FILTERS.find(({ value }) => value === filter)?.emptyText);
 
   function show(chosenFilter: WishFilter): void {
-    replaceWith(hashOf({ page: 'wishlist', wishlistId, filter: chosenFilter }));
+    navigateTo(hashOf({ page: 'wishlist', wishlistId, filter: chosenFilter }));
   }
 </script>
 
@@ -43,16 +46,22 @@
       back={{ label: 'Wunschlisten', hash: hashOf({ page: 'wishlists' }) }}
     >
       {#snippet actions()}
-        <a
+        <button
+          type="button"
           class="button button--icon"
-          href={hashOf({ page: 'editWishlist', wishlistId })}
           aria-label="Wunschliste bearbeiten"
+          onclick={() => navigateTo(hashOf({ page: 'editWishlist', wishlistId }))}
         >
           <Pencil aria-hidden="true" size="1.5em" />
-        </a>
-        <a class="button button--icon" href={createWishHash} aria-label="Wunsch erstellen">
+        </button>
+        <button
+          type="button"
+          class="button button--icon"
+          aria-label="Wunsch erstellen"
+          onclick={() => navigateTo(createWishHash)}
+        >
           <Plus aria-hidden="true" size="1.5em" />
-        </a>
+        </button>
       {/snippet}
     </PageHeader>
 
@@ -74,22 +83,25 @@
       <p>{emptyText}</p>
       {#if filter === 'open'}
         <div class="button-row">
-          <a class="button" href={createWishHash}>
+          <button type="button" class="button" onclick={() => navigateTo(createWishHash)}>
             <Plus aria-hidden="true" size="1.25em" /> Wunsch erstellen
-          </a>
+          </button>
         </div>
       {/if}
     {:else if shownWishes}
-      <ul class="link-list">
+      <ul class="entry-list">
         {#each shownWishes as wish (wish.id)}
           <li>
-            <a href={hashOf({ page: 'wish', wishId: wish.id })}>
+            <button
+              type="button"
+              onclick={() => navigateTo(hashOf({ page: 'wish', wishId: wish.id }))}
+            >
               <span>
                 <span class="wish-name">{wish.details.name.value}</span>
                 <WishSummary details={wish.details} />
               </span>
               <ChevronRight aria-hidden="true" size="1.25em" />
-            </a>
+            </button>
           </li>
         {/each}
       </ul>

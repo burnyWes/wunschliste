@@ -119,6 +119,31 @@ const pages: CheckedPage[] = [
   },
 ];
 
+const offerLinkOnly: { name: string; path: string; heading: string; links: string[] }[] = [
+  { name: 'overview', path: './', heading: 'Wunschlisten', links: [] },
+  { name: 'wishlist', path: './#/liste/birthday', heading: 'Geburtstag 2027', links: [] },
+  {
+    name: 'wish',
+    path: './#/wunsch/helmet',
+    heading: 'Fahrradhelm',
+    links: ['Zum Angebot auf amazon.de'],
+  },
+];
+
+for (const { name, path, heading, links } of offerLinkOnly) {
+  test(`${name} page offers buttons instead of links inside the app`, async ({ page }) => {
+    await seed(page, wishlistWithWishes);
+    await page.goto(path);
+    await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
+
+    const linkNames = await page
+      .getByRole('link')
+      .evaluateAll((elements) => elements.map((element) => element.textContent?.trim()));
+
+    expect(linkNames).toEqual(links);
+  });
+}
+
 const colorSchemes = ['dark', 'light', 'inverted'];
 
 for (const colorScheme of colorSchemes) {

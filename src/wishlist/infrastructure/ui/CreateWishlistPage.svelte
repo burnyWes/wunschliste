@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Plus } from '@lucide/svelte';
-  import { replaceWith } from '../../../shared/ui/navigation';
+  import { Plus, X } from '@lucide/svelte';
+  import { navigateTo } from '../../../shared/ui/navigation';
   import type { Name } from '../../domain/Name';
   import { hashOf } from './wishlistAddresses';
   import { useWishlistModule } from './wishlistModuleContext';
@@ -10,7 +10,7 @@
 
   async function create(name: Name): Promise<void> {
     const wishlistId = await createWishlist.execute(name);
-    replaceWith(hashOf({ page: 'wishlist', wishlistId, filter: 'open' }));
+    navigateTo(hashOf({ page: 'wishlist', wishlistId, filter: 'open' }));
   }
 </script>
 
@@ -18,5 +18,8 @@
   {#snippet actions()}
     <button class="button" type="submit"><Plus aria-hidden="true" size="1.25em" /> Erstellen</button
     >
+    <button class="button" type="button" onclick={() => navigateTo(hashOf({ page: 'wishlists' }))}>
+      <X aria-hidden="true" size="1.25em" /> Abbrechen
+    </button>
   {/snippet}
 </WishlistNameForm>

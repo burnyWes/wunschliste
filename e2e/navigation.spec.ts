@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { historyLength, seed } from './seed';
 
 const mainNavigation = (page: Page) => page.getByRole('navigation', { name: 'Hauptnavigation' });
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
@@ -6,7 +7,7 @@ const pageHeading = (page: Page, name: string) => page.getByRole('heading', { le
 test('starts on the wishlists page without moving focus', async ({ page }) => {
   await page.goto('./');
 
-  await expect(mainNavigation(page).getByRole('link', { name: 'Wunschlisten' })).toHaveAttribute(
+  await expect(mainNavigation(page).getByRole('button', { name: 'Wunschlisten' })).toHaveAttribute(
     'aria-current',
     'page',
   );
@@ -17,20 +18,54 @@ test('starts on the wishlists page without moving focus', async ({ page }) => {
 
 test('moves focus to the heading of each newly shown page', async ({ page }) => {
   await page.goto('./');
+  const startLength = await historyLength(page);
 
-  await mainNavigation(page).getByRole('link', { name: 'Einstellungen' }).click();
+  await mainNavigation(page).getByRole('button', { name: 'Einstellungen' }).click();
 
   await expect(page).toHaveURL(/#\/einstellungen$/);
   await expect(pageHeading(page, 'Einstellungen')).toBeFocused();
-  await expect(mainNavigation(page).getByRole('link', { name: 'Einstellungen' })).toHaveAttribute(
+  await expect(mainNavigation(page).getByRole('button', { name: 'Einstellungen' })).toHaveAttribute(
     'aria-current',
     'page',
   );
+  await expect(
+    mainNavigation(page).getByRole('button', { name: 'Wunschlisten' }),
+  ).not.toHaveAttribute('aria-current');
   await expect(page).toHaveTitle('Einstellungen – Wunschliste');
 
-  await page.goBack();
+  await mainNavigation(page).getByRole('button', { name: 'Wunschlisten' }).click();
 
   await expect(pageHeading(page, 'Wunschlisten')).toBeFocused();
+  expect(await historyLength(page)).toBe(startLength);
+});
+
+for (const path of ['./', './#/einstellungen']) {
+  test(`shows the main navigation on the main page ${path}`, async ({ page }) => {
+    await page.goto(path);
+
+    await expect(mainNavigation(page)).toBeVisible();
+  });
+}
+
+for (const path of ['./#/liste/birthday', './#/liste/neu']) {
+  test(`hides the main navigation on the sub page ${path}`, async ({ page }) => {
+    await seed(page, { wishlists: [{ id: 'birthday', name: 'Geburtstag' }] });
+    await page.goto(path);
+
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(mainNavigation(page)).toHaveCount(0);
+  });
+}
+
+test('gives both navigation buttons the same width', async ({ page }) => {
+  await page.goto('./');
+
+  const widths = await mainNavigation(page)
+    .getByRole('button')
+    .evaluateAll((buttons) => buttons.map((button) => button.getBoundingClientRect().width));
+
+  expect(widths).toHaveLength(2);
+  expect(Math.abs(widths[0] - widths[1])).toBeLessThan(1);
 });
 
 test('redirects unknown addresses to the wishlists page', async ({ page }) => {

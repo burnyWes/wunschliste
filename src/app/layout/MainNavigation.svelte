@@ -1,43 +1,41 @@
 <script lang="ts">
   import { Settings } from '@lucide/svelte';
-  import { navigationTargetOf, type NavigationTarget, type Route } from '../router/routes';
+  import { navigateTo } from '../../shared/ui/navigation';
+  import { hashFor, type MainPage } from '../router/routes';
 
-  let { route }: { route: Route } = $props();
-
-  function currentMarkerOf(target: NavigationTarget): 'page' | 'true' | undefined {
-    if (route.page === target) {
-      return 'page';
-    }
-    return navigationTargetOf(route) === target ? 'true' : undefined;
-  }
-
-  const wishlistsMarker = $derived(currentMarkerOf('wishlists'));
-  const settingsMarker = $derived(currentMarkerOf('settings'));
+  let { active }: { active: MainPage } = $props();
 </script>
 
 <nav aria-label="Hauptnavigation">
-  <a
-    href="#/"
+  <button
+    type="button"
     class="button"
-    class:button--quiet={wishlistsMarker === undefined}
-    aria-current={wishlistsMarker}>Wunschlisten</a
+    class:button--quiet={active !== 'wishlists'}
+    aria-current={active === 'wishlists' ? 'page' : undefined}
+    onclick={() => navigateTo(hashFor({ page: 'wishlists' }))}
   >
-  <a
-    href="#/einstellungen"
+    Wunschlisten
+  </button>
+  <button
+    type="button"
     class="button"
-    class:button--quiet={settingsMarker === undefined}
-    aria-current={settingsMarker}
+    class:button--quiet={active !== 'settings'}
+    aria-current={active === 'settings' ? 'page' : undefined}
+    onclick={() => navigateTo(hashFor({ page: 'settings' }))}
   >
     <Settings aria-hidden="true" size="1.25em" /> Einstellungen
-  </a>
+  </button>
 </nav>
 
 <style>
   nav {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
+  }
+
+  nav > .button {
+    flex: 1 1 0;
   }
 </style>

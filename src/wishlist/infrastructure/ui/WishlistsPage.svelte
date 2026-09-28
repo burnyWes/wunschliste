@@ -1,8 +1,10 @@
 <script lang="ts">
   import { ChevronRight, Plus } from '@lucide/svelte';
+  import { navigateTo } from '../../../shared/ui/navigation';
   import PageHeader from '../../../shared/ui/PageHeader.svelte';
   import type { Wishlist } from '../../domain/Wishlist';
   import { hashOf } from './wishlistAddresses';
+  import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
 
   const { watchWishlists } = useWishlistModule();
@@ -17,27 +19,35 @@
 <div class="page">
   <PageHeader heading="Wunschlisten">
     {#snippet actions()}
-      <a class="button button--icon" href={createWishlistHash} aria-label="Wunschliste erstellen">
+      <button
+        type="button"
+        class="button button--icon"
+        aria-label="Wunschliste erstellen"
+        onclick={() => navigateTo(createWishlistHash)}
+      >
         <Plus aria-hidden="true" size="1.5em" />
-      </a>
+      </button>
     {/snippet}
   </PageHeader>
 
   {#if wishlists?.length === 0}
     <p>Noch keine Wunschlisten.</p>
     <div class="button-row">
-      <a class="button" href={createWishlistHash}>
+      <button type="button" class="button" onclick={() => navigateTo(createWishlistHash)}>
         <Plus aria-hidden="true" size="1.25em" /> Wunschliste erstellen
-      </a>
+      </button>
     </div>
   {:else if wishlists}
-    <ul class="link-list">
+    <ul class="entry-list">
       {#each wishlists as wishlist (wishlist.id)}
         <li>
-          <a href={hashOf({ page: 'wishlist', wishlistId: wishlist.id, filter: 'open' })}>
+          <button
+            type="button"
+            onclick={() => navigateTo(wishlistFilterMemory.hashOf(wishlist.id))}
+          >
             <span>{wishlist.name.value}</span>
             <ChevronRight aria-hidden="true" size="1.25em" />
-          </a>
+          </button>
         </li>
       {/each}
     </ul>

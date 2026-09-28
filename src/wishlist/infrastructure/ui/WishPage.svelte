@@ -1,6 +1,7 @@
 <script lang="ts">
   import { ExternalLink, Gift, Pencil, Undo2 } from '@lucide/svelte';
   import ActionBar from '../../../shared/ui/ActionBar.svelte';
+  import { navigateTo } from '../../../shared/ui/navigation';
   import PageHeader from '../../../shared/ui/PageHeader.svelte';
   import { Watched } from '../../../shared/ui/watched.svelte';
   import type { WishId } from '../../domain/ids';
@@ -8,6 +9,7 @@
   import type { Wishlist } from '../../domain/Wishlist';
   import NotFound from './NotFound.svelte';
   import { hashOf } from './wishlistAddresses';
+  import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
   import WishSummary from './WishSummary.svelte';
 
@@ -43,7 +45,7 @@
   const backToWishlist = $derived(
     wishlist.value && {
       label: wishlist.value.name.value,
-      hash: hashOf({ page: 'wishlist', wishlistId: wishlist.value.id, filter: 'open' }),
+      hash: wishlistFilterMemory.hashOf(wishlist.value.id),
     },
   );
 </script>
@@ -68,9 +70,13 @@
     {/if}
     <p class="status" role="status">{statusMessage}</p>
     <ActionBar>
-      <a class="button" href={hashOf({ page: 'editWish', wishId })}>
+      <button
+        type="button"
+        class="button"
+        onclick={() => navigateTo(hashOf({ page: 'editWish', wishId }))}
+      >
         <Pencil aria-hidden="true" size="1.25em" /> Bearbeiten
-      </a>
+      </button>
       <button class="button" type="button" onclick={() => wish.value && toggleGift(wish.value)}>
         {#if wish.value.gifted}
           <Undo2 aria-hidden="true" size="1.25em" /> Schenken zurücknehmen

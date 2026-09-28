@@ -3,7 +3,7 @@
   import { tick, untrack, type Snippet } from 'svelte';
   import ActionBar from '../../../shared/ui/ActionBar.svelte';
   import ChoiceGroup from '../../../shared/ui/ChoiceGroup.svelte';
-  import { goBack } from '../../../shared/ui/navigation';
+  import { navigateTo } from '../../../shared/ui/navigation';
   import PageHeader from '../../../shared/ui/PageHeader.svelte';
   import TextField from '../../../shared/ui/TextField.svelte';
   import { RATINGS, type Rating } from '../../domain/Rating';
@@ -26,13 +26,13 @@
   let {
     heading,
     initialInput,
-    cancelFallback,
+    cancelTarget,
     onsubmit,
     extra,
   }: {
     heading: string;
     initialInput?: WishDetailsInput;
-    cancelFallback: string;
+    cancelTarget: string;
     onsubmit: (details: WishDetails) => Promise<void>;
     extra?: Snippet;
   } = $props();
@@ -142,7 +142,7 @@
   <ActionBar>
     <button class="button" type="submit"><Save aria-hidden="true" size="1.25em" /> Speichern</button
     >
-    <button class="button" type="button" onclick={() => goBack(cancelFallback)}>
+    <button class="button" type="button" onclick={() => navigateTo(cancelTarget)}>
       <X aria-hidden="true" size="1.25em" /> Abbrechen
     </button>
   </ActionBar>

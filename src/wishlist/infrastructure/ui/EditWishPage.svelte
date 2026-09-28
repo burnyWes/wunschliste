@@ -1,13 +1,14 @@
 <script lang="ts">
   import { Trash2 } from '@lucide/svelte';
   import ConfirmDialog from '../../../shared/ui/ConfirmDialog.svelte';
-  import { goBack, replaceWith } from '../../../shared/ui/navigation';
+  import { navigateTo } from '../../../shared/ui/navigation';
   import { Watched } from '../../../shared/ui/watched.svelte';
   import type { WishId } from '../../domain/ids';
   import type { Wish } from '../../domain/Wish';
   import type { WishDetails } from '../../domain/WishDetails';
   import NotFound from './NotFound.svelte';
   import { hashOf } from './wishlistAddresses';
+  import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
   import WishForm from './WishForm.svelte';
   import { wishDeletionMessage, wishDetailsInputOf } from './wishTexts';
@@ -26,26 +27,22 @@
 
   async function save(details: WishDetails): Promise<void> {
     await editWish.execute(wishId, details);
-    goBack(wishHash);
+    navigateTo(wishHash);
   }
 
   async function deleteConfirmed(wishlistHash: string): Promise<void> {
     isDeleting = true;
     await deleteWish.execute(wishId);
-    replaceWith(wishlistHash);
+    navigateTo(wishlistHash);
   }
 </script>
 
 {#if wish.value}
-  {@const wishlistHash = hashOf({
-    page: 'wishlist',
-    wishlistId: wish.value.wishlistId,
-    filter: 'open',
-  })}
+  {@const wishlistHash = wishlistFilterMemory.hashOf(wish.value.wishlistId)}
   <WishForm
     heading="Wunsch bearbeiten"
     initialInput={wishDetailsInputOf(wish.value.details)}
-    cancelFallback={wishHash}
+    cancelTarget={wishHash}
     onsubmit={save}
   >
     {#snippet extra()}

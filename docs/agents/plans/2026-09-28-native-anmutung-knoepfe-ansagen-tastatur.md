@@ -262,10 +262,10 @@ History-Einträge. Zurück kennt den Filter der Wunschliste, und die Hauptnaviga
 es nur noch auf den Hauptseiten.
 
 **Aufgaben**:
-- [ ] `src/wishlist/infrastructure/ui/wishlistFilterMemory.test.ts` zuerst schreiben:
+- [x] `src/wishlist/infrastructure/ui/wishlistFilterMemory.test.ts` zuerst schreiben:
   Ohne Eintrag liefert `hashOf` `#/liste/<id>`. Nach `remember(id, 'fulfilled')` liefert
   es `#/liste/<id>/erfuellt`. Zwei Wunschlisten stören sich nicht gegenseitig.
-- [ ] `wishlistFilterMemory.ts` umsetzen:
+- [x] `wishlistFilterMemory.ts` umsetzen:
   ```ts
   export class WishlistFilterMemory {
     readonly #filters = new Map<WishlistId, WishFilter>();
@@ -276,7 +276,7 @@ es nur noch auf den Hauptseiten.
   }
   export const wishlistFilterMemory = new WishlistFilterMemory();
   ```
-- [ ] `src/shared/ui/navigation.ts`: nur noch
+- [x] `src/shared/ui/navigation.ts`: nur noch
   ```ts
   export function navigateTo(hash: string): void {
     if (location.hash !== hash) {
@@ -285,72 +285,72 @@ es nur noch auf den Hauptseiten.
   }
   ```
   `navigation.test.ts` löschen.
-- [ ] `src/app/router/currentRoute.svelte.ts`: Marker-Aufrufe im Konstruktor und in
+- [x] `src/app/router/currentRoute.svelte.ts`: Marker-Aufrufe im Konstruktor und in
   `followHashChanges` entfernen. `#showCanonicalHash` bleibt.
-- [ ] `src/app/router/routes.ts`: `navigationTargetOf` ersetzen durch
+- [x] `src/app/router/routes.ts`: `navigationTargetOf` ersetzen durch
   `mainPageOf(route): MainPage | undefined` (`'wishlists' | 'settings'`), das nur für die
   Seiten `wishlists` und `settings` einen Wert liefert. Den Test in `routes.test.ts`
   anpassen: `createWishlist` und `wishlist` ergeben `undefined`.
-- [ ] `src/app/App.svelte`: `MainNavigation` nur rendern, wenn `mainPageOf(route)`
+- [x] `src/app/App.svelte`: `MainNavigation` nur rendern, wenn `mainPageOf(route)`
   definiert ist, und den aktiven Wert als Prop übergeben. `.status-bar-backdrop` bleibt
   immer im `<header>`.
-- [ ] `src/app/layout/MainNavigation.svelte`: zwei `<button type="button" class="button">`
+- [x] `src/app/layout/MainNavigation.svelte`: zwei `<button type="button" class="button">`
   mit `onclick={() => navigateTo(…)}` und `aria-current={active ? 'page' : undefined}`.
   Inaktive Knöpfe bekommen `button--quiet`. Im Layout `nav { display: flex; gap: 0.5rem }`
   und `nav > .button { flex: 1 1 0 }`, das ergibt gleich breite Knöpfe, die bei Dynamic
   Type umbrechen dürfen (`flex-wrap: wrap`).
-- [ ] `src/shared/ui/PageHeader.svelte`: Zurück wird
+- [x] `src/shared/ui/PageHeader.svelte`: Zurück wird
   `<button type="button" class="back-button" aria-label="Zurück zu {label}" onclick={() => navigateTo(back.hash)}>`.
   Das Button-Styling wird zurückgesetzt (kein Rahmen, kein Hintergrund,
   `color: inherit`, `font: inherit`, `padding: 0`). Die bisherige Optik mit Chevron,
   `font-weight: 600` und `min-height: 2.75rem` bleibt.
-- [ ] `src/shared/ui/linkList.css` → `entryList.css` mit der Klasse `.entry-list`. Die
+- [x] `src/shared/ui/linkList.css` → `entryList.css` mit der Klasse `.entry-list`. Die
   Regeln gelten für `button`: volle Breite, `text-align: start`, kein Rahmen, kein
   Hintergrund, `color: inherit`, `font: inherit`. Import in `src/main.ts` anpassen.
-- [ ] `WishlistsPage.svelte`: [+] und der Knopf im Leerzustand werden
+- [x] `WishlistsPage.svelte`: [+] und der Knopf im Leerzustand werden
   `<button type="button" class="button …" onclick={() => navigateTo(createWishlistHash)}>`,
   Listeneinträge werden `<button type="button">` in `.entry-list`.
-- [ ] `WishlistPage.svelte`: Bearbeiten, [+], den Knopf im Leerzustand und die
+- [x] `WishlistPage.svelte`: Bearbeiten, [+], den Knopf im Leerzustand und die
   Listeneinträge wie oben umstellen. `$effect(() => wishlistFilterMemory.remember(wishlistId, filter))`
   ergänzen. `show()` nutzt `navigateTo`.
-- [ ] `WishPage.svelte`: Bearbeiten wird `<button>`, „Zum Angebot“ bleibt `<a>`. Als
+- [x] `WishPage.svelte`: Bearbeiten wird `<button>`, „Zum Angebot“ bleibt `<a>`. Als
   Zurück-Ziel dient `wishlistFilterMemory.hashOf(wishlist.value.id)`.
-- [ ] `CreateWishlistPage.svelte`: `navigateTo` statt `replaceWith` und neuer Knopf
+- [x] `CreateWishlistPage.svelte`: `navigateTo` statt `replaceWith` und neuer Knopf
   „Abbrechen“ (X-Icon) → `navigateTo(hashOf({ page: 'wishlists' }))`.
-- [ ] `EditWishlistPage.svelte`: Speichern und Abbrechen führen per `navigateTo` zu
+- [x] `EditWishlistPage.svelte`: Speichern und Abbrechen führen per `navigateTo` zu
   `wishlistFilterMemory.hashOf(wishlistId)`, Löschen führt zu `#/`.
-- [ ] `WishForm.svelte`: `cancelFallback` → `cancelTarget`, Abbrechen ruft
+- [x] `WishForm.svelte`: `cancelFallback` → `cancelTarget`, Abbrechen ruft
   `navigateTo(cancelTarget)`.
-- [ ] `CreateWishPage.svelte`: `cancelTarget = wishlistFilterMemory.hashOf(wishlistId)`,
+- [x] `CreateWishPage.svelte`: `cancelTarget = wishlistFilterMemory.hashOf(wishlistId)`,
   nach dem Erstellen `navigateTo(hashOf({ page: 'wish', wishId }))`.
-- [ ] `EditWishPage.svelte`: Speichern führt per `navigateTo` zu `wishHash`, Löschen zu
+- [x] `EditWishPage.svelte`: Speichern führt per `navigateTo` zu `wishHash`, Löschen zu
   `wishlistFilterMemory.hashOf(wish.value.wishlistId)`.
-- [ ] `NotFound.svelte`: „Zur Übersicht“ wird `<button type="button" class="button">`.
-- [ ] E2E-Tests anpassen: In-App-`getByRole('link')` wird `getByRole('button')`. Das
+- [x] `NotFound.svelte`: „Zur Übersicht“ wird `<button type="button" class="button">`.
+- [x] E2E-Tests anpassen: In-App-`getByRole('link')` wird `getByRole('button')`. Das
   betrifft `backLinks`, `editing`, `gifting`, `navigation`, `wishes`, `wishlists`,
   `accessibility`. In `colorScheme.spec.ts` werden `nav a[…]` zu `nav button[…]`,
   in `gifting.spec.ts:84` die Prüfung auf den Angebotslink bleibt `link`.
-- [ ] Tests, die `page.goBack()` als Verlaufs-Verhalten prüfen, auf das neue Modell
+- [x] Tests, die `page.goBack()` als Verlaufs-Verhalten prüfen, auf das neue Modell
   umschreiben (`backLinks.spec.ts:16-28`, `editing.spec.ts:41,94`, `gifting.spec.ts:47,62`,
   `navigation.spec.ts:31`, `wishes.spec.ts:35`, `wishlists.spec.ts:43-53`): Statt
   `goBack` wird `history.length` vor und nach den Wechseln verglichen, und er bleibt
   gleich. Die Fokusprüfungen nach „Zurück“ bleiben.
-- [ ] Neuer E2E-Test in `backLinks.spec.ts`: „keeps the filter of the wishlist“ geht
+- [x] Neuer E2E-Test in `backLinks.spec.ts`: „keeps the filter of the wishlist“ geht
   über den Filterknopf „Erfüllte Wünsche“ → Zelt → „Zurück zu Geburtstag“ und landet auf
   `#/liste/birthday/erfuellt`. Außerdem: Der Direkteinstieg `#/wunsch/tent` führt mit
   „Zurück“ zu `#/liste/birthday` (Offen).
-- [ ] Neuer E2E-Test in `navigation.spec.ts`: Die Hauptnavigation ist auf `#/` und
+- [x] Neuer E2E-Test in `navigation.spec.ts`: Die Hauptnavigation ist auf `#/` und
   `#/einstellungen` sichtbar, auf `#/liste/birthday` und `#/liste/neu` nicht.
   Außerdem sind beide Knöpfe gleich breit (Breiten-Differenz unter 1 px).
-- [ ] Neuer E2E-Test in `wishlists.spec.ts`: „Abbrechen“ auf „Wunschliste erstellen“
+- [x] Neuer E2E-Test in `wishlists.spec.ts`: „Abbrechen“ auf „Wunschliste erstellen“
   führt zu „Wunschlisten“, und es wird nichts angelegt.
-- [ ] Neuer E2E-Test in `accessibility.spec.ts`: Auf den Seiten Übersicht, Liste und
+- [x] Neuer E2E-Test in `accessibility.spec.ts`: Auf den Seiten Übersicht, Liste und
   Wunsch gibt es im `main` bzw. in der `navigation` keinen `link` außer „Zum Angebot“.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit`: `wishlistFilterMemory.test.ts` und `routes.test.ts` grün.
-- [ ] `npm run test:e2e`: alle Specs grün, einschließlich der neuen Tests.
-- [ ] `npm run lint` und `npm run test:architecture` grün.
+- [x] `npm run test:unit`: `wishlistFilterMemory.test.ts` und `routes.test.ts` grün.
+- [x] `npm run test:e2e`: alle Specs grün, einschließlich der neuen Tests.
+- [x] `npm run lint` und `npm run test:architecture` grün.
 
 **Manuelle Verifikation** (iPhone, Home-Bildschirm-App, VoiceOver):
 - [ ] „Wunschliste erstellen, Taste“, „Geburtstag, Taste“ und „Zurück zu Geburtstag,
@@ -485,6 +485,13 @@ Knöpfe reagieren wie native Knöpfe, und die untere Leiste weicht der Bildschir
 ## Notizen zur Umsetzung
 
 Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalten.
+
+- Phase 1: „Zur Übersicht“ auf „Nicht gefunden“ steht als Knopf in einer `.button-row`,
+  weil ein `.button` im Fließtext-`<p>` fremd wirkt.
+- Phase 1: `gifting.spec.ts` („shows the empty fulfilled wishes without a create button“)
+  prüft jetzt, dass in der `.button-row` kein Knopf „Wunsch erstellen“ steht. Die alte
+  Prüfung auf `link` wäre nach dem Umbau immer grün gewesen.
+- Phase 1: `history.length` wird über den Helfer `historyLength` in `e2e/seed.ts` gelesen.
 
 ## Verweise
 

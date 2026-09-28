@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { wishlistIdOf } from '../../wishlist/domain/ids';
-import { hashFor, navigationTargetOf, pageKeyOf, resolveRoute, type Route } from './routes';
+import { hashFor, mainPageOf, pageKeyOf, resolveRoute, type MainPage, type Route } from './routes';
 
 const birthday = wishlistIdOf('birthday');
 const christmas = wishlistIdOf('christmas');
@@ -45,13 +45,13 @@ describe('pageKeyOf', () => {
   });
 });
 
-describe('navigationTargetOf', () => {
-  it.each<[Route, string]>([
+describe('mainPageOf', () => {
+  it.each<[Route, MainPage | undefined]>([
     [{ page: 'wishlists' }, 'wishlists'],
-    [{ page: 'createWishlist' }, 'wishlists'],
-    [{ page: 'wishlist', wishlistId: birthday, filter: 'open' }, 'wishlists'],
     [{ page: 'settings' }, 'settings'],
-  ])('leads %j to %s', (route, target) => {
-    expect(navigationTargetOf(route)).toBe(target);
+    [{ page: 'createWishlist' }, undefined],
+    [{ page: 'wishlist', wishlistId: birthday, filter: 'open' }, undefined],
+  ])('gives %j the main page %s', (route, mainPage) => {
+    expect(mainPageOf(route)).toBe(mainPage);
   });
 });

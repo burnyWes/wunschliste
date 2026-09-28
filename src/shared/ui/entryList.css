@@ -1,24 +1,32 @@
-.link-list {
+.entry-list {
   margin: 0;
   padding: 0;
   list-style: none;
   border-top: 0.0625rem solid var(--color-outline);
 }
 
-.link-list > li {
+.entry-list > li {
   border-bottom: 0.0625rem solid var(--color-outline);
 }
 
-.link-list a {
+.entry-list button {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  box-sizing: border-box;
+  width: 100%;
   min-height: 2.75rem;
+  margin: 0;
   padding: 0.75rem 0;
-  text-decoration: none;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
 }
 
-.link-list a > svg {
+.entry-list button > svg {
   flex: none;
 }

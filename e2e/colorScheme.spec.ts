@@ -49,8 +49,8 @@ test('applies the stored scheme before the application starts', async ({ page })
 });
 
 test('fills only the button of the current page', async ({ page }) => {
-  expect(await backgroundOf(page, 'nav a[aria-current="page"]')).toBe(ROYAL_BLUE);
-  expect(await backgroundOf(page, 'nav a:not([aria-current])')).toBe(BLACK);
+  expect(await backgroundOf(page, 'nav button[aria-current="page"]')).toBe(ROYAL_BLUE);
+  expect(await backgroundOf(page, 'nav button:not([aria-current])')).toBe(BLACK);
 });
 
 test('fills the current page button with the inverse of royal blue in the inverted scheme', async ({
@@ -58,8 +58,8 @@ test('fills the current page button with the inverse of royal blue in the invert
 }) => {
   await tapSchemeRow(page, 'Invertiert');
 
-  expect(await backgroundOf(page, 'nav a[aria-current="page"]')).toBe(INVERTED_ROYAL_BLUE);
-  expect(await backgroundOf(page, 'nav a:not([aria-current])')).toBe(WHITE);
+  expect(await backgroundOf(page, 'nav button[aria-current="page"]')).toBe(INVERTED_ROYAL_BLUE);
+  expect(await backgroundOf(page, 'nav button:not([aria-current])')).toBe(WHITE);
 });
 
 for (const label of ['Hell', 'Invertiert']) {

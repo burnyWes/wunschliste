@@ -16,7 +16,7 @@ test.beforeEach(async ({ page }) => {
 
 test('creates a wish with every field and shows its details', async ({ page }) => {
   await page.goto('./#/liste/birthday');
-  await page.getByRole('link', { name: 'Wunsch erstellen' }).first().click();
+  await page.getByRole('button', { name: 'Wunsch erstellen' }).first().click();
 
   await field(page, 'Name').fill('Fahrradhelm');
   await field(page, 'Link').fill('amazon.de/helm');
@@ -32,7 +32,7 @@ test('creates a wish with every field and shows its details', async ({ page }) =
   await expect(offer).toHaveAttribute('href', 'https://amazon.de/helm');
   await expect(offer).toHaveAttribute('target', '_blank');
 
-  await page.goBack();
+  await page.getByRole('button', { name: 'Zurück zu Geburtstag' }).click();
 
   await expect(pageHeading(page, 'Geburtstag')).toBeVisible();
 });
@@ -89,7 +89,7 @@ test.describe('with wishes of different ratings', () => {
   test('names each entry without the stars', async ({ page }) => {
     await page.goto('./#/liste/birthday');
 
-    await expect(page.getByRole('link', { name: /^Fahrradhelm/ })).toHaveAccessibleName(
+    await expect(page.getByRole('button', { name: /^Fahrradhelm/ })).toHaveAccessibleName(
       /^Fahrradhelm unbedingt 49,99\s€$/,
     );
   });
@@ -97,7 +97,7 @@ test.describe('with wishes of different ratings', () => {
 
 test('goes back to the wishlist on cancel without creating anything', async ({ page }) => {
   await page.goto('./#/liste/birthday');
-  await page.getByRole('link', { name: 'Wunsch erstellen' }).first().click();
+  await page.getByRole('button', { name: 'Wunsch erstellen' }).first().click();
   await field(page, 'Name').fill('Verworfen');
 
   await page.getByRole('button', { name: 'Abbrechen' }).click();

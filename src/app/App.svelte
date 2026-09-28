@@ -4,7 +4,7 @@
   import { provideWishlistModule } from '../wishlist/infrastructure/ui/wishlistModuleContext';
   import MainNavigation from './layout/MainNavigation.svelte';
   import { CurrentRoute } from './router/currentRoute.svelte';
-  import { pageKeyOf } from './router/routes';
+  import { mainPageOf, pageKeyOf } from './router/routes';
   import SettingsPage from './settings/SettingsPage.svelte';
 
   provideWishlistModule(
@@ -18,11 +18,15 @@
   const currentRoute = new CurrentRoute();
 
   $effect(() => currentRoute.followHashChanges());
+
+  const mainPage = $derived(mainPageOf(currentRoute.route));
 </script>
 
 <header>
   <div class="status-bar-backdrop"></div>
-  <MainNavigation route={currentRoute.route} />
+  {#if mainPage}
+    <MainNavigation active={mainPage} />
+  {/if}
 </header>
 
 <main>

@@ -6,7 +6,7 @@ import {
 
 export type Route = WishlistAddress | { page: 'settings' };
 
-export type NavigationTarget = 'wishlists' | 'settings';
+export type MainPage = 'wishlists' | 'settings';
 
 const SETTINGS_HASH = '#/einstellungen';
 
@@ -27,6 +27,6 @@ export function pageKeyOf(route: Route): string {
   return route.page === 'wishlist' ? hashFor({ ...route, filter: 'open' }) : hashFor(route);
 }
 
-export function navigationTargetOf(route: Route): NavigationTarget {
-  return route.page === 'settings' ? 'settings' : 'wishlists';
+export function mainPageOf(route: Route): MainPage | undefined {
+  return route.page === 'wishlists' || route.page === 'settings' ? route.page : undefined;
 }

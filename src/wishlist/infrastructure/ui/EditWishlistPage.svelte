@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Save, Trash2, X } from '@lucide/svelte';
   import ConfirmDialog from '../../../shared/ui/ConfirmDialog.svelte';
-  import { goBack, replaceWith } from '../../../shared/ui/navigation';
+  import { navigateTo } from '../../../shared/ui/navigation';
   import { Watched } from '../../../shared/ui/watched.svelte';
   import type { WishlistId } from '../../domain/ids';
   import type { Name } from '../../domain/Name';
@@ -9,6 +9,7 @@
   import type { Wishlist } from '../../domain/Wishlist';
   import NotFound from './NotFound.svelte';
   import { hashOf } from './wishlistAddresses';
+  import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
   import WishlistNameForm from './WishlistNameForm.svelte';
   import { wishlistDeletionMessage } from './wishTexts';
@@ -26,17 +27,17 @@
   $effect(() => watchWishlist.execute(wishlistId, (reported) => wishlist.show(reported)));
   $effect(() => watchWishesOfWishlist.execute(wishlistId, (reported) => (wishes = reported)));
 
-  const wishlistHash = $derived(hashOf({ page: 'wishlist', wishlistId, filter: 'open' }));
+  const wishlistHash = $derived(wishlistFilterMemory.hashOf(wishlistId));
 
   async function save(name: Name): Promise<void> {
     await renameWishlist.execute(wishlistId, name);
-    goBack(wishlistHash);
+    navigateTo(wishlistHash);
   }
 
   async function deleteConfirmed(): Promise<void> {
     isDeleting = true;
     await deleteWishlist.execute(wishlistId);
-    replaceWith(hashOf({ page: 'wishlists' }));
+    navigateTo(hashOf({ page: 'wishlists' }));
   }
 </script>
 
@@ -68,7 +69,7 @@
       <button class="button" type="submit"
         ><Save aria-hidden="true" size="1.25em" /> Speichern</button
       >
-      <button class="button" type="button" onclick={() => goBack(wishlistHash)}>
+      <button class="button" type="button" onclick={() => navigateTo(wishlistHash)}>
         <X aria-hidden="true" size="1.25em" /> Abbrechen
       </button>
     {/snippet}

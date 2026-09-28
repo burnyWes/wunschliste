@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { navigateTo } from '../../../shared/ui/navigation';
   import PageHeader from '../../../shared/ui/PageHeader.svelte';
   import { hashOf } from './wishlistAddresses';
 
@@ -8,5 +9,9 @@
 <div class="page">
   <PageHeader heading="Nicht gefunden" />
   <p>{message}</p>
-  <p><a href={hashOf({ page: 'wishlists' })}>Zur Übersicht</a></p>
+  <div class="button-row">
+    <button type="button" class="button" onclick={() => navigateTo(hashOf({ page: 'wishlists' }))}>
+      Zur Übersicht
+    </button>
+  </div>
 </div>

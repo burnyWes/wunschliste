@@ -34,6 +34,10 @@ export async function seed(page: Page, data: SeedData): Promise<void> {
   }, entries);
 }
 
+export async function historyLength(page: Page): Promise<number> {
+  return page.evaluate(() => history.length);
+}
+
 export async function storedRecords<T>(page: Page, key: string): Promise<T[]> {
   return page.evaluate((storageKey) => JSON.parse(localStorage.getItem(storageKey) ?? '[]'), key);
 }

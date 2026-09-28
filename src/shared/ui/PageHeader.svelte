@@ -1,13 +1,13 @@
 <script lang="ts">
   import { ChevronLeft } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
-  import { goBack } from './navigation';
+  import { navigateTo } from './navigation';
   import { takeHeadingFocusRequest } from './pageFocus';
   import { showPageTitle } from './pageTitle';
 
-  type BackLink = { label: string; hash: string };
+  type BackTarget = { label: string; hash: string };
 
-  let { heading, back, actions }: { heading: string; back?: BackLink; actions?: Snippet } =
+  let { heading, back, actions }: { heading: string; back?: BackTarget; actions?: Snippet } =
     $props();
 
   let headingElement: HTMLHeadingElement;
@@ -19,24 +19,19 @@
       headingElement.focus();
     }
   });
-
-  function goBackTo(event: MouseEvent, target: BackLink): void {
-    event.preventDefault();
-    goBack(target.hash);
-  }
 </script>
 
 <div class="page-header">
   {#if back}
-    <a
-      class="back-link"
-      href={back.hash}
+    <button
+      type="button"
+      class="back-button"
       aria-label="Zurück zu {back.label}"
-      onclick={(event) => goBackTo(event, back)}
+      onclick={() => navigateTo(back.hash)}
     >
       <ChevronLeft aria-hidden="true" size="1.25em" />
       {back.label}
-    </a>
+    </button>
   {/if}
   <div class="heading-row">
     <h1 tabindex="-1" bind:this={headingElement}>{heading}</h1>
@@ -51,18 +46,24 @@
     margin: 1rem 0;
   }
 
-  .back-link {
+  .back-button {
     display: inline-flex;
     align-items: center;
     gap: 0.25em;
     min-height: 2.75rem;
-    margin-bottom: 0.25rem;
+    margin: 0 0 0.25rem;
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
     font-weight: 600;
-    text-decoration: none;
+    text-align: start;
     overflow-wrap: anywhere;
+    cursor: pointer;
   }
 
-  .back-link :global(svg) {
+  .back-button :global(svg) {
     flex: none;
   }
 
