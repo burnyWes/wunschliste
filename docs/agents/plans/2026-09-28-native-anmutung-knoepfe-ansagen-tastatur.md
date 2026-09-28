@@ -5,7 +5,7 @@ branch: main
 story: WL-003
 topic: "Nativere Anmutung: Knöpfe statt Links, Navigation ohne Verlauf, Ansagen, Tastatur und Berührung"
 tags: [plan, router, navigation, shared-ui, accessibility, voiceover, pwa, wishlist-ui]
-status: ready
+status: done
 ---
 
 # PLAN: WL-003 — Nativere Anmutung: Knöpfe, Navigation ohne Verlauf, Ansagen, Tastatur
@@ -475,10 +475,10 @@ Knöpfe reagieren wie native Knöpfe, und die untere Leiste weicht der Bildschir
 - [x] `npm run build` läuft durch.
 
 **Manuelle Verifikation** (iPhone, Home-Bildschirm-App):
-- [ ] Antippen eines Knopfs zeigt kein graues Rechteck, der Knopf wird kurz blasser.
-- [ ] Langes Drücken auf „Wunschliste erstellen“ oder einen Listeneintrag markiert
+- [x] Antippen eines Knopfs zeigt kein graues Rechteck, der Knopf wird kurz blasser.
+- [x] Langes Drücken auf „Wunschliste erstellen“ oder einen Listeneintrag markiert
   keinen Text und öffnet kein Menü. Doppeltippen zoomt nicht.
-- [ ] „Wunsch bearbeiten“: Beim Tippen ins Feld „Preis“ springt die Leiste ans
+- [x] „Wunsch bearbeiten“: Beim Tippen ins Feld „Preis“ springt die Leiste ans
   Formularende und liegt nicht hinter der Tastatur. Beim Schließen der Tastatur klebt
   sie wieder unten.
 
