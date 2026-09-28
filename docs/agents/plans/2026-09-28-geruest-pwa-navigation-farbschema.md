@@ -200,9 +200,9 @@ Farbtokens (aus dem Konzept):
 |---|---|---|---|
 | `--color-background` | `#000000` | `#FFFFFF` | `#FFFFFF` |
 | `--color-text` | `#FFFFFF` | `#000000` | `#000000` |
-| `--color-button` | `#1D4ED8` | `#1D4ED8` | `#DA9C14` |
+| `--color-button` | `#002366` | `#002366` | `#DA9C14` |
 | `--color-button-text` | `#FFFFFF` | `#FFFFFF` | `#000000` |
-| `--color-button-border` | `#93C5FD` | `#1E3A8A` | `#6C3A02` |
+| `--color-button-border` | `#93C5FD` | `#000000` | `#6C3A02` |
 | `--color-check` | `#22FF22` | `#15803D` | `#DD00DD` |
 | `--color-outline` (Fokusrahmen, Linien der Kästchen) | `#FFFFFF` | `#000000` | `#000000` |
 | `--color-status-bar` (Safe-Area-Streifen oben) | `#000000` | `#000000` | `#000000` |
@@ -671,6 +671,7 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
 - Phase 3: Sticky ist der `<header>` in `App.svelte`. Er enthält den Safe-Area-Streifen (`.status-bar-backdrop`) und darunter `MainNavigation`. `CurrentRoute` ruft `focusPageHeading` selbst auf, wenn ein `hashchange` die Seite wirklich wechselt. `tsconfig.node.json` bindet `DOM` ein, weil die Callbacks von `page.evaluate` im Browser laufen.
 - Phase 4: `ColorSchemeSettings` nutzt `checked` + `onchange` statt `bind:group`. So ist eindeutig, dass Speichern und Anwenden erst nach der Auswahl laufen. Der Haken ist Lucide `Check` (Strichstärke 4). Die E2E-Tests wählen ein Schema durch Tippen auf die Zeile (`label`), wie ein Mensch es tut. Das visuell versteckte Input liegt unter der Beschriftung und ist nicht direkt klickbar. `saveColorScheme` trägt einen Warum-Kommentar mit MDN-Quelle, weil ESLint leere `catch`-Blöcke verbietet.
 - Manuelle Prüfung auf dem iPhone bestanden. Rückmeldung: Die blaue Buttonfläche muss dunkler sein. `--color-button` in Dunkel und Hell daher `#1D4ED8` statt `#2563EB` (weiße Schrift 6,7 : 1 statt 5,2 : 1). Der Strich des App-Icons bleibt `#2563EB`.
+- Auch `#1D4ED8` war auf dem iPhone zu hell. Gewünscht: Königs- bzw. Mitternachtsblau. `--color-button` in Dunkel und Hell ist jetzt `#002366` (traditionelles Königsblau, weiße Schrift 14,4 : 1). Der Buttonrand im Hell-Schema wird `#000000`, weil das bisherige `#1E3A8A` sich kaum von der neuen Fläche abhob.
 
 ## Verweise
 
