@@ -70,3 +70,4 @@ TODO
 m Bilder zu Wünschen (Firebase Storage, Upload)
 - TypeScript auf 7 anheben, sobald typescript-eslint und svelte-check es unterstützen
 - "gewünscht seit <Datum>" auf Wunsch-Detailseite anzeigen
+- Schritt 4/5: Übergang für Firestore-Dokumente ohne ownerId bzw. mit altem Feld gifted einplanen (z. B. Standardwert beim Einlesen), sonst verschwinden bestehende Listen und Wünsche
