@@ -42,6 +42,9 @@ Noch keine Personen, kein Firebase, keine Geheim-Einträge.
   Elternseite, statt die App zu verlassen. Eine unbekannte ID zeigt einen Hinweis mit Link
   zur Übersicht. Nach jedem Seitenwechsel liegt der Fokus auf dem `h1`, sobald die Seite
   ihre Daten hat. Der Seitentitel folgt immer dem `h1`.
+- Die Wunsch-Detailseite und die Listenseite haben über dem `h1` einen Rück-Link zur
+  Elternseite („‹ Geburtstag 2027“ bzw. „‹ Wunschlisten“). Er führt einen Schritt zurück
+  (inklusive Filter) und, wer direkt eingestiegen ist, zur Elternseite.
 - In der Hauptnavigation bleibt „Wunschlisten“ auf allen Unterseiten hervorgehoben
   (`aria-current="true"`), auf der Übersicht selbst `aria-current="page"`.
 - axe-core meldet auf allen neuen Seiten und im offenen Löschdialog in allen drei
@@ -161,6 +164,16 @@ Noch keine Personen, kein Firebase, keine Geheim-Einträge.
       (auch „Einstellungen“ und `NotFound`) nutzen `PageHeader`.
 21. **Eine Definition von „dieselbe Seite“:** `pageKeyOf(route)` (Hash ohne Filter) steuert
     sowohl den Fokus in `CurrentRoute` als auch `{#key}` in `App.svelte`.
+22. **Rück-Link zur Elternseite** (nachträglich nach Phase 2, Wunsch des Nutzers): Als
+    installierte App hat das iPhone keine Zurück-Taste, von der Detailseite ging es nur
+    über „Wunschlisten“ in der Navigation zurück.
+    - Umsetzung: `<a href={Elternseite}>` mit stummem Lucide `ChevronLeft` und dem Namen
+      der Elternseite als Text, davor unsichtbar „Zurück zu“. Beim Antippen
+      `preventDefault()` und `goBack(<Elternseite>)`.
+    - Warum `goBack` statt eines normalen Links: Ein normaler Link legte einen neuen
+      Verlaufseintrag an (Liste, Wunsch, Liste), und der Filter `/erfuellt` ginge
+      verloren. Das `href` bleibt für „In neuem Tab öffnen“ und den VoiceOver-Rotor.
+    - Auswirkung: `PageHeader` bekommt die optionale Prop `back: { label; hash }`.
 
 ## Ausgangslage
 
@@ -680,11 +693,11 @@ Link-Knopf. Die Farbschema-Einstellung zieht auf `ChoiceGroup` um.
 - [x] `npm test` grün inklusive `wishes.spec.ts` und `colorScheme.spec.ts`
 
 **Manuelle Verifikation**:
-- [ ] iPhone: Beim Tippen in „Preis in Euro“ erscheint die Zifferntastatur mit Komma
-- [ ] iPhone mit VoiceOver: Ein Listeneintrag wird als „Fahrradhelm, unbedingt,
+- [x] iPhone: Beim Tippen in „Preis in Euro“ erscheint die Zifferntastatur mit Komma
+- [x] iPhone mit VoiceOver: Ein Listeneintrag wird als „Fahrradhelm, unbedingt,
       49,99 €, Link“ gelesen, ohne Sterne. Der Link-Knopf öffnet den Shop, und man kommt
       in die App zurück.
-- [ ] VoiceOver im Formular: Nach „Speichern“ mit leerem Namen landet der Fokus auf
+- [x] VoiceOver im Formular: Nach „Speichern“ mit leerem Namen landet der Fokus auf
       „Name“, und der Fehlertext wird vorgelesen
 
 ### Phase 3: Bearbeiten und Löschen
@@ -725,6 +738,19 @@ mit dem eigenen Bestätigungsdialog.
       `goBack(<Detailseite>)`, Löschen → `replaceWith` zur Liste des Wunsches.
 - [ ] `ui/WishPage.svelte`: `ActionBar` mit [✏ Bearbeiten] (Lucide `Pencil`, Link auf
       `#/wunsch/<id>/bearbeiten`)
+- [ ] Rück-Link (Entscheidung 22): `src/shared/ui/PageHeader.svelte` mit optionaler Prop
+      `back: { label; hash }`, dargestellt über dem `h1` als Link „‹ {label}“ mit
+      zugänglichem Namen „Zurück zu {label}“, Tippen → `goBack(hash)`.
+      `ui/WishPage.svelte` nutzt ihn mit dem Namen der Liste (per `WatchWishlist` über
+      `wish.wishlistId`) und dem Hash der Liste, `ui/WishlistPage.svelte` mit
+      „Wunschlisten“ und `#/`.
+- [ ] `e2e/backLinks.spec.ts`:
+  - Liste → Wunsch → „Zurück zu Geburtstag“ → Listenseite, h1 fokussiert; ein weiteres
+    `page.goBack()` führt zur Übersicht (kein zusätzlicher Verlaufseintrag)
+  - Liste im Filter „Erfüllte“ (Adresse `/erfuellt`) → Wunsch → Rück-Link → wieder
+    `/erfuellt` (sobald Phase 4 den Filter liefert, bis dahin mit der Adresse geprüft)
+  - `#/wunsch/<id>` direkt aufrufen (Seed) → Rück-Link → Listenseite, die App bleibt offen
+  - Listenseite → „Zurück zu Wunschlisten“ → Übersicht
 - [ ] `e2e/editing.spec.ts`:
   - Liste umbenennen → Listenseite mit neuem h1; `page.goBack()` führt zur Übersicht
     (kein doppelter Eintrag der Liste); Übersicht neu sortiert
@@ -746,7 +772,8 @@ mit dem eigenen Bestätigungsdialog.
 **Automatisierte Verifikation**:
 - [ ] `npm run test:unit` grün inklusive der neuen Use-Case- und Texttests
 - [ ] `npm run lint` grün
-- [ ] `npm test` grün inklusive `editing.spec.ts` und der Dialog-Prüfung mit axe
+- [ ] `npm test` grün inklusive `editing.spec.ts`, `backLinks.spec.ts` und der Dialog-Prüfung
+      mit axe
 
 **Manuelle Verifikation**:
 - [ ] iPhone mit VoiceOver: „Wunschliste löschen“ doppeltippen → VoiceOver liest
@@ -754,6 +781,9 @@ mit dem eigenen Bestätigungsdialog.
       „Abbrechen“. Wischen verlässt den Dialog nicht. Die Zwei-Finger-Z-Geste schließt
       ihn, danach steht der Fokus wieder auf „Wunschliste löschen“.
 - [ ] Der Dialog sieht in allen drei Farbschemata stimmig aus
+- [ ] iPhone als installierte App: Von einem Wunsch führt „‹ <Listenname>“ zurück zur Liste
+      und von dort „‹ Wunschlisten“ zur Übersicht. VoiceOver liest „Zurück zu
+      <Listenname>, Link“.
 
 ### Phase 4: Schenken und Filter
 
