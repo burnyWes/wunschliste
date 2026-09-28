@@ -5,7 +5,7 @@ branch: main
 story: WL-002
 topic: "Wunschlisten und Wünsche verwalten, lokal gespeichert"
 tags: [plan, wishlist, domain, application, local-storage, router, shared-ui, accessibility]
-status: ready
+status: done
 ---
 
 # PLAN: WL-002 — Wunschlisten und Wünsche verwalten, lokal gespeichert
@@ -840,11 +840,11 @@ Wünsche verschenken und das Schenken zurücknehmen. Die Listenseite filtert nac
 - [x] `npm test` grün inklusive `gifting.spec.ts`
 
 **Manuelle Verifikation**:
-- [ ] iPhone mit VoiceOver: „Schenken“ doppeltippen → VoiceOver sagt „Als erfüllt
+- [x] iPhone mit VoiceOver: „Schenken“ doppeltippen → VoiceOver sagt „Als erfüllt
       markiert.“, danach heißt der Knopf „Schenken zurücknehmen“
-- [ ] Filter: VoiceOver liest „Offene Wünsche, Taste, ausgewählt“ (bzw. die tatsächliche
+- [x] Filter: VoiceOver liest „Offene Wünsche, Taste, ausgewählt“ (bzw. die tatsächliche
       Ansage für `aria-pressed` notieren, falls sie abweicht)
-- [ ] Gesamtablauf auf dem iPhone: Liste anlegen, drei Wünsche, einen verschenken, App
+- [x] Gesamtablauf auf dem iPhone: Liste anlegen, drei Wünsche, einen verschenken, App
       schließen und neu starten → alles unverändert da
 
 ## Notizen zur Umsetzung

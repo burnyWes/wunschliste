@@ -69,3 +69,4 @@ TODO
         - Checkbox selbst nur linke und untere Linie zeichnen
 m Bilder zu Wünschen (Firebase Storage, Upload)
 - TypeScript auf 7 anheben, sobald typescript-eslint und svelte-check es unterstützen
+- "gewünscht seit <Datum>" auf Wunsch-Detailseite anzeigen
