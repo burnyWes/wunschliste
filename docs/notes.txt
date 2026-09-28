@@ -68,3 +68,4 @@ TODO
         - im Darkmode großer leuchtend-grüner Haken
         - Checkbox selbst nur linke und untere Linie zeichnen
 m Bilder zu Wünschen (Firebase Storage, Upload)
+- TypeScript auf 7 anheben, sobald typescript-eslint und svelte-check es unterstützen

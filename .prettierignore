@@ -1,0 +1,10 @@
+dist
+dev-dist
+playwright-report
+test-results
+docs
+.claude
+*.md
+package-lock.json
+public/*.png
+public/*.ico

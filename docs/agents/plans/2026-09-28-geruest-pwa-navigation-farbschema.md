@@ -245,7 +245,7 @@ Ein Svelte-5-Projekt, das „Wunschlisten“ anzeigt, und das vollständige Gate
 Lint (ESLint, svelte-check), Architekturtest, Vitest, Playwright mit axe.
 
 **Aufgaben**:
-- [ ] `package.json` anlegen (`"type": "module"`, `"private": true`,
+- [x] `package.json` anlegen (`"type": "module"`, `"private": true`,
       `"engines": { "node": ">=24" }`) mit Skripten:
   ```json
   {
@@ -260,17 +260,17 @@ Lint (ESLint, svelte-check), Architekturtest, Vitest, Playwright mit axe.
     "test": "npm run test:architecture && npm run test:unit && npm run test:e2e"
   }
   ```
-- [ ] Abhängigkeiten installieren (aktuelle Versionen zum Planungszeitpunkt):
+- [x] Abhängigkeiten installieren (aktuelle Versionen zum Planungszeitpunkt):
       `svelte@^5.57`, `@lucide/svelte`; dev: `vite@^8`, `@sveltejs/vite-plugin-svelte@^7`,
       `typescript@~6.0`, `svelte-check`, `vitest@^5`, `@playwright/test`,
       `@axe-core/playwright`, `eslint@^10`, `@eslint/js`, `typescript-eslint`,
       `eslint-plugin-svelte`, `globals`, `prettier`, `prettier-plugin-svelte`,
       `@types/node`
-- [ ] `npx playwright install webkit`
-- [ ] `.nvmrc` mit `24`
-- [ ] `.gitignore` ergänzen: `node_modules/`, `dist/`, `dev-dist/`, `test-results/`,
+- [x] `npx playwright install webkit`
+- [x] `.nvmrc` mit `24`
+- [x] `.gitignore` ergänzen: `node_modules/`, `dist/`, `dev-dist/`, `test-results/`,
       `playwright-report/`, `.env.local`, `.idea/`
-- [ ] Getrennte TypeScript-Konfigurationen, weil TS 6 standardmäßig keine `types` mehr
+- [x] Getrennte TypeScript-Konfigurationen, weil TS 6 standardmäßig keine `types` mehr
       einbindet und Browser- und Node-Code verschiedene Umgebungen haben:
   - `tsconfig.json` — nur `references` auf die beiden folgenden, `files: []`
   - `tsconfig.app.json` — `src/**`; `strict`, `moduleResolution: "bundler"`,
@@ -280,16 +280,16 @@ Lint (ESLint, svelte-check), Architekturtest, Vitest, Playwright mit axe.
     `eslint*.config.js`, `e2e/**`, `tests/**`; gleiche Strenge, `types: ["node"]`
   - `svelte-check` läuft mit `--tsconfig ./tsconfig.app.json`, die Node-Seite zusätzlich
     per `tsc -p tsconfig.node.json` im Lint-Skript
-- [ ] `svelte.config.js` mit `vitePreprocess()`
-- [ ] `vite.config.ts`: `defineConfig` aus **`vitest/config`** (sonst ist `test` unbekannt),
+- [x] `svelte.config.js` mit `vitePreprocess()`
+- [x] `vite.config.ts`: `defineConfig` aus **`vitest/config`** (sonst ist `test` unbekannt),
       `base: '/wunschliste/'`, `svelte()`, Vitest-Block
       (`include: ['src/**/*.test.ts', 'tests/**/*.test.ts']`, `environment: 'node'`)
-- [ ] `.prettierrc.json` (Plugin `prettier-plugin-svelte`) und `.prettierignore`:
+- [x] `.prettierrc.json` (Plugin `prettier-plugin-svelte`) und `.prettierignore`:
       `dist`, `dev-dist`, `playwright-report`, `test-results`, `docs`, `.claude`,
       `*.md`, `package-lock.json`, `public/*.png`, `public/*.ico`.
       `docs/` und `.claude/` gehören dem Nutzer bzw. dem Template und werden nie
       umformatiert.
-- [ ] `eslint.architecture.config.js`: Parser-Einstellungen für `src/**/*.ts`
+- [x] `eslint.architecture.config.js`: Parser-Einstellungen für `src/**/*.ts`
       (typescript-eslint) und `src/**/*.svelte` (eslint-plugin-svelte mit TS-Parser) sowie
       nur die Grenzregeln:
   ```js
@@ -332,12 +332,12 @@ Lint (ESLint, svelte-check), Architekturtest, Vitest, Playwright mit axe.
   `'app'`. Testdateien dürfen Pakete (`vitest`) importieren, aber keine äußeren Schichten.
   `sourceParserSetup` setzt **kein** `projectService`/`project`, damit `lintText` mit
   nicht existierenden Pfaden funktioniert.
-- [ ] `eslint.config.js`: `@eslint/js` recommended, `typescript-eslint` recommended,
+- [x] `eslint.config.js`: `@eslint/js` recommended, `typescript-eslint` recommended,
       `eslint-plugin-svelte` recommended (mit TS-Parser für `<script lang="ts">`),
       `globals.browser`, Ignores für `dist`, `dev-dist`, `playwright-report`,
       `test-results`. Die Architektur-Konfiguration wird eingebunden
       (`...architectureConfig`).
-- [ ] `tests/architecture.test.ts` (Vitest, ESLint-Node-API mit
+- [x] `tests/architecture.test.ts` (Vitest, ESLint-Node-API mit
       `overrideConfigFile: 'eslint.architecture.config.js'` und `lintText(code, { filePath })`).
       Ausgewertet werden nur Meldungen mit `ruleId === 'no-restricted-imports'`. Zusätzlich
       muss jedes Ergebnis `fatalErrorCount === 0` und `warningCount === 0` haben, sonst
@@ -351,27 +351,27 @@ Lint (ESLint, svelte-check), Architekturtest, Vitest, Playwright mit axe.
   - `domain` importiert `./wish` → 0 Verstöße
   - `infrastructure` importiert `svelte` → 0 Verstöße
   - `domain/wish.test.ts` importiert `vitest` → 0 Verstöße
-- [ ] `index.html`: `lang="de"`, `<title>Wunschliste</title>`,
+- [x] `index.html`: `lang="de"`, `<title>Wunschliste</title>`,
       `<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">`,
       `<div id="app"></div>`, Skript `/src/main.ts`
-- [ ] `src/main.ts`: `mount(App, { target: requireAppRoot() })` mit einer benannten
+- [x] `src/main.ts`: `mount(App, { target: requireAppRoot() })` mit einer benannten
       Funktion `requireAppRoot()`, die bei fehlendem `#app` einen sprechenden Fehler wirft
       (kein `!`)
-- [ ] `src/app/App.svelte` bindet `WishlistsPage` ein
-- [ ] `src/wishlist/infrastructure/ui/WishlistsPage.svelte`:
+- [x] `src/app/App.svelte` bindet `WishlistsPage` ein
+- [x] `src/wishlist/infrastructure/ui/WishlistsPage.svelte`:
       `<h1 tabindex="-1">Wunschlisten</h1>` und `<p>Noch keine Wunschlisten.</p>`
-- [ ] `playwright.config.ts`: `testDir: 'e2e'`,
+- [x] `playwright.config.ts`: `testDir: 'e2e'`,
       `projects: [{ name: 'iphone-webkit', use: { ...devices['iPhone 15'] } }]`,
       `use: { baseURL: 'http://localhost:4173/wunschliste/', serviceWorkers: 'block' }`,
       `webServer: { command: 'npm run build && npm run preview -- --port 4173 --strictPort', url: 'http://localhost:4173/wunschliste/', reuseExistingServer: false, timeout: 120_000 }`.
       `reuseExistingServer: false`, damit das Commit-Gate nie gegen einen veralteten Build
       eines noch laufenden Preview-Servers testet.
-- [ ] **Alle Specs navigieren relativ zur `baseURL`**: `page.goto('./')`,
+- [x] **Alle Specs navigieren relativ zur `baseURL`**: `page.goto('./')`,
       `page.goto('./#/einstellungen')`, `request.get('manifest.webmanifest')` — nie mit
       führendem `/`, sonst landet der Aufruf auf `http://localhost:4173/` (404).
-- [ ] `e2e/accessibility.spec.ts`: Startseite zeigt Überschrift „Wunschlisten“, axe
+- [x] `e2e/accessibility.spec.ts`: Startseite zeigt Überschrift „Wunschlisten“, axe
       (`withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])`) ohne Verstöße
-- [ ] `.claude/projekt.md` Befehle setzen (Stack und Kontext `wishlist` sind bereits
+- [x] `.claude/projekt.md` Befehle setzen (Stack und Kontext `wishlist` sind bereits
       eingetragen):
   ```
   Test:    npm test
@@ -379,18 +379,18 @@ Lint (ESLint, svelte-check), Architekturtest, Vitest, Playwright mit axe.
   Format:  npm run format
   Build:   npm run build
   ```
-- [ ] `README.md`: Stack, Befehle, einmalige Einrichtung (`npm install`,
+- [x] `README.md`: Stack, Befehle, einmalige Einrichtung (`npm install`,
       `npx playwright install webkit`), Hinweis auf das Konzeptdokument
-- [ ] `docs/notes.txt` unter TODO anhängen:
+- [x] `docs/notes.txt` unter TODO anhängen:
       `- TypeScript auf 7 anheben, sobald typescript-eslint und svelte-check es unterstützen`
 
 **Automatisierte Verifikation**:
-- [ ] `npm run format` ändert nichts mehr bei einem zweiten Lauf
-- [ ] `npm run lint` grün (ESLint, svelte-check ohne Warnungen, Prettier)
-- [ ] `npm run test:architecture` grün
-- [ ] `npm run test:unit` grün, `tests/architecture.test.ts` mit allen 9 Fällen
-- [ ] `npm run test:e2e` grün
-- [ ] `npm test` grün
+- [x] `npm run format` ändert nichts mehr bei einem zweiten Lauf
+- [x] `npm run lint` grün (ESLint, svelte-check ohne Warnungen, Prettier)
+- [x] `npm run test:architecture` grün
+- [x] `npm run test:unit` grün, `tests/architecture.test.ts` mit allen 9 Fällen
+- [x] `npm run test:e2e` grün
+- [x] `npm test` grün
 
 ### Phase 2: PWA und Veröffentlichung
 
@@ -400,10 +400,10 @@ Die App wird installierbar, offline startfähig und bei jedem grünen Push auf `
 veröffentlicht.
 
 **Aufgaben**:
-- [ ] `public/icon.svg`: Lucide-Icon „gift“ (ISC-Lizenz), Strich `#2563EB`, auf
+- [x] `public/icon.svg`: Lucide-Icon „gift“ (ISC-Lizenz), Strich `#2563EB`, auf
       schwarzem, quadratischem Hintergrund, **ohne** eigenen Innenabstand (den setzt der
       Generator)
-- [ ] Icons einmalig erzeugen und einchecken. Der Preset `minimal-2023` legt für
+- [x] Icons einmalig erzeugen und einchecken. Der Preset `minimal-2023` legt für
       `maskable` und `apple` einen **weißen** Rand an (`padding: 0.3`,
       `background: 'white'`). Deshalb eine temporäre Konfiguration in der Sandbox
       (Scratchpad, nicht im Repo) mit `preset: { ...minimal2023Preset, maskable: { ..., resizeOptions: { background: '#000000' } }, apple: { ..., resizeOptions: { background: '#000000' } } }`
@@ -412,7 +412,7 @@ veröffentlicht.
       `maskable-icon-512x512.png`, `apple-touch-icon-180x180.png`. Das Paket wird nicht
       als Abhängigkeit aufgenommen. Der Aufruf wird im README unter „App-Icon neu
       erzeugen“ dokumentiert.
-- [ ] `vite-plugin-pwa` als Dev-Abhängigkeit, in `vite.config.ts`:
+- [x] `vite-plugin-pwa` als Dev-Abhängigkeit, in `vite.config.ts`:
   ```ts
   VitePWA({
     registerType: 'autoUpdate',
@@ -435,21 +435,21 @@ veröffentlicht.
     workbox: { globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest}'] },
   })
   ```
-- [ ] `index.html` ergänzen:
+- [x] `index.html` ergänzen:
       `<meta name="mobile-web-app-capable" content="yes">`,
       `<meta name="apple-mobile-web-app-capable" content="yes">`,
       `<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">`,
       `<meta name="apple-mobile-web-app-title" content="Wunschliste">`,
       `<link rel="apple-touch-icon" href="apple-touch-icon-180x180.png">`,
       `<link rel="icon" href="favicon.ico">`
-- [ ] `src/app/global.css`, Import in `main.ts`:
+- [x] `src/app/global.css`, Import in `main.ts`:
   - `html { font-family: system-ui, sans-serif; font: -apple-system-body; }` — die
     Kurzform nur auf `html`, damit `rem` mit Dynamic Type wächst. Alle Größen in `rem`/`em`.
   - `body` mit Safe-Area-Abständen auf **allen vier** Seiten
     (`env(safe-area-inset-*)`), weil `black-translucent` den Inhalt unter die
     Statusleiste zieht. Phase 3 verlegt den oberen Abstand in die Navigation.
   - schwarzer Hintergrund, weiße Schrift
-- [ ] `.github/workflows/deploy.yml`:
+- [x] `.github/workflows/deploy.yml`:
   ```yaml
   on:
     push: { branches: [main] }
@@ -484,16 +484,16 @@ veröffentlicht.
   `npm test` baut über den Playwright-`webServer` bereits `dist/`, es gibt keinen
   zweiten Build. `concurrency` hängt nur am `deploy`-Job, damit ein Pull-Request-Lauf
   nie einen wartenden Deploy auf `main` verdrängt.
-- [ ] `e2e/pwa.spec.ts`: `manifest.webmanifest` wird ausgeliefert und enthält
+- [x] `e2e/pwa.spec.ts`: `manifest.webmanifest` wird ausgeliefert und enthält
       `name: 'Wunschliste'`, `display: 'standalone'`; `apple-touch-icon-180x180.png`
       liefert Status 200
-- [ ] `README.md`: Veröffentlichungs-URL und einmalige Einstellung
+- [x] `README.md`: Veröffentlichungs-URL und einmalige Einstellung
       „Settings → Pages → Build and deployment → Source: GitHub Actions“
 
 **Automatisierte Verifikation**:
-- [ ] `npm run build` erzeugt `dist/manifest.webmanifest` und `dist/sw.js`
-- [ ] `npm run lint` grün
-- [ ] `npm test` grün inklusive `e2e/pwa.spec.ts`
+- [x] `npm run build` erzeugt `dist/manifest.webmanifest` und `dist/sw.js`
+- [x] `npm run lint` grün
+- [x] `npm test` grün inklusive `e2e/pwa.spec.ts`
 
 **Manuelle Verifikation**:
 - [ ] Nutzer stellt in GitHub „Settings → Pages → Source“ auf „GitHub Actions“
@@ -514,27 +514,27 @@ Abhängigkeiten: Phase 1
 Fixierte Hauptnavigation, Hash-Router, zwei Seiten, Fokus- und Titelverwaltung.
 
 **Aufgaben**:
-- [ ] `src/app/router/routes.test.ts` zuerst (TDD):
+- [x] `src/app/router/routes.test.ts` zuerst (TDD):
   - `resolveRoute('')` → `'wishlists'`
   - `resolveRoute('#/')` → `'wishlists'`
   - `resolveRoute('#/einstellungen')` → `'settings'`
   - `resolveRoute('#/quatsch')` → `'wishlists'`
   - `hashFor('settings')` → `'#/einstellungen'`, `hashFor('wishlists')` → `'#/'`
   - `pageTitleFor('settings')` → `'Einstellungen'`
-- [ ] `src/app/router/routes.ts` implementieren
-- [ ] `src/app/router/currentRoute.svelte.ts`: Klasse oder Modul mit `$state`, startet
+- [x] `src/app/router/routes.ts` implementieren
+- [x] `src/app/router/currentRoute.svelte.ts`: Klasse oder Modul mit `$state`, startet
       mit `resolveRoute(location.hash)`, hört auf `hashchange`. Ist
       `location.hash !== hashFor(route)`, ersetzt es den Hash per
       `history.replaceState` (kein zusätzlicher Verlaufseintrag). Setzt
       `document.title = \`${pageTitleFor(route)} – Wunschliste\``.
-- [ ] `src/app/router/focusPageHeading.ts`: fokussiert nach `tick()` das `main h1` —
+- [x] `src/app/router/focusPageHeading.ts`: fokussiert nach `tick()` das `main h1` —
       **nur wenn sich die Route tatsächlich geändert hat**. Nicht beim ersten Laden und
       nicht, wenn eine Umleitung (`#/quatsch` → `#/`) auf derselben Seite bleibt. Das
       `h1` erhält beim programmatischen Fokus keinen sichtbaren Rahmen
       (`h1:focus:not(:focus-visible) { outline: none }`), VoiceOver setzt seinen eigenen.
       `replaceState` löst kein `hashchange` aus, eine Umleitungsschleife ist damit
       ausgeschlossen.
-- [ ] `src/app/layout/MainNavigation.svelte`:
+- [x] `src/app/layout/MainNavigation.svelte`:
   ```svelte
   <nav aria-label="Hauptnavigation">
     <a href="#/" aria-current={route === 'wishlists' ? 'page' : undefined}>Wunschlisten</a>
@@ -548,11 +548,11 @@ Fixierte Hauptnavigation, Hash-Router, zwei Seiten, Fokus- und Titelverwaltung.
   Trefferfläche mindestens 44 × 44 px. Leiste `position: sticky; top: 0` mit
   `padding-top: env(safe-area-inset-top)`, darf umbrechen und mitwachsen. Der obere
   Safe-Area-Abstand wandert dafür aus `body` (Phase 2) in die Leiste.
-- [ ] `src/app/settings/SettingsPage.svelte`: `<h1 tabindex="-1">Einstellungen</h1>`
-- [ ] `src/app/App.svelte`: `<MainNavigation>` im `<header>`, darunter
+- [x] `src/app/settings/SettingsPage.svelte`: `<h1 tabindex="-1">Einstellungen</h1>`
+- [x] `src/app/App.svelte`: `<MainNavigation>` im `<header>`, darunter
       `<main>` mit der Seite zur aktuellen Route
-- [ ] Sichtbarer Fokusrahmen für Links und Bedienelemente (`:focus-visible`)
-- [ ] `e2e/navigation.spec.ts`:
+- [x] Sichtbarer Fokusrahmen für Links und Bedienelemente (`:focus-visible`)
+- [x] `e2e/navigation.spec.ts`:
   - Start → „Wunschlisten“-Link hat `aria-current="page"`, Titel „Wunschlisten – Wunschliste“,
     das h1 ist **nicht** fokussiert
   - Klick auf „Einstellungen“ → URL endet auf `#/einstellungen`, h1 „Einstellungen“ ist
@@ -561,12 +561,12 @@ Fixierte Hauptnavigation, Hash-Router, zwei Seiten, Fokus- und Titelverwaltung.
   - `#/quatsch` aufrufen → URL endet auf `#/`, h1 „Wunschlisten“
   - Nach dem Scrollen (künstlich hoher Inhalt per `page.evaluate`) ist die Navigation
     noch im Viewport
-- [ ] `e2e/accessibility.spec.ts` um die Einstellungsseite erweitern
+- [x] `e2e/accessibility.spec.ts` um die Einstellungsseite erweitern
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` grün inklusive `routes.test.ts`
-- [ ] `npm run lint` grün
-- [ ] `npm test` grün inklusive `navigation.spec.ts`
+- [x] `npm run test:unit` grün inklusive `routes.test.ts`
+- [x] `npm run lint` grün
+- [x] `npm test` grün inklusive `navigation.spec.ts`
 
 **Manuelle Verifikation**:
 - [ ] iPhone mit VoiceOver: „Hauptnavigation“, „Wunschlisten, aktuelle Seite, Link“ und
@@ -583,19 +583,19 @@ Drei Farbschemata als CSS-Variablen, auswählbar per Radiogruppe im Checkbox-Loo
 gespeichert pro Gerät, ab dem ersten Bild aktiv.
 
 **Aufgaben**:
-- [ ] `src/app/theme/colorScheme.test.ts` zuerst (TDD):
+- [x] `src/app/theme/colorScheme.test.ts` zuerst (TDD):
   - `parseColorScheme(null)` → `'dark'`
   - `parseColorScheme('light')` → `'light'`, `'inverted'` → `'inverted'`
   - `parseColorScheme('purple')` → `'dark'`
   - `COLOR_SCHEMES` enthält genau Dunkel, Hell, Invertiert in dieser Reihenfolge
-- [ ] `src/app/theme/colorScheme.ts` implementieren
-- [ ] `src/app/theme/colorSchemeStorage.ts`: `loadColorScheme`, `saveColorScheme`,
+- [x] `src/app/theme/colorScheme.ts` implementieren
+- [x] `src/app/theme/colorSchemeStorage.ts`: `loadColorScheme`, `saveColorScheme`,
       `applyColorScheme` (Schlüssel `wunschliste.colorScheme`, Fehler beim Zugriff auf
       `localStorage` → Standard bzw. stilles Nichtspeichern)
-- [ ] `src/app/theme/colorSchemes.css`: Tokens laut Tabelle im Zielbild, `:root` trägt
+- [x] `src/app/theme/colorSchemes.css`: Tokens laut Tabelle im Zielbild, `:root` trägt
       Dunkel, dazu `[data-color-scheme='light']` und `[data-color-scheme='inverted']`.
       `global.css` und `MainNavigation` nutzen nur noch die Tokens.
-- [ ] `index.html`: Inline-Skript im `<head>` vor jedem Stylesheet:
+- [x] `index.html`: Inline-Skript im `<head>` vor jedem Stylesheet:
   ```html
   <script>
     try {
@@ -608,7 +608,7 @@ gespeichert pro Gerät, ab dem ersten Bild aktiv.
   ```
   Der Schlüssel ist doppelt vorhanden (Skript und `colorSchemeStorage.ts`). Ein
   Playwright-Test hält beide zusammen (siehe unten).
-- [ ] `src/app/theme/ColorSchemeSettings.svelte`:
+- [x] `src/app/theme/ColorSchemeSettings.svelte`:
   ```svelte
   <fieldset>
     <legend>Farbschema</legend>
@@ -628,8 +628,8 @@ gespeichert pro Gerät, ab dem ersten Bild aktiv.
   `--color-check` (SVG-Haken, `aria-hidden`), bei `input:focus-visible + .box` ein
   deutlicher Fokusrahmen. Die ganze Zeile ist Trefferfläche, mindestens 44 px hoch.
   Änderung → `saveColorScheme` + `applyColorScheme`.
-- [ ] `SettingsPage.svelte` bindet `ColorSchemeSettings` ein
-- [ ] `e2e/colorScheme.spec.ts`:
+- [x] `SettingsPage.svelte` bindet `ColorSchemeSettings` ein
+- [x] `e2e/colorScheme.spec.ts`:
   - Standard: „Dunkel“ ausgewählt, `html[data-color-scheme='dark']`, Hintergrund von
     `body` ist `rgb(0, 0, 0)`
   - „Hell“ wählen → Hintergrund `rgb(255, 255, 255)`; nach `page.reload()` weiterhin „Hell“
@@ -642,13 +642,13 @@ gespeichert pro Gerät, ab dem ersten Bild aktiv.
   - In „Hell“ und „Invertiert“ hat der Safe-Area-Streifen der Navigation den
     Hintergrund `rgb(0, 0, 0)` (geprüft über das Element, das `--color-status-bar` trägt)
   - Radiogruppe ist per Tastatur bedienbar (Pfeiltaste wechselt die Auswahl)
-- [ ] `e2e/accessibility.spec.ts`: beide Seiten × drei Farbschemata ohne axe-Verstöße
+- [x] `e2e/accessibility.spec.ts`: beide Seiten × drei Farbschemata ohne axe-Verstöße
       (Schema per `localStorage` in `addInitScript` setzen)
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` grün inklusive `colorScheme.test.ts`
-- [ ] `npm run lint` grün
-- [ ] `npm test` grün inklusive `colorScheme.spec.ts` und aller sechs axe-Kombinationen
+- [x] `npm run test:unit` grün inklusive `colorScheme.test.ts`
+- [x] `npm run lint` grün
+- [x] `npm test` grün inklusive `colorScheme.spec.ts` und aller sechs axe-Kombinationen
 
 **Manuelle Verifikation**:
 - [ ] iPhone mit VoiceOver auf „Einstellungen“: „Farbschema“, dann „Dunkel, Optionsfeld,
@@ -663,6 +663,13 @@ gespeichert pro Gerät, ab dem ersten Bild aktiv.
 ## Notizen zur Umsetzung
 
 Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalten.
+
+- Phase 1: `tsconfig.app.json` braucht `allowJs`/`checkJs`. svelte-check übersetzt Komponenten ohne `<script lang="ts">` als JavaScript, sonst meldet es beim Import „implicitly has an any type“.
+- Phase 1: Die Architektur-Konfiguration nutzt `defineConfig` aus `eslint/config` und schreibt die Regelobjekte je Block aus, statt sie per Hilfsfunktion zu bauen. Nur so typisiert `tsc -p tsconfig.node.json` das JS ohne JSDoc-Kommentare. Die Reihenfolge und vollständige Wiederholung der Muster bleiben wie geplant.
+- Phase 1: `tests/architecture.test.ts` hüllt den Import bei `.svelte`-Pfaden in einen `<script lang="ts">`-Block, sonst wäre er Markup.
+- Phase 2: Die Generator-Konfiguration übernimmt `resizeOptions` des Presets per Spread. `minimal2023Preset` bringt für `maskable`/`apple` keine eigenen `resizeOptions` mit, die Standardwerte (Innenabstand 0.3) greifen weiter, nur der Hintergrund wird schwarz.
+- Phase 3: Sticky ist der `<header>` in `App.svelte`. Er enthält den Safe-Area-Streifen (`.status-bar-backdrop`) und darunter `MainNavigation`. `CurrentRoute` ruft `focusPageHeading` selbst auf, wenn ein `hashchange` die Seite wirklich wechselt. `tsconfig.node.json` bindet `DOM` ein, weil die Callbacks von `page.evaluate` im Browser laufen.
+- Phase 4: `ColorSchemeSettings` nutzt `checked` + `onchange` statt `bind:group`. So ist eindeutig, dass Speichern und Anwenden erst nach der Auswahl laufen. Der Haken ist Lucide `Check` (Strichstärke 4). Die E2E-Tests wählen ein Schema durch Tippen auf die Zeile (`label`), wie ein Mensch es tut. Das visuell versteckte Input liegt unter der Beschriftung und ist nicht direkt klickbar. `saveColorScheme` trägt einen Warum-Kommentar mit MDN-Quelle, weil ESLint leere `catch`-Blöcke verbietet.
 
 ## Verweise
 

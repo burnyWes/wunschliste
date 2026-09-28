@@ -1,0 +1,34 @@
+html {
+  font-family: system-ui, sans-serif;
+  font: -apple-system-body;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+body {
+  margin: 0;
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+:focus-visible {
+  outline: 0.1875rem solid var(--color-outline);
+  outline-offset: 0.1875rem;
+}
+
+h1:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

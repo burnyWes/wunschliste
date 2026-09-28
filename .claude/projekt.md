@@ -11,10 +11,10 @@ Bauart:  onion
 
 ## Befehle
 
-Test:    -
-Lint:    -
-Format:  -
-Build:   -
+Test:    npm test
+Lint:    npm run lint
+Format:  npm run format
+Build:   npm run build
 
 ## Fachliche Kontexte
 
