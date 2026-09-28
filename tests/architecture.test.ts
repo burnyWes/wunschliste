@@ -25,6 +25,12 @@ describe('architecture boundaries', () => {
     ['src/wishlist/infrastructure/ui/X.svelte', '../../../app/App.svelte'],
     ['src/wishlist/domain/wish.ts', '../../app/App.svelte'],
     ['src/wishlist/domain/wish.test.ts', '../application/useCase'],
+    ['src/shared/ui/X.svelte', '../../app/App.svelte'],
+    ['src/shared/ui/X.svelte', '../../wishlist/domain/Wish'],
+    ['src/wishlist/domain/Wish.ts', '../../shared/ui/navigation'],
+    ['src/wishlist/application/CreateWish.ts', '../../shared/ui/navigation'],
+    ['src/wishlist/domain/Wish.test.ts', '../../shared/ui/navigation'],
+    ['src/wishlist/application/CreateWish.test.ts', '../../shared/ui/navigation'],
   ])('rejects %s importing %s', async (filePath, importedModule) => {
     expect(await boundaryViolationsIn(filePath, importedModule)).toBe(1);
   });
@@ -33,6 +39,8 @@ describe('architecture boundaries', () => {
     ['src/wishlist/domain/wish.ts', './wish'],
     ['src/wishlist/infrastructure/ui/X.svelte', 'svelte'],
     ['src/wishlist/domain/wish.test.ts', 'vitest'],
+    ['src/shared/ui/X.svelte', 'svelte'],
+    ['src/wishlist/infrastructure/ui/X.svelte', '../../../shared/ui/ActionBar.svelte'],
   ])('allows %s importing %s', async (filePath, importedModule) => {
     expect(await boundaryViolationsIn(filePath, importedModule)).toBe(0);
   });

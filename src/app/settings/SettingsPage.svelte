@@ -1,6 +1,9 @@
 <script lang="ts">
+  import PageHeader from '../../shared/ui/PageHeader.svelte';
   import ColorSchemeSettings from '../theme/ColorSchemeSettings.svelte';
 </script>
 
-<h1 tabindex="-1">Einstellungen</h1>
-<ColorSchemeSettings />
+<div class="page">
+  <PageHeader heading="Einstellungen" />
+  <ColorSchemeSettings />
+</div>

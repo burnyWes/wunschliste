@@ -1,30 +1,57 @@
 import { describe, expect, it } from 'vitest';
-import { hashFor, pageTitleFor, resolveRoute } from './routes';
+import { wishlistIdOf } from '../../wishlist/domain/ids';
+import { hashFor, navigationTargetOf, pageKeyOf, resolveRoute, type Route } from './routes';
+
+const birthday = wishlistIdOf('birthday');
+const christmas = wishlistIdOf('christmas');
 
 describe('resolveRoute', () => {
-  it.each([
-    ['', 'wishlists'],
-    ['#/', 'wishlists'],
-    ['#/einstellungen', 'settings'],
-    ['#/quatsch', 'wishlists'],
-  ])('resolves %j to %s', (hash, route) => {
-    expect(resolveRoute(hash)).toBe(route);
+  it.each<[string, Route]>([
+    ['', { page: 'wishlists' }],
+    ['#/', { page: 'wishlists' }],
+    ['#/einstellungen', { page: 'settings' }],
+    ['#/quatsch', { page: 'wishlists' }],
+    ['#/liste/a', { page: 'wishlist', wishlistId: wishlistIdOf('a'), filter: 'open' }],
+  ])('resolves %j', (hash, route) => {
+    expect(resolveRoute(hash)).toEqual(route);
   });
 });
 
 describe('hashFor', () => {
   it('gives the canonical hash of each route', () => {
-    expect(hashFor('settings')).toBe('#/einstellungen');
-    expect(hashFor('wishlists')).toBe('#/');
+    expect(hashFor({ page: 'settings' })).toBe('#/einstellungen');
+    expect(hashFor({ page: 'wishlists' })).toBe('#/');
+    expect(hashFor({ page: 'wishlist', wishlistId: birthday, filter: 'fulfilled' })).toBe(
+      '#/liste/birthday/erfuellt',
+    );
   });
 });
 
-describe('pageTitleFor', () => {
-  it('names the settings page', () => {
-    expect(pageTitleFor('settings')).toBe('Einstellungen');
+describe('pageKeyOf', () => {
+  it('treats both filters of one wishlist as the same page', () => {
+    expect(pageKeyOf({ page: 'wishlist', wishlistId: birthday, filter: 'open' })).toBe(
+      pageKeyOf({ page: 'wishlist', wishlistId: birthday, filter: 'fulfilled' }),
+    );
   });
 
-  it('names the wishlists page', () => {
-    expect(pageTitleFor('wishlists')).toBe('Wunschlisten');
+  it('tells two wishlists apart', () => {
+    expect(pageKeyOf({ page: 'wishlist', wishlistId: birthday, filter: 'open' })).not.toBe(
+      pageKeyOf({ page: 'wishlist', wishlistId: christmas, filter: 'open' }),
+    );
+  });
+
+  it('keys the settings page by its hash', () => {
+    expect(pageKeyOf({ page: 'settings' })).toBe('#/einstellungen');
+  });
+});
+
+describe('navigationTargetOf', () => {
+  it.each<[Route, string]>([
+    [{ page: 'wishlists' }, 'wishlists'],
+    [{ page: 'createWishlist' }, 'wishlists'],
+    [{ page: 'wishlist', wishlistId: birthday, filter: 'open' }, 'wishlists'],
+    [{ page: 'settings' }, 'settings'],
+  ])('leads %j to %s', (route, target) => {
+    expect(navigationTargetOf(route)).toBe(target);
   });
 });

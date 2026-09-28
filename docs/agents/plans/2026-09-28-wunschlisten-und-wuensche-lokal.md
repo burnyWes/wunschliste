@@ -433,7 +433,7 @@ und Verdrahtung. Man kann Wunschlisten anlegen, sieht sie in der Übersicht und 
 Die Listenseite zeigt vorerst nur den Kopf und „Noch keine offenen Wünsche.“.
 
 **Aufgaben**:
-- [ ] `tests/architecture.test.ts` zuerst um die neuen Fälle erweitern:
+- [x] `tests/architecture.test.ts` zuerst um die neuen Fälle erweitern:
   - verboten: `src/shared/ui/X.svelte` → `../../app/App.svelte`,
     `src/shared/ui/X.svelte` → `../../wishlist/domain/Wish`,
     `src/wishlist/domain/Wish.ts` → `../../shared/ui/navigation`,
@@ -442,11 +442,11 @@ Die Listenseite zeigt vorerst nur den Kopf und „Noch keine offenen Wünsche.�
     `src/wishlist/application/CreateWish.test.ts` → `../../shared/ui/navigation`
   - erlaubt: `src/shared/ui/X.svelte` → `svelte`,
     `src/wishlist/infrastructure/ui/X.svelte` → `../../../shared/ui/ActionBar.svelte`
-- [ ] `eslint.architecture.config.js`: neuer Block für `src/shared/**/*.{ts,svelte}` mit
+- [x] `eslint.architecture.config.js`: neuer Block für `src/shared/**/*.{ts,svelte}` mit
       `outwardTo(['app', 'wishlist'])`. `'shared/ui'` kommt in die Verbotslisten der
       `domain`- und `application`-Blöcke **einschließlich** ihrer Testdatei-Blöcke (die
       Reihenfolge der Blöcke bleibt tragend, siehe WL-001, Entscheidung 3).
-- [ ] `src/wishlist/infrastructure/ui/wishlistAddresses.test.ts` zuerst (TDD):
+- [x] `src/wishlist/infrastructure/ui/wishlistAddresses.test.ts` zuerst (TDD):
   - `parseWishlistAddress('#/')` → `{ page: 'wishlists' }`
   - `'#/liste/neu'` → `{ page: 'createWishlist' }`
   - `'#/liste/abc-1'` → `{ page: 'wishlist', wishlistId: 'abc-1', filter: 'open' }`
@@ -455,38 +455,38 @@ Die Listenseite zeigt vorerst nur den Kopf und „Noch keine offenen Wünsche.�
     `'#/wunsch/w-1/bearbeiten'` → jeweilige Seite
   - `'#/liste/ab c'`, `'#/wunsch/'`, `'#/quatsch'` → `undefined`
   - `hashOf` ist für jede Adresse die Umkehrung von `parseWishlistAddress`
-- [ ] `wishlistAddresses.ts` implementieren. Die Seite `wishlist` führt `filter`, alle
+- [x] `wishlistAddresses.ts` implementieren. Die Seite `wishlist` führt `filter`, alle
       Seiten den Schlüssel `page`.
-- [ ] `src/app/router/routes.test.ts` anpassen und erweitern:
+- [x] `src/app/router/routes.test.ts` anpassen und erweitern:
   - `resolveRoute('#/einstellungen')` → `{ page: 'settings' }`, `'#/quatsch'` →
     `{ page: 'wishlists' }`, `'#/liste/a'` → Wunschlisten-Adresse
   - `pageKeyOf` ist für beide Filter derselben Liste gleich, für zwei Listen verschieden,
     für `settings` `'#/einstellungen'`
   - `navigationTargetOf(route)` → `'wishlists'` bzw. `'settings'` (für `aria-current`)
   - der bisherige Test für `pageTitleFor` entfällt
-- [ ] `src/app/router/routes.ts`: `type Route = WishlistAddress | { page: 'settings' }`,
+- [x] `src/app/router/routes.ts`: `type Route = WishlistAddress | { page: 'settings' }`,
       `resolveRoute`, `hashFor` (settings → `'#/einstellungen'`, sonst `hashOf`),
       `pageKeyOf`, `navigationTargetOf`; `pageTitleFor` entfällt
-- [ ] `src/shared/ui/navigation.test.ts` zuerst: `backTargetFor({ entry: 'inApp' })` →
+- [x] `src/shared/ui/navigation.test.ts` zuerst: `backTargetFor({ entry: 'inApp' })` →
       `'back'`, `{ entry: 'start' }` und `null` → `'fallback'`
-- [ ] `src/shared/ui/pageTitle.ts`, `pageFocus.ts`, `navigation.ts`,
+- [x] `src/shared/ui/pageTitle.ts`, `pageFocus.ts`, `navigation.ts`,
       `watched.svelte.ts`
-- [ ] `src/app/router/currentRoute.svelte.ts`: Seitenwechsel per
+- [x] `src/app/router/currentRoute.svelte.ts`: Seitenwechsel per
       `pageKeyOf(neu) !== pageKeyOf(alt)`, dann `requestHeadingFocus()` statt
       `focusPageHeading()`. Den Titel setzt es nicht mehr. Beim Start
       `markHistoryEntry('start')`, bei `hashchange` mit `history.state === null`
       `markHistoryEntry('inApp')`. `focusPageHeading.ts` löschen.
-- [ ] `src/shared/ui/buttons.css` mit `.button` und `.button--quiet`, Import in `main.ts`.
+- [x] `src/shared/ui/buttons.css` mit `.button` und `.button--quiet`, Import in `main.ts`.
       `MainNavigation.svelte` nutzt die Klassen statt des lokalen CSS. Das Aussehen bleibt
       gleich, `e2e/colorScheme.spec.ts` sichert das ab.
-- [ ] `MainNavigation.svelte` bekommt die `Route`. `aria-current` ist `'page'` für die
+- [x] `MainNavigation.svelte` bekommt die `Route`. `aria-current` ist `'page'` für die
       exakte Seite (`wishlists`, `settings`), `'true'` für Unterseiten des Ziels
       `wishlists`. Die Füllung hängt an `[aria-current]`, nicht nur an `='page'`.
-- [ ] `src/shared/ui/PageHeader.svelte`: `h1 tabindex="-1"`, Snippet `actions`,
+- [x] `src/shared/ui/PageHeader.svelte`: `h1 tabindex="-1"`, Snippet `actions`,
       `$effect(() => showPageTitle(heading))`. Beim Einhängen wird bei
       `takeHeadingFocusRequest()` das `h1` fokussiert. `SettingsPage.svelte` und
       `WishlistsPage.svelte` nutzen `PageHeader`.
-- [ ] `src/shared/ui/ActionBar.svelte` und Layout als durchgehende Flex-Kette:
+- [x] `src/shared/ui/ActionBar.svelte` und Layout als durchgehende Flex-Kette:
       `#app` (`display: flex; flex-direction: column; min-height: 100dvh`) → `main`
       (`flex: 1; display: flex; flex-direction: column`) → Seitenwurzel, also `form` oder
       `.page` (`flex: 1; display: flex; flex-direction: column`) → `ActionBar` als letztes
@@ -497,31 +497,31 @@ Die Listenseite zeigt vorerst nur den Kopf und „Noch keine offenen Wünsche.�
       Breite hat). `body` verliert den unteren Safe-Area-Abstand. `main` hat unten
       `calc(1rem + env(safe-area-inset-bottom))` nur, wenn es keine Leiste enthält
       (`main:not(:has(.action-bar))`), sonst 0.
-- [ ] `e2e/layout.spec.ts`: Auf „Wunschliste erstellen“ liegt die Leiste bei kurzem Inhalt
+- [x] `e2e/layout.spec.ts`: Auf „Wunschliste erstellen“ liegt die Leiste bei kurzem Inhalt
       am unteren Rand des Viewports. Bei künstlich hohem Inhalt bleibt sie nach dem
       Scrollen im Viewport, und ihre Unterkante fällt mit der des Viewports zusammen.
-- [ ] Domäne, TDD in `src/wishlist/domain/*.test.ts`:
+- [x] Domäne, TDD in `src/wishlist/domain/*.test.ts`:
   - `Name.parse`: `'  Geburtstag  '` → `'Geburtstag'`, `''` und `'   '` → `missing`,
     100 Zeichen ok, 101 → `tooLong`, 100 Emoji zählen als 100
   - `Wishlist.create` trägt ID und Namen, `rename` liefert eine neue Liste mit neuem Namen
     und gleicher ID
   - `sortWishlists`: `['Weihnachten', 'ärger', 'Apfel']` → `Apfel, ärger, Weihnachten`.
     Bei gleichem Namen entscheidet die ID, damit die Reihenfolge stabil bleibt.
-- [ ] `ids.ts`, `parsed.ts`, `Unsubscribe.ts`, `Name.ts`, `Wishlist.ts`,
+- [x] `ids.ts`, `parsed.ts`, `Unsubscribe.ts`, `Name.ts`, `Wishlist.ts`,
       `WishlistRepository.ts` implementieren
-- [ ] `src/wishlist/application/fakes/InMemoryWishlistRepository.ts`,
+- [x] `src/wishlist/application/fakes/InMemoryWishlistRepository.ts`,
       `fakes/SequentialIdGenerator.ts`. Beobachter werden bei `watch…` sofort und bei
       jedem `save`/`delete` benachrichtigt.
-- [ ] Use Cases, TDD in `src/wishlist/application/*.test.ts` gegen die Fakes:
+- [x] Use Cases, TDD in `src/wishlist/application/*.test.ts` gegen die Fakes:
   - `CreateWishlist.execute(name)` speichert eine Liste mit der nächsten ID und gibt die
     ID zurück
   - `WatchWishlists.execute(onChange)` liefert sortiert, meldet neue Listen, die
     Abmeldefunktion beendet die Meldungen
   - `WatchWishlist.execute(id, onChange)` liefert die Liste bzw. `undefined`
-- [ ] `src/wishlist/infrastructure/localStorage/StoredCollection.ts` und
+- [x] `src/wishlist/infrastructure/localStorage/StoredCollection.ts` und
       `LocalStorageWishlistRepository.ts` (Schlüssel `wunschliste.wishlists`, Record
       `{ id, name }`)
-- [ ] Integrationstest `LocalStorageWishlistRepository.test.ts` mit einem im Test
+- [x] Integrationstest `LocalStorageWishlistRepository.test.ts` mit einem im Test
       definierten Speicher (`Pick<Storage, 'getItem' | 'setItem'>` auf Basis einer `Map`)
       und einem `EventTarget`. Ereignisse entstehen per
       `Object.assign(new Event('storage'), { key })`, weil Node kein `StorageEvent` kennt:
@@ -533,24 +533,24 @@ Die Listenseite zeigt vorerst nur den Kopf und „Noch keine offenen Wünsche.�
     Listen sind vorhanden (kein Überschreiben durch veralteten Stand)
   - ungültiges JSON → leere Sammlung. Ein Eintrag mit leerem Namen wird übersprungen, die
     übrigen bleiben erhalten.
-- [ ] `src/wishlist/infrastructure/createWishlistModule.ts` und
+- [x] `src/wishlist/infrastructure/createWishlistModule.ts` und
       `ui/wishlistModuleContext.ts`. `App.svelte` ruft
       `provideWishlistModule(createWishlistModule({ storage: localStorage, storageEvents: window, idGenerator: { next: () => crypto.randomUUID() } }))`
       auf.
-- [ ] `App.svelte`: `{#key pageKeyOf(route)}` um `{#if route.page === 'settings'} <SettingsPage /> {:else} <WishlistPages address={route} /> {/if}`
-- [ ] `ui/WishlistPages.svelte`: wählt die Seite zur Adresse. Seiten, die erst in späteren
+- [x] `App.svelte`: `{#key pageKeyOf(route)}` um `{#if route.page === 'settings'} <SettingsPage /> {:else} <WishlistPages address={route} /> {/if}`
+- [x] `ui/WishlistPages.svelte`: wählt die Seite zur Adresse. Seiten, die erst in späteren
       Phasen entstehen, zeigen bis dahin `NotFound`.
-- [ ] `ui/WishlistsPage.svelte`: `PageHeader` mit [+] (`a.button`, `aria-label="Wunschliste erstellen"`,
+- [x] `ui/WishlistsPage.svelte`: `PageHeader` mit [+] (`a.button`, `aria-label="Wunschliste erstellen"`,
       Lucide `Plus`), Liste als `<ul>` mit einem Link je Liste (`›`-Icon stumm) oder dem
       leeren Zustand
-- [ ] `ui/CreateWishlistPage.svelte`: `<form novalidate>`, Feld „Name“, Fehler per
+- [x] `ui/CreateWishlistPage.svelte`: `<form novalidate>`, Feld „Name“, Fehler per
       `aria-invalid`/`aria-describedby`, Fokus aufs Feld bei Fehler. `ActionBar` mit
       [+ Erstellen] (`type="submit"`). Erfolg → `replaceWith(hashOf({ page: 'wishlist', … }))`.
-- [ ] `ui/WishlistPage.svelte` (vorerst): `Watched` über `WatchWishlist`. `loading` →
+- [x] `ui/WishlistPage.svelte` (vorerst): `Watched` über `WatchWishlist`. `loading` →
       nichts, `found` → `PageHeader` mit dem Namen und „Noch keine offenen Wünsche.“,
       `missing` → `NotFound` mit „Diese Wunschliste gibt es nicht mehr.“
-- [ ] `ui/NotFound.svelte`: `PageHeader` „Nicht gefunden“, Satz, Link „Zur Übersicht“
-- [ ] `e2e/wishlists.spec.ts`:
+- [x] `ui/NotFound.svelte`: `PageHeader` „Nicht gefunden“, Satz, Link „Zur Übersicht“
+- [x] `e2e/wishlists.spec.ts`:
   - leerer Zustand → „Wunschliste erstellen“ öffnet `#/liste/neu`, h1 fokussiert
   - leerer Name → Fehlertext sichtbar, Feld hat `aria-invalid="true"` und ist fokussiert
   - „Geburtstag 2027“ erstellen → Listenseite, h1 „Geburtstag 2027“ fokussiert, Titel
@@ -560,23 +560,23 @@ Die Listenseite zeigt vorerst nur den Kopf und „Noch keine offenen Wünsche.�
   - Auf der Listenseite trägt der Navigationslink „Wunschlisten“ `aria-current="true"`
   - zweiter Tab im selben Kontext: eine dort erstellte Liste erscheint im ersten Tab ohne
     Neuladen
-- [ ] `e2e/navigation.spec.ts` bleibt grün (Titel, Umleitung `#/quatsch`, Fokus, sticky)
-- [ ] `e2e/accessibility.spec.ts`: Seitenliste als Tabelle mit optionalem Seed. Hilfsdatei
+- [x] `e2e/navigation.spec.ts` bleibt grün (Titel, Umleitung `#/quatsch`, Fokus, sticky)
+- [x] `e2e/accessibility.spec.ts`: Seitenliste als Tabelle mit optionalem Seed. Hilfsdatei
       `e2e/seed.ts` schreibt Records per `addInitScript` in `localStorage`, **nur wenn der
       Schlüssel noch fehlt**, damit ein `reload` die Änderungen des Tests nicht überschreibt. Neu: Übersicht
       mit Listen, „Wunschliste erstellen“, Listenseite, „Nicht gefunden“ — jeweils × drei
       Farbschemata
-- [ ] `README.md`, Abschnitt „Architektur“: `shared/ui` ergänzen; neuer Abschnitt
+- [x] `README.md`, Abschnitt „Architektur“: `shared/ui` ergänzen; neuer Abschnitt
       „Daten“: in Schritt 2 nur lokal im Browser (`wunschliste.wishlists`,
       `wunschliste.wishes`), sie werden beim späteren Wechsel auf Firestore nicht übernommen
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` grün, u. a. `architecture.test.ts` mit allen alten und neuen
+- [x] `npm run test:unit` grün, u. a. `architecture.test.ts` mit allen alten und neuen
       Fällen, `wishlistAddresses.test.ts`, `routes.test.ts`, `navigation.test.ts`,
       Domänen-, Use-Case- und Adaptertests
-- [ ] `npm run test:architecture` grün
-- [ ] `npm run lint` grün
-- [ ] `npm test` grün inklusive `wishlists.spec.ts`, `layout.spec.ts`, `navigation.spec.ts`,
+- [x] `npm run test:architecture` grün
+- [x] `npm run lint` grün
+- [x] `npm test` grün inklusive `wishlists.spec.ts`, `layout.spec.ts`, `navigation.spec.ts`,
       `colorScheme.spec.ts` und aller axe-Kombinationen
 
 **Manuelle Verifikation**:
@@ -814,6 +814,23 @@ Wünsche verschenken und das Schenken zurücknehmen. Die Listenseite filtert nac
 ## Notizen zur Umsetzung
 
 Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalten.
+
+Phase 1:
+- `CurrentRoute` markiert den Starteintrag nur, wenn `history.state` noch leer ist. Nach
+  einem Neuladen bleibt ein Eintrag, der in der App entstanden ist, damit `inApp`, denn
+  `history.back()` führt dort weiterhin in die App.
+- `WishFilter` liegt schon in Phase 1 in `domain/wishOrder.ts`, weil die Adressen ihn
+  brauchen.
+- Zusätzliche fachfreie Bausteine: `shared/ui/TextField.svelte` (Beschriftung, Feld,
+  Fehlertext samt `aria-invalid`/`aria-describedby`, `focus()`), `shared/ui/linkList.css`
+  (`.link-list`) und `.button--icon` für die Kopf-Knöpfe. Die Klasse `.page` steht in
+  `app/global.css`, globale Links erben die Textfarbe.
+- `domain/parsed.ts` enthält zusätzlich `valid`, `invalid` und `requireValid` (Tests und
+  Wiederherstellen).
+- Die Fehlertexte liegen als Tabellen je Feld in `wishTexts.ts` (`NAME_PROBLEM_MESSAGES`),
+  weil `tooLong` für Name und Beschreibung verschiedene Sätze braucht.
+- Die Fakes nutzen die gemeinsame Hilfsklasse `application/fakes/ObservableMap.ts`, der
+  Adaptertest `localStorage/testStorage.ts` (`MapStorage`, `storageEventFor`).
 
 ## Verweise
 

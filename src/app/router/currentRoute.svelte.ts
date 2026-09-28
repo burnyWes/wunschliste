@@ -1,33 +1,41 @@
-import { focusPageHeading } from './focusPageHeading';
-import { hashFor, pageTitleFor, resolveRoute, type Route } from './routes';
+import { isHistoryEntryMarked, markHistoryEntry } from '../../shared/ui/navigation';
+import { requestHeadingFocus } from '../../shared/ui/pageFocus';
+import { hashFor, pageKeyOf, resolveRoute, type Route } from './routes';
 
 export class CurrentRoute {
-  route = $state<Route>(resolveRoute(location.hash));
+  route = $state.raw<Route>(resolveRoute(location.hash));
 
   constructor() {
-    this.#showRoute();
+    if (!isHistoryEntryMarked()) {
+      markHistoryEntry('start');
+    }
+    this.#showCanonicalHash();
   }
 
   followHashChanges(): () => void {
-    const followHash = () => this.#navigateTo(resolveRoute(location.hash));
+    const followHash = () => {
+      if (!isHistoryEntryMarked()) {
+        markHistoryEntry('inApp');
+      }
+      this.#navigateTo(resolveRoute(location.hash));
+    };
     window.addEventListener('hashchange', followHash);
     return () => window.removeEventListener('hashchange', followHash);
   }
 
   #navigateTo(route: Route): void {
-    const isPageChange = route !== this.route;
+    const isPageChange = pageKeyOf(route) !== pageKeyOf(this.route);
     this.route = route;
-    this.#showRoute();
+    this.#showCanonicalHash();
     if (isPageChange) {
-      void focusPageHeading();
+      requestHeadingFocus();
     }
   }
 
-  #showRoute(): void {
+  #showCanonicalHash(): void {
     const canonicalHash = hashFor(this.route);
     if (location.hash !== canonicalHash) {
       history.replaceState(history.state, '', canonicalHash);
     }
-    document.title = `${pageTitleFor(this.route)} – Wunschliste`;
   }
 }

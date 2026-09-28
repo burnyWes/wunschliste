@@ -1,32 +1,32 @@
-export type Route = 'wishlists' | 'settings';
+import {
+  hashOf,
+  parseWishlistAddress,
+  type WishlistAddress,
+} from '../../wishlist/infrastructure/ui/wishlistAddresses';
 
-const DEFAULT_ROUTE: Route = 'wishlists';
+export type Route = WishlistAddress | { page: 'settings' };
 
-const HASHES: Record<Route, string> = {
-  wishlists: '#/',
-  settings: '#/einstellungen',
-};
+export type NavigationTarget = 'wishlists' | 'settings';
 
-const PAGE_TITLES: Record<Route, string> = {
-  wishlists: 'Wunschlisten',
-  settings: 'Einstellungen',
-};
+const SETTINGS_HASH = '#/einstellungen';
 
-function isRoute(candidate: string): candidate is Route {
-  return Object.hasOwn(HASHES, candidate);
-}
+const DEFAULT_ROUTE: Route = { page: 'wishlists' };
 
 export function resolveRoute(hash: string): Route {
-  const matchingRoute = Object.keys(HASHES)
-    .filter(isRoute)
-    .find((route) => HASHES[route] === hash);
-  return matchingRoute ?? DEFAULT_ROUTE;
+  if (hash === SETTINGS_HASH) {
+    return { page: 'settings' };
+  }
+  return parseWishlistAddress(hash) ?? DEFAULT_ROUTE;
 }
 
 export function hashFor(route: Route): string {
-  return HASHES[route];
+  return route.page === 'settings' ? SETTINGS_HASH : hashOf(route);
 }
 
-export function pageTitleFor(route: Route): string {
-  return PAGE_TITLES[route];
+export function pageKeyOf(route: Route): string {
+  return route.page === 'wishlist' ? hashFor({ ...route, filter: 'open' }) : hashFor(route);
+}
+
+export function navigationTargetOf(route: Route): NavigationTarget {
+  return route.page === 'settings' ? 'settings' : 'wishlists';
 }

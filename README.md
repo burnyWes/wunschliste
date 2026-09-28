@@ -79,12 +79,21 @@ Dann `npx pwa-assets-generator --config pwa-assets.config.mjs`. Die Dateien land
 ```
 src/
   app/          Kompositionswurzel: Einstieg, Router, Layout, Farbschema
+  shared/
+    ui/         fachfreie Bausteine: Knöpfe, Seitenkopf, Leiste, Dialog, Navigation
   wishlist/     fachlicher Kontext
     domain/ application/ infrastructure/
 ```
 
-Abhängigkeiten zeigen nach innen. `eslint.architecture.config.js` setzt das durch,
-`tests/architecture.test.ts` sichert die Regel selbst ab.
+Abhängigkeiten zeigen nach innen. `shared/ui` kennt weder `app` noch fachliche Kontexte,
+`domain` und `application` kennen `shared/ui` nicht. `eslint.architecture.config.js` setzt
+das durch, `tests/architecture.test.ts` sichert die Regel selbst ab.
+
+## Daten
+
+In Schritt 2 liegen alle Daten nur lokal im Browser (`localStorage`) unter den Schlüsseln
+`wunschliste.wishlists` und `wunschliste.wishes`. Beim späteren Wechsel auf Firestore
+werden sie nicht übernommen.
 
 ## Arbeitsablauf
 

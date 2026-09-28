@@ -1,8 +1,19 @@
 <script lang="ts">
-  import WishlistsPage from '../wishlist/infrastructure/ui/WishlistsPage.svelte';
+  import { createWishlistModule } from '../wishlist/infrastructure/createWishlistModule';
+  import WishlistPages from '../wishlist/infrastructure/ui/WishlistPages.svelte';
+  import { provideWishlistModule } from '../wishlist/infrastructure/ui/wishlistModuleContext';
   import MainNavigation from './layout/MainNavigation.svelte';
   import { CurrentRoute } from './router/currentRoute.svelte';
+  import { pageKeyOf } from './router/routes';
   import SettingsPage from './settings/SettingsPage.svelte';
+
+  provideWishlistModule(
+    createWishlistModule({
+      storage: localStorage,
+      storageEvents: window,
+      idGenerator: { next: () => crypto.randomUUID() },
+    }),
+  );
 
   const currentRoute = new CurrentRoute();
 
@@ -15,11 +26,13 @@
 </header>
 
 <main>
-  {#if currentRoute.route === 'settings'}
-    <SettingsPage />
-  {:else}
-    <WishlistsPage />
-  {/if}
+  {#key pageKeyOf(currentRoute.route)}
+    {#if currentRoute.route.page === 'settings'}
+      <SettingsPage />
+    {:else}
+      <WishlistPages address={currentRoute.route} />
+    {/if}
+  {/key}
 </main>
 
 <style>
@@ -36,6 +49,13 @@
   }
 
   main {
-    padding: 0 1rem 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 1rem calc(1rem + env(safe-area-inset-bottom));
+  }
+
+  main:has(:global(.action-bar)) {
+    padding-bottom: 0;
   }
 </style>

@@ -30,18 +30,27 @@ export default defineConfig(
     },
   },
   {
+    files: ['src/shared/**/*.{ts,svelte}'],
+    rules: {
+      'no-restricted-imports': ['error', { patterns: [outwardTo(['app', 'wishlist'])] }],
+    },
+  },
+  {
     files: ['src/**/application/**/*.{ts,svelte}'],
     rules: {
       'no-restricted-imports': [
         'error',
-        { patterns: [nonRelativeImport, outwardTo(['infrastructure', 'app'])] },
+        { patterns: [nonRelativeImport, outwardTo(['infrastructure', 'app', 'shared/ui'])] },
       ],
     },
   },
   {
     files: ['src/**/application/**/*.test.ts'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: [outwardTo(['infrastructure', 'app'])] }],
+      'no-restricted-imports': [
+        'error',
+        { patterns: [outwardTo(['infrastructure', 'app', 'shared/ui'])] },
+      ],
     },
   },
   {
@@ -49,7 +58,12 @@ export default defineConfig(
     rules: {
       'no-restricted-imports': [
         'error',
-        { patterns: [nonRelativeImport, outwardTo(['application', 'infrastructure', 'app'])] },
+        {
+          patterns: [
+            nonRelativeImport,
+            outwardTo(['application', 'infrastructure', 'app', 'shared/ui']),
+          ],
+        },
       ],
     },
   },
@@ -58,7 +72,7 @@ export default defineConfig(
     rules: {
       'no-restricted-imports': [
         'error',
-        { patterns: [outwardTo(['application', 'infrastructure', 'app'])] },
+        { patterns: [outwardTo(['application', 'infrastructure', 'app', 'shared/ui'])] },
       ],
     },
   },

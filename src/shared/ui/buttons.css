@@ -1,0 +1,28 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.4em 0.9em;
+  border: 0.1875rem solid var(--color-button-border);
+  border-radius: 0.5rem;
+  background-color: var(--color-button);
+  color: var(--color-button-text);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button--quiet {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+.button--icon {
+  padding: 0.4em;
+}
