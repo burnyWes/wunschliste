@@ -6,7 +6,7 @@
 
 Name:    Wunschliste
 Kürzel:  WL
-Stack:   noch offen
+Stack:   TypeScript, Svelte 5, Vite, Firebase (Firestore, Auth), PWA auf GitHub Pages
 Bauart:  onion
 
 ## Befehle
@@ -18,7 +18,7 @@ Build:   -
 
 ## Fachliche Kontexte
 
-<noch keine>
+- **wishlist** — Personen, ihre Wunschlisten und Wünsche samt Geheim-Einträgen, Schenken und Erhalten.
 
 ---
 
