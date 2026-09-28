@@ -17,3 +17,8 @@ export function sortWishes(wishes: readonly Wish[]): Wish[] {
       compareIds(first.id, second.id),
   );
 }
+
+export function wishesMatching(wishes: readonly Wish[], filter: WishFilter): Wish[] {
+  const shouldBeOpen = filter === 'open';
+  return wishes.filter((wish) => wish.isOpen === shouldBeOpen);
+}

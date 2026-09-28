@@ -3,9 +3,11 @@ import { wishIdOf, wishlistIdOf } from './ids';
 import { Name } from './Name';
 import { requireValid } from './parsed';
 import { Price } from './Price';
-import { Wish } from './Wish';
+import { Wish, WishAlreadyGifted, WishNotGifted } from './Wish';
 
 const helmet = { name: requireValid(Name.parse('Fahrradhelm')) };
+
+const openWish = () => Wish.create(wishIdOf('w'), wishlistIdOf('l'), helmet);
 
 describe('Wish', () => {
   it('is open when created', () => {
@@ -31,5 +33,25 @@ describe('Wish', () => {
     expect(edited.wishlistId).toBe('l');
     expect(edited.gifted).toBe(true);
     expect(wish.details).toBe(helmet);
+  });
+
+  it('is gifted into a wish that is no longer open', () => {
+    const gifted = openWish().gift();
+
+    expect(gifted.gifted).toBe(true);
+    expect(gifted.isOpen).toBe(false);
+    expect(gifted.id).toBe('w');
+  });
+
+  it('cannot be gifted twice', () => {
+    expect(() => openWish().gift().gift()).toThrow(WishAlreadyGifted);
+  });
+
+  it('is open again after taking the gift back', () => {
+    expect(openWish().gift().takeBackGift().isOpen).toBe(true);
+  });
+
+  it('cannot take back a gift that was never given', () => {
+    expect(() => openWish().takeBackGift()).toThrow(WishNotGifted);
   });
 });

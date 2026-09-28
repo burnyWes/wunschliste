@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ExternalLink, Pencil } from '@lucide/svelte';
+  import { ExternalLink, Gift, Pencil, Undo2 } from '@lucide/svelte';
   import ActionBar from '../../../shared/ui/ActionBar.svelte';
   import PageHeader from '../../../shared/ui/PageHeader.svelte';
   import { Watched } from '../../../shared/ui/watched.svelte';
@@ -13,7 +13,7 @@
 
   let { wishId }: { wishId: WishId } = $props();
 
-  const { watchWish, watchWishlist } = useWishlistModule();
+  const { watchWish, watchWishlist, giftWish, takeBackGift } = useWishlistModule();
 
   const wish = new Watched<Wish>();
   const wishlist = new Watched<Wishlist>();
@@ -28,6 +28,18 @@
     }
   });
 
+  let statusMessage = $state('');
+
+  async function toggleGift(currentWish: Wish): Promise<void> {
+    if (currentWish.gifted) {
+      await takeBackGift.execute(currentWish.id);
+      statusMessage = 'Wieder offen.';
+    } else {
+      await giftWish.execute(currentWish.id);
+      statusMessage = 'Als erfüllt markiert.';
+    }
+  }
+
   const backToWishlist = $derived(
     wishlist.value && {
       label: wishlist.value.name.value,
@@ -41,6 +53,9 @@
   <div class="page">
     <PageHeader heading={name.value} back={backToWishlist} />
     <p><WishSummary details={wish.value.details} /></p>
+    {#if wish.value.gifted}
+      <p class="fulfilled">Erfüllt</p>
+    {/if}
     {#if link}
       <div class="button-row">
         <a class="button" href={link.href} target="_blank" rel="noopener">
@@ -51,10 +66,18 @@
     {#if description}
       <p class="description">{description.value}</p>
     {/if}
+    <p class="status" role="status">{statusMessage}</p>
     <ActionBar>
       <a class="button" href={hashOf({ page: 'editWish', wishId })}>
         <Pencil aria-hidden="true" size="1.25em" /> Bearbeiten
       </a>
+      <button class="button" type="button" onclick={() => wish.value && toggleGift(wish.value)}>
+        {#if wish.value.gifted}
+          <Undo2 aria-hidden="true" size="1.25em" /> Schenken zurücknehmen
+        {:else}
+          <Gift aria-hidden="true" size="1.25em" /> Schenken
+        {/if}
+      </button>
     </ActionBar>
   </div>
 {:else if wish.status === 'missing'}
@@ -62,6 +85,11 @@
 {/if}
 
 <style>
+  .fulfilled,
+  .status {
+    font-weight: 700;
+  }
+
   .description {
     white-space: pre-line;
     overflow-wrap: anywhere;

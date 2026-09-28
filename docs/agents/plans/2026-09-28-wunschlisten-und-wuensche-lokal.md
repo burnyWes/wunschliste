@@ -782,12 +782,12 @@ mit dem eigenen Bestätigungsdialog.
       mit axe
 
 **Manuelle Verifikation**:
-- [ ] iPhone mit VoiceOver: „Wunschliste löschen“ doppeltippen → VoiceOver liest
+- [x] iPhone mit VoiceOver: „Wunschliste löschen“ doppeltippen → VoiceOver liest
       „Wunschliste löschen?“ und den Text mit der Anzahl, der Fokus steht auf
       „Abbrechen“. Wischen verlässt den Dialog nicht. Die Zwei-Finger-Z-Geste schließt
       ihn, danach steht der Fokus wieder auf „Wunschliste löschen“.
-- [ ] Der Dialog sieht in allen drei Farbschemata stimmig aus
-- [ ] iPhone als installierte App: Von einem Wunsch führt „‹ <Listenname>“ zurück zur Liste
+- [x] Der Dialog sieht in allen drei Farbschemata stimmig aus
+- [x] iPhone als installierte App: Von einem Wunsch führt „‹ <Listenname>“ zurück zur Liste
       und von dort „‹ Wunschlisten“ zur Übersicht. VoiceOver liest „Zurück zu
       <Listenname>, Link“.
 
@@ -799,26 +799,26 @@ Wünsche verschenken und das Schenken zurücknehmen. Die Listenseite filtert nac
 „Offene“ und „Erfüllte“, der Filter steht in der Adresse.
 
 **Aufgaben**:
-- [ ] Domäne, TDD:
+- [x] Domäne, TDD:
   - `gift()` auf einem offenen Wunsch → `gifted`, nicht mehr `isOpen`; auf einem
     verschenkten → `WishAlreadyGifted`
   - `takeBackGift()` auf einem verschenkten → offen; auf einem offenen → `WishNotGifted`
   - `wishesMatching(wishes, 'open')` / `'fulfilled'` trennt nach `isOpen` und erhält die
     Reihenfolge
-- [ ] Use Cases, TDD: `GiftWish.execute(id)`, `TakeBackGift.execute(id)` laden, rufen die
+- [x] Use Cases, TDD: `GiftWish.execute(id)`, `TakeBackGift.execute(id)` laden, rufen die
       Domäne auf, speichern; unbekannt → `WishNotFound`
-- [ ] `ui/WishPage.svelte`: in der `ActionBar` rechts [🎁 Schenken] (Lucide `Gift`) bzw.
+- [x] `ui/WishPage.svelte`: in der `ActionBar` rechts [🎁 Schenken] (Lucide `Gift`) bzw.
       [↶ Schenken zurücknehmen] (Lucide `Undo2`), jeweils `<button>`. Ist der Wunsch
       verschenkt, steht unter der Zusammenfassung „Erfüllt“. Eine immer vorhandene
       Statuszeile `role="status"` erhält nach der Aktion „Als erfüllt markiert.“ bzw.
       „Wieder offen.“. Der Fokus bleibt auf dem Knopf.
-- [ ] `ui/WishlistPage.svelte`: zwischen Kopf und Liste zwei `<button aria-pressed>`
+- [x] `ui/WishlistPage.svelte`: zwischen Kopf und Liste zwei `<button aria-pressed>`
       „Offene Wünsche“ / „Erfüllte Wünsche“ mit Knopf-Optik, der gedrückte gefüllt
       (`.button`), der andere `.button--quiet`. Tippen → `replaceWith` auf die Adresse mit
       dem anderen Filter, der Fokus bleibt auf dem Knopf (kein Seitenwechsel dank
       `pageKeyOf`). Die Liste zeigt `wishesMatching(…)`. Leere Zustände je Filter laut
       Akzeptanzkriterien.
-- [ ] `e2e/gifting.spec.ts`:
+- [x] `e2e/gifting.spec.ts`:
   - Wunsch öffnen → „Schenken“ → Statuszeile „Als erfüllt markiert.“, Knopf heißt
     „Schenken zurücknehmen“, „Erfüllt“ sichtbar
   - zurück zur Liste: Wunsch fehlt unter „Offene Wünsche“ („Offene Wünsche“ hat
@@ -831,13 +831,13 @@ Wünsche verschenken und das Schenken zurücknehmen. Die Listenseite filtert nac
     Umschalten)
   - „Schenken zurücknehmen“ → Wunsch wieder unter „Offene Wünsche“
   - leerer Zustand „Noch keine erfüllten Wünsche.“ ohne Knopf
-- [ ] `e2e/accessibility.spec.ts`: Listenseite mit Filter „Erfüllte“, Detailseite eines
+- [x] `e2e/accessibility.spec.ts`: Listenseite mit Filter „Erfüllte“, Detailseite eines
       verschenkten Wunsches
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` grün inklusive der Tests für Schenken, Filter und Use Cases
-- [ ] `npm run lint` grün
-- [ ] `npm test` grün inklusive `gifting.spec.ts`
+- [x] `npm run test:unit` grün inklusive der Tests für Schenken, Filter und Use Cases
+- [x] `npm run lint` grün
+- [x] `npm test` grün inklusive `gifting.spec.ts`
 
 **Manuelle Verifikation**:
 - [ ] iPhone mit VoiceOver: „Schenken“ doppeltippen → VoiceOver sagt „Als erfüllt
@@ -891,6 +891,14 @@ Phase 3:
   Seitenwechsel nicht kurz „Nicht gefunden“ auf.
 - Rück-Link ohne sichtbare Unterstreichung, erkennbar am Pfeil `ChevronLeft`; der
   zugängliche Name steht per `aria-label` („Zurück zu …“) und enthält den sichtbaren Text.
+
+Phase 4:
+- „Schenken“ und „Schenken zurücknehmen“ sind **ein** Knopf, dessen Icon und Text
+  wechseln. So bleibt der Fokus auf demselben Element.
+- Die Filterknöpfe stehen wie die übrigen frei stehenden Knöpfe zentriert in einer
+  `.button-row`.
+- WebKit fokussiert einen Knopf beim Antippen nicht. `gifting.spec.ts` löst „Schenken“
+  deshalb per `focus()` und `Enter` aus, um das Verbleiben des Fokus zu prüfen.
 
 ## Verweise
 

@@ -16,7 +16,7 @@
 {:else if address.page === 'createWishlist'}
   <CreateWishlistPage />
 {:else if address.page === 'wishlist'}
-  <WishlistPage wishlistId={address.wishlistId} />
+  <WishlistPage wishlistId={address.wishlistId} filter={address.filter} />
 {:else if address.page === 'editWishlist'}
   <EditWishlistPage wishlistId={address.wishlistId} />
 {:else if address.page === 'createWish'}

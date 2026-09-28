@@ -28,6 +28,14 @@ const wishlistWithWishes: SeedData = {
   ],
 };
 
+const wishlistWithGiftedWish: SeedData = {
+  wishlists: twoWishlists.wishlists,
+  wishes: [
+    ...(wishlistWithWishes.wishes ?? []),
+    { id: 'tent', wishlistId: 'birthday', name: 'Zelt', rating: 'nice', gifted: true },
+  ],
+};
+
 async function submitInvalidWish(page: Page): Promise<void> {
   await page.getByRole('textbox', { name: 'Preis in Euro' }).fill('abc');
   await page.getByRole('button', { name: 'Speichern' }).click();
@@ -90,6 +98,18 @@ const pages: CheckedPage[] = [
     heading: 'Wunschliste bearbeiten',
     data: wishlistWithWishes,
     prepare: openDeletionDialog,
+  },
+  {
+    name: 'fulfilled wishes',
+    path: './#/liste/birthday/erfuellt',
+    heading: 'Geburtstag 2027',
+    data: wishlistWithGiftedWish,
+  },
+  {
+    name: 'gifted wish',
+    path: './#/wunsch/tent',
+    heading: 'Zelt',
+    data: wishlistWithGiftedWish,
   },
   {
     name: 'edit wish',

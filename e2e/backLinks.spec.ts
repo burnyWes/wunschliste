@@ -6,7 +6,10 @@ const pageHeading = (page: Page, name: string) => page.getByRole('heading', { le
 test.beforeEach(async ({ page }) => {
   await seed(page, {
     wishlists: [{ id: 'birthday', name: 'Geburtstag' }],
-    wishes: [{ id: 'helmet', wishlistId: 'birthday', name: 'Fahrradhelm', gifted: false }],
+    wishes: [
+      { id: 'helmet', wishlistId: 'birthday', name: 'Fahrradhelm', gifted: false },
+      { id: 'tent', wishlistId: 'birthday', name: 'Zelt', gifted: true },
+    ],
   });
 });
 
@@ -26,7 +29,7 @@ test('leads from a wish back to its wishlist without a new history entry', async
 
 test('keeps the filter of the wishlist', async ({ page }) => {
   await page.goto('./#/liste/birthday/erfuellt');
-  await page.getByRole('link', { name: /^Fahrradhelm/ }).click();
+  await page.getByRole('link', { name: /^Zelt/ }).click();
 
   await page.getByRole('link', { name: 'Zurück zu Geburtstag' }).click();
 

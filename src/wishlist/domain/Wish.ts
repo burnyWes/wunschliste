@@ -31,11 +31,39 @@ export class Wish {
   edit(details: WishDetails): Wish {
     return new Wish(this.id, this.wishlistId, details, this.gifted);
   }
+
+  gift(): Wish {
+    if (this.gifted) {
+      throw new WishAlreadyGifted(this.id);
+    }
+    return new Wish(this.id, this.wishlistId, this.details, true);
+  }
+
+  takeBackGift(): Wish {
+    if (!this.gifted) {
+      throw new WishNotGifted(this.id);
+    }
+    return new Wish(this.id, this.wishlistId, this.details, false);
+  }
 }
 
 export class WishNotFound extends Error {
   constructor(readonly wishId: WishId) {
     super(`The wish ${wishId} does not exist.`);
     this.name = 'WishNotFound';
+  }
+}
+
+export class WishAlreadyGifted extends Error {
+  constructor(readonly wishId: WishId) {
+    super(`The wish ${wishId} has already been gifted.`);
+    this.name = 'WishAlreadyGifted';
+  }
+}
+
+export class WishNotGifted extends Error {
+  constructor(readonly wishId: WishId) {
+    super(`The wish ${wishId} has not been gifted.`);
+    this.name = 'WishNotGifted';
   }
 }

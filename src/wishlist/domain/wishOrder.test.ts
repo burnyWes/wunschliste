@@ -4,7 +4,7 @@ import { Name } from './Name';
 import { requireValid } from './parsed';
 import type { Rating } from './Rating';
 import { Wish } from './Wish';
-import { sortWishes } from './wishOrder';
+import { sortWishes, wishesMatching } from './wishOrder';
 
 function wish(name: string, rating?: Rating, id = name): Wish {
   return Wish.create(wishIdOf(id), wishlistIdOf('l'), {
@@ -43,5 +43,17 @@ describe('sortWishes', () => {
     const sorted = sortWishes([wish('Buch', undefined, 'b'), wish('Buch', undefined, 'a')]);
 
     expect(sorted.map(({ id }) => id)).toEqual(['a', 'b']);
+  });
+});
+
+describe('wishesMatching', () => {
+  const wishes = [wish('A', 'essential'), wish('B', 'wanted').gift(), wish('C'), wish('D').gift()];
+
+  it('keeps the open wishes in their order', () => {
+    expect(namesOf(wishesMatching(wishes, 'open'))).toEqual(['A', 'C']);
+  });
+
+  it('keeps the fulfilled wishes in their order', () => {
+    expect(namesOf(wishesMatching(wishes, 'fulfilled'))).toEqual(['B', 'D']);
   });
 });

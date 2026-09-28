@@ -3,7 +3,9 @@ import { CreateWishlist } from '../application/CreateWishlist';
 import { DeleteWish } from '../application/DeleteWish';
 import { DeleteWishlist } from '../application/DeleteWishlist';
 import { EditWish } from '../application/EditWish';
+import { GiftWish } from '../application/GiftWish';
 import { RenameWishlist } from '../application/RenameWishlist';
+import { TakeBackGift } from '../application/TakeBackGift';
 import { WatchWish } from '../application/WatchWish';
 import { WatchWishesOfWishlist } from '../application/WatchWishesOfWishlist';
 import { WatchWishlist } from '../application/WatchWishlist';
@@ -33,6 +35,8 @@ export function createWishlistModule({ storage, storageEvents, idGenerator }: Wi
     watchWish: new WatchWish(wishes),
     editWish: new EditWish(wishes),
     deleteWish: new DeleteWish(wishes),
+    giftWish: new GiftWish(wishes),
+    takeBackGift: new TakeBackGift(wishes),
   };
 }
 
