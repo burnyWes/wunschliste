@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { requireValid } from '../../domain/parsed';
+import { parseWishDetails } from '../../domain/WishDetails';
 import { Price } from '../../domain/Price';
 import {
   DESCRIPTION_PROBLEM_MESSAGES,
@@ -9,6 +10,9 @@ import {
   PRICE_PROBLEM_MESSAGES,
   ratingLabel,
   ratingStars,
+  wishDeletionMessage,
+  wishDetailsInputOf,
+  wishlistDeletionMessage,
 } from './wishTexts';
 
 describe('formatPrice', () => {
@@ -47,5 +51,39 @@ describe('problem messages', () => {
       notPositive: 'Der Preis muss größer als 0 sein.',
       tooHigh: 'Der Preis darf höchstens 99.999,99 € betragen.',
     });
+  });
+});
+
+describe('deletion messages', () => {
+  it.each([
+    [0, '„Geburtstag“ wird gelöscht.'],
+    [1, '„Geburtstag“ mit 1 Wunsch wird gelöscht.'],
+    [5, '„Geburtstag“ mit 5 Wünschen wird gelöscht.'],
+  ])('names a wishlist with %i wishes', (wishCount, message) => {
+    expect(wishlistDeletionMessage('Geburtstag', wishCount)).toBe(message);
+  });
+
+  it('names the wish', () => {
+    expect(wishDeletionMessage('Fahrradhelm')).toBe('„Fahrradhelm“ wird gelöscht.');
+  });
+});
+
+describe('wishDetailsInputOf', () => {
+  it.each([
+    {
+      name: 'Fahrradhelm',
+      link: 'https://amazon.de/helm',
+      description: 'Größe M',
+      price: '49,99',
+      rating: 'essential' as const,
+    },
+    { name: 'Buch', link: '', description: '', price: '12,00', rating: undefined },
+  ])('fills the form so that saving it unchanged keeps $name', (input) => {
+    const parsed = parseWishDetails(input);
+    if (!parsed.ok) {
+      throw new Error('Invalid test input');
+    }
+
+    expect(wishDetailsInputOf(parsed.details)).toEqual(input);
   });
 });

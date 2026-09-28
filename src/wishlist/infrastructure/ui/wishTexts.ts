@@ -2,6 +2,7 @@ import type { DescriptionProblem } from '../../domain/Description';
 import type { NameProblem } from '../../domain/Name';
 import type { Price, PriceProblem } from '../../domain/Price';
 import type { Rating } from '../../domain/Rating';
+import type { WishDetails, WishDetailsInput } from '../../domain/WishDetails';
 import type { WishLinkProblem } from '../../domain/WishLink';
 
 export const NAME_PROBLEM_MESSAGES: Record<NameProblem, string> = {
@@ -49,4 +50,30 @@ export function ratingLabel(rating: Rating): string {
 
 export function ratingStars(rating: Rating): string {
   return RATING_STARS[rating];
+}
+
+export function wishlistDeletionMessage(name: string, wishCount: number): string {
+  if (wishCount === 0) {
+    return `„${name}“ wird gelöscht.`;
+  }
+  const wishes = wishCount === 1 ? '1 Wunsch' : `${wishCount} Wünschen`;
+  return `„${name}“ mit ${wishes} wird gelöscht.`;
+}
+
+export function wishDeletionMessage(name: string): string {
+  return wishlistDeletionMessage(name, 0);
+}
+
+function priceInputOf(price: Price): string {
+  return (price.cents / CENTS_PER_EURO).toFixed(2).replace('.', ',');
+}
+
+export function wishDetailsInputOf(details: WishDetails): WishDetailsInput {
+  return {
+    name: details.name.value,
+    link: details.link?.href ?? '',
+    description: details.description?.value ?? '',
+    price: details.price ? priceInputOf(details.price) : '',
+    rating: details.rating,
+  };
 }

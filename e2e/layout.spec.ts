@@ -27,3 +27,25 @@ test('keeps the action bar at the bottom of the viewport while scrolling tall co
   await expect(actionBar(page)).toBeInViewport();
   expect(Math.abs(await bottomGapOf(page))).toBeLessThan(1);
 });
+
+test('centers the buttons in the action bar', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'wunschliste.wishlists',
+      JSON.stringify([{ id: 'b', name: 'Geburtstag' }]),
+    );
+  });
+  await page.goto('./#/liste/b/wunsch/neu');
+
+  const offCenter = await actionBar(page).evaluate((bar) => {
+    const barBox = bar.getBoundingClientRect();
+    const buttonBoxes = [...bar.querySelectorAll('.button')].map((button) =>
+      button.getBoundingClientRect(),
+    );
+    const left = Math.min(...buttonBoxes.map((box) => box.left));
+    const right = Math.max(...buttonBoxes.map((box) => box.right));
+    return Math.abs((left + right) / 2 - (barBox.left + barBox.right) / 2);
+  });
+
+  expect(offCenter).toBeLessThan(1);
+});

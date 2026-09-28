@@ -100,6 +100,19 @@ describe('LocalStorageWishRepository', () => {
     expect(await repository.get(wishIdOf('Buch'))).toBeDefined();
   });
 
+  it('deletes all wishes of one wishlist and keeps the others', async () => {
+    await repository.save(wishNamed('Helm'));
+    await repository.save(wishNamed('Buch'));
+    await repository.save(wishNamed('Schlitten', christmas));
+
+    await repository.deleteAllOf(birthday);
+
+    const otherInstance = new LocalStorageWishRepository(storage, new EventTarget());
+    expect(await otherInstance.get(wishIdOf('Helm'))).toBeUndefined();
+    expect(await otherInstance.get(wishIdOf('Buch'))).toBeUndefined();
+    expect(await otherInstance.get(wishIdOf('Schlitten'))).toBeDefined();
+  });
+
   it('skips records that break a rule and keeps the others', () => {
     const valid = { id: 'ok', wishlistId: 'birthday', name: 'Helm', gifted: false };
     storage.setItem(

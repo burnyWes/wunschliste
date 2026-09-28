@@ -31,4 +31,8 @@ export class InMemoryWishRepository implements WishRepository {
   async delete(id: WishId): Promise<void> {
     this.#wishes.delete(id);
   }
+
+  async deleteAllOf(wishlistId: WishlistId): Promise<void> {
+    this.#wishes.deleteWhere((wish) => wish.wishlistId === wishlistId);
+  }
 }

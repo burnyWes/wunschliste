@@ -13,6 +13,7 @@
     z-index: 1;
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 0.5rem;
     margin-top: auto;
     margin-inline: -1rem;

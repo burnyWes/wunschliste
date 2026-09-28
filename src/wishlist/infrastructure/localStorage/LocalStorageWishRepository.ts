@@ -133,4 +133,8 @@ export class LocalStorageWishRepository implements WishRepository {
   async delete(id: WishId): Promise<void> {
     this.#collection.removeWhere((record) => record.id === id);
   }
+
+  async deleteAllOf(wishlistId: WishlistId): Promise<void> {
+    this.#collection.removeWhere((record) => record.wishlistId === wishlistId);
+  }
 }

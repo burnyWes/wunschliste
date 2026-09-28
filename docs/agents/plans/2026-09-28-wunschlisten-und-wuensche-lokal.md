@@ -708,7 +708,7 @@ Listen umbenennen und löschen (mit ihren Wünschen), Wünsche bearbeiten und l�
 mit dem eigenen Bestätigungsdialog.
 
 **Aufgaben**:
-- [ ] Use Cases, TDD:
+- [x] Use Cases, TDD:
   - `RenameWishlist.execute(id, name)` speichert den neuen Namen; unbekannt →
     `WishlistNotFound`
   - `DeleteWishlist.execute(id)` löscht die Liste und **nur** ihre Wünsche; die Wünsche
@@ -716,42 +716,48 @@ mit dem eigenen Bestätigungsdialog.
   - `EditWish.execute(id, details)` speichert die neuen Details, `gifted` bleibt;
     unbekannt → `WishNotFound`
   - `DeleteWish.execute(id)` entfernt den Wunsch
-- [ ] `WishRepository.deleteAllOf` in Fake und Adapter, Adaptertest ergänzt
-- [ ] `src/shared/ui/ConfirmDialog.svelte`: `<dialog aria-labelledby aria-describedby>`,
+- [x] `WishRepository.deleteAllOf` in Fake und Adapter, Adaptertest ergänzt
+- [x] `src/shared/ui/ConfirmDialog.svelte`: `<dialog aria-labelledby aria-describedby>`,
       `h2`, Text, eigene Knopfzeile (nicht `ActionBar`) mit [🗑 {confirmLabel}] und
       [✕ Abbrechen]. `open(returnFocusTo)` merkt sich das Element, ruft `showModal()` auf
       und fokussiert „Abbrechen“. Das Ereignis `close` (auch per Escape) gibt den Fokus an
       `returnFocusTo` zurück. „Löschen“ schließt erst den Dialog, dann folgt `onconfirm`. Der
       Hintergrund (`::backdrop`) ist halbtransparent schwarz, der Dialog nutzt die
       Farbtokens.
-- [ ] `ui/wishTexts.ts`: `wishlistDeletionMessage` mit Test: 0 → „„X“ wird gelöscht.“,
+- [x] `ui/wishTexts.ts`: `wishlistDeletionMessage` mit Test: 0 → „„X“ wird gelöscht.“,
       1 → „„X“ mit 1 Wunsch wird gelöscht.“, 5 → „„X“ mit 5 Wünschen wird gelöscht.“
-- [ ] `ui/EditWishlistPage.svelte`: Formular wie beim Erstellen, vorbelegt. Am Ende
+- [x] `ui/EditWishlistPage.svelte`: Formular wie beim Erstellen, vorbelegt. Am Ende
       [🗑 Wunschliste löschen] öffnet den Dialog „Wunschliste löschen?“ mit der Anzahl aus
       `WatchWishesOfWishlist`. Aufruf `open(event.currentTarget)`. `ActionBar`:
       [💾 Speichern] → `goBack(<Liste>)`, [✕ Abbrechen] → `goBack(<Liste>)`. Löschen →
       `replaceWith('#/')`. Unbekannte ID → `NotFound`.
-- [ ] `ui/WishlistPage.svelte`: Kopf-Knopf [✏] „Wunschliste bearbeiten“ (Lucide `Pencil`)
+- [x] `ui/WishlistPage.svelte`: Kopf-Knopf [✏] „Wunschliste bearbeiten“ (Lucide `Pencil`)
       vor [+]
-- [ ] `ui/EditWishPage.svelte`: `WishForm` vorbelegt, Zusatzinhalt [🗑 Wunsch löschen] mit
+- [x] `ui/EditWishPage.svelte`: `WishForm` vorbelegt, Zusatzinhalt [🗑 Wunsch löschen] mit
       Dialog „Wunsch löschen?“ / „„Fahrradhelm“ wird gelöscht.“. Speichern und Abbrechen →
       `goBack(<Detailseite>)`, Löschen → `replaceWith` zur Liste des Wunsches.
-- [ ] `ui/WishPage.svelte`: `ActionBar` mit [✏ Bearbeiten] (Lucide `Pencil`, Link auf
+- [x] `ui/WishPage.svelte`: `ActionBar` mit [✏ Bearbeiten] (Lucide `Pencil`, Link auf
       `#/wunsch/<id>/bearbeiten`)
-- [ ] Rück-Link (Entscheidung 22): `src/shared/ui/PageHeader.svelte` mit optionaler Prop
+- [x] Rück-Link (Entscheidung 22): `src/shared/ui/PageHeader.svelte` mit optionaler Prop
       `back: { label; hash }`, dargestellt über dem `h1` als Link „‹ {label}“ mit
       zugänglichem Namen „Zurück zu {label}“, Tippen → `goBack(hash)`.
       `ui/WishPage.svelte` nutzt ihn mit dem Namen der Liste (per `WatchWishlist` über
       `wish.wishlistId`) und dem Hash der Liste, `ui/WishlistPage.svelte` mit
       „Wunschlisten“ und `#/`.
-- [ ] `e2e/backLinks.spec.ts`:
+- [x] Knöpfe zentriert (Wunsch des Nutzers nach Phase 2): Die `ActionBar` zentriert ihre
+      Knöpfe. Frei stehende Knöpfe (Link-Knopf „Zum Angebot“, [+ … erstellen] im leeren
+      Zustand, [🗑 … löschen]) stehen in einer zentrierten Zeile `.button-row` aus
+      `src/shared/ui/buttons.css`. Die Kopf-Knöpfe bleiben rechts neben dem `h1`.
+      `e2e/layout.spec.ts` prüft, dass „Speichern“ und „Abbrechen“ zusammen mittig in der
+      Leiste stehen.
+- [x] `e2e/backLinks.spec.ts`:
   - Liste → Wunsch → „Zurück zu Geburtstag“ → Listenseite, h1 fokussiert; ein weiteres
     `page.goBack()` führt zur Übersicht (kein zusätzlicher Verlaufseintrag)
   - Liste im Filter „Erfüllte“ (Adresse `/erfuellt`) → Wunsch → Rück-Link → wieder
     `/erfuellt` (sobald Phase 4 den Filter liefert, bis dahin mit der Adresse geprüft)
   - `#/wunsch/<id>` direkt aufrufen (Seed) → Rück-Link → Listenseite, die App bleibt offen
   - Listenseite → „Zurück zu Wunschlisten“ → Übersicht
-- [ ] `e2e/editing.spec.ts`:
+- [x] `e2e/editing.spec.ts`:
   - Liste umbenennen → Listenseite mit neuem h1; `page.goBack()` führt zur Übersicht
     (kein doppelter Eintrag der Liste); Übersicht neu sortiert
   - Liste im Filter „Erfüllte“ öffnen (Adresse `/erfuellt`) → bearbeiten → Speichern →
@@ -766,13 +772,13 @@ mit dem eigenen Bestätigungsdialog.
   - Wunsch bearbeiten: Preis leeren und Bewertung auf „keine Angabe“ → Detailseite ohne
     Zusammenfassung
   - Wunsch löschen → Listenseite ohne den Wunsch
-- [ ] `e2e/accessibility.spec.ts`: „Wunschliste bearbeiten“, „Wunsch bearbeiten“ und der
+- [x] `e2e/accessibility.spec.ts`: „Wunschliste bearbeiten“, „Wunsch bearbeiten“ und der
       offene Löschdialog
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` grün inklusive der neuen Use-Case- und Texttests
-- [ ] `npm run lint` grün
-- [ ] `npm test` grün inklusive `editing.spec.ts`, `backLinks.spec.ts` und der Dialog-Prüfung
+- [x] `npm run test:unit` grün inklusive der neuen Use-Case- und Texttests
+- [x] `npm run lint` grün
+- [x] `npm test` grün inklusive `editing.spec.ts`, `backLinks.spec.ts` und der Dialog-Prüfung
       mit axe
 
 **Manuelle Verifikation**:
@@ -871,6 +877,20 @@ Phase 2:
   (`LINK_PROBLEM_MESSAGES`, `DESCRIPTION_PROBLEM_MESSAGES`, `PRICE_PROBLEM_MESSAGES`).
 - `e2e/seed.ts` schreibt nur die übergebenen Schlüssel, damit ein Seed im
   `beforeEach` einen spezielleren Seed im Test nicht blockiert.
+
+Phase 3:
+- `goBack(parentPageKey)` geht nur dann per `history.back()` zurück, wenn der aktuelle
+  Eintrag von genau dieser Elternseite aus geöffnet wurde. Dafür merkt sich jeder in der
+  App entstandene Eintrag `{ entry: 'inApp', cameFrom: <pageKey der Vorseite> }`, und
+  `replaceWith` überträgt den Zustand des ersetzten Eintrags auf den neuen. Ohne das
+  führte der Rück-Link nach dem Löschen eines Wunsches von der Liste zurück auf den
+  gelöschten Wunsch, und nach „Erstellen“ entstünde ein doppelter Listeneintrag.
+- Anlegen und Bearbeiten einer Liste teilen sich `ui/WishlistNameForm.svelte` (Feld
+  „Name“, Snippets `extra` und `actions` für die Leiste).
+- Die Bearbeitungsseiten merken sich `isDeleting`. So blitzt zwischen dem Löschen und dem
+  Seitenwechsel nicht kurz „Nicht gefunden“ auf.
+- Rück-Link ohne sichtbare Unterstreichung, erkennbar am Pfeil `ChevronLeft`; der
+  zugängliche Name steht per `aria-label` („Zurück zu …“) und enthält den sichtbaren Text.
 
 ## Verweise
 

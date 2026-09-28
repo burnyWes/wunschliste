@@ -1,5 +1,9 @@
 import { CreateWish } from '../application/CreateWish';
 import { CreateWishlist } from '../application/CreateWishlist';
+import { DeleteWish } from '../application/DeleteWish';
+import { DeleteWishlist } from '../application/DeleteWishlist';
+import { EditWish } from '../application/EditWish';
+import { RenameWishlist } from '../application/RenameWishlist';
 import { WatchWish } from '../application/WatchWish';
 import { WatchWishesOfWishlist } from '../application/WatchWishesOfWishlist';
 import { WatchWishlist } from '../application/WatchWishlist';
@@ -22,9 +26,13 @@ export function createWishlistModule({ storage, storageEvents, idGenerator }: Wi
     createWishlist: new CreateWishlist(wishlists, idGenerator),
     watchWishlists: new WatchWishlists(wishlists),
     watchWishlist: new WatchWishlist(wishlists),
+    renameWishlist: new RenameWishlist(wishlists),
+    deleteWishlist: new DeleteWishlist(wishlists, wishes),
     createWish: new CreateWish(wishlists, wishes, idGenerator),
     watchWishesOfWishlist: new WatchWishesOfWishlist(wishes),
     watchWish: new WatchWish(wishes),
+    editWish: new EditWish(wishes),
+    deleteWish: new DeleteWish(wishes),
   };
 }
 

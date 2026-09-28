@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ChevronRight, Plus } from '@lucide/svelte';
+  import { ChevronRight, Pencil, Plus } from '@lucide/svelte';
   import PageHeader from '../../../shared/ui/PageHeader.svelte';
   import { Watched } from '../../../shared/ui/watched.svelte';
   import type { WishlistId } from '../../domain/ids';
@@ -25,8 +25,18 @@
 
 {#if wishlist.value}
   <div class="page">
-    <PageHeader heading={wishlist.value.name.value}>
+    <PageHeader
+      heading={wishlist.value.name.value}
+      back={{ label: 'Wunschlisten', hash: hashOf({ page: 'wishlists' }) }}
+    >
       {#snippet actions()}
+        <a
+          class="button button--icon"
+          href={hashOf({ page: 'editWishlist', wishlistId })}
+          aria-label="Wunschliste bearbeiten"
+        >
+          <Pencil aria-hidden="true" size="1.5em" />
+        </a>
         <a class="button button--icon" href={createWishHash} aria-label="Wunsch erstellen">
           <Plus aria-hidden="true" size="1.5em" />
         </a>
@@ -35,11 +45,11 @@
 
     {#if wishes?.length === 0}
       <p>Noch keine offenen Wünsche.</p>
-      <p>
+      <div class="button-row">
         <a class="button" href={createWishHash}>
           <Plus aria-hidden="true" size="1.25em" /> Wunsch erstellen
         </a>
-      </p>
+      </div>
     {:else if wishes}
       <ul class="link-list">
         {#each wishes as wish (wish.id)}

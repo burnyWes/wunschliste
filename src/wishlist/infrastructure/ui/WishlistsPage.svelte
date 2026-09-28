@@ -25,11 +25,11 @@
 
   {#if wishlists?.length === 0}
     <p>Noch keine Wunschlisten.</p>
-    <p>
+    <div class="button-row">
       <a class="button" href={createWishlistHash}>
         <Plus aria-hidden="true" size="1.25em" /> Wunschliste erstellen
       </a>
-    </p>
+    </div>
   {:else if wishlists}
     <ul class="link-list">
       {#each wishlists as wishlist (wishlist.id)}

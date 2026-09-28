@@ -8,4 +8,5 @@ export interface WishRepository {
   get(id: WishId): Promise<Wish | undefined>;
   save(wish: Wish): Promise<void>;
   delete(id: WishId): Promise<void>;
+  deleteAllOf(wishlistId: WishlistId): Promise<void>;
 }

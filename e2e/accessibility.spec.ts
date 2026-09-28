@@ -34,6 +34,11 @@ async function submitInvalidWish(page: Page): Promise<void> {
   await expect(page.getByText('Bitte einen Namen eingeben.')).toBeVisible();
 }
 
+async function openDeletionDialog(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Wunschliste löschen' }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+}
+
 type CheckedPage = {
   name: string;
   path: string;
@@ -72,6 +77,25 @@ const pages: CheckedPage[] = [
     heading: 'Wunsch erstellen',
     data: twoWishlists,
     prepare: submitInvalidWish,
+  },
+  {
+    name: 'edit wishlist',
+    path: './#/liste/birthday/bearbeiten',
+    heading: 'Wunschliste bearbeiten',
+    data: wishlistWithWishes,
+  },
+  {
+    name: 'deletion dialog',
+    path: './#/liste/birthday/bearbeiten',
+    heading: 'Wunschliste bearbeiten',
+    data: wishlistWithWishes,
+    prepare: openDeletionDialog,
+  },
+  {
+    name: 'edit wish',
+    path: './#/wunsch/helmet/bearbeiten',
+    heading: 'Wunsch bearbeiten',
+    data: wishlistWithWishes,
   },
 ];
 

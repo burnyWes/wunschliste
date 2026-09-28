@@ -1,7 +1,8 @@
 <script lang="ts">
   import CreateWishlistPage from './CreateWishlistPage.svelte';
   import CreateWishPage from './CreateWishPage.svelte';
-  import NotFound from './NotFound.svelte';
+  import EditWishlistPage from './EditWishlistPage.svelte';
+  import EditWishPage from './EditWishPage.svelte';
   import type { WishlistAddress } from './wishlistAddresses';
   import WishlistPage from './WishlistPage.svelte';
   import WishlistsPage from './WishlistsPage.svelte';
@@ -16,10 +17,12 @@
   <CreateWishlistPage />
 {:else if address.page === 'wishlist'}
   <WishlistPage wishlistId={address.wishlistId} />
+{:else if address.page === 'editWishlist'}
+  <EditWishlistPage wishlistId={address.wishlistId} />
 {:else if address.page === 'createWish'}
   <CreateWishPage wishlistId={address.wishlistId} />
 {:else if address.page === 'wish'}
   <WishPage wishId={address.wishId} />
 {:else}
-  <NotFound message="Diese Seite gibt es noch nicht." />
+  <EditWishPage wishId={address.wishId} />
 {/if}

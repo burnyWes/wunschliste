@@ -1,4 +1,4 @@
-import { isHistoryEntryMarked, markHistoryEntry } from '../../shared/ui/navigation';
+import { isHistoryEntryMarked, markNewEntry, markStartEntry } from '../../shared/ui/navigation';
 import { requestHeadingFocus } from '../../shared/ui/pageFocus';
 import { hashFor, pageKeyOf, resolveRoute, type Route } from './routes';
 
@@ -7,7 +7,7 @@ export class CurrentRoute {
 
   constructor() {
     if (!isHistoryEntryMarked()) {
-      markHistoryEntry('start');
+      markStartEntry();
     }
     this.#showCanonicalHash();
   }
@@ -15,7 +15,7 @@ export class CurrentRoute {
   followHashChanges(): () => void {
     const followHash = () => {
       if (!isHistoryEntryMarked()) {
-        markHistoryEntry('inApp');
+        markNewEntry(pageKeyOf(this.route));
       }
       this.#navigateTo(resolveRoute(location.hash));
     };
