@@ -34,3 +34,16 @@
   gap: 0.5rem;
   margin: 1rem 0;
 }
+
+button,
+.button {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.button:active,
+.entry-list button:active,
+.back-button:active {
+  opacity: 0.6;
+}

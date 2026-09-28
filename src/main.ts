@@ -13,4 +13,8 @@ function requireAppRoot(): HTMLElement {
   return appRoot;
 }
 
+// iOS Safari only applies :active styles once a touch listener is registered, see
+// https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html
+document.addEventListener('touchstart', () => {}, { passive: true });
+
 mount(App, { target: requireAppRoot() });

@@ -3,6 +3,8 @@ html {
   font: -apple-system-body;
   background-color: var(--color-background);
   color: var(--color-text);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 body {

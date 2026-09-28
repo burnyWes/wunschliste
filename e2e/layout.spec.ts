@@ -49,3 +49,42 @@ test('centers the buttons in the action bar', async ({ page }) => {
 
   expect(offCenter).toBeLessThan(1);
 });
+
+test('lets the action bar flow to the end of the form while the keyboard is open', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const fakeViewport = Object.assign(new EventTarget(), {
+      height: window.innerHeight,
+      width: window.innerWidth,
+      scale: 1,
+    });
+    Object.defineProperty(window, 'visualViewport', { configurable: true, value: fakeViewport });
+  });
+  await page.goto('./#/liste/neu');
+  await expect(actionBar(page)).not.toHaveClass(/action-bar--in-flow/);
+
+  await page.evaluate(() => {
+    const viewport = window.visualViewport as VisualViewport & { height: number };
+    viewport.height = window.innerHeight - 300;
+    viewport.dispatchEvent(new Event('resize'));
+  });
+
+  await expect(actionBar(page)).toHaveClass(/action-bar--in-flow/);
+  await expect(actionBar(page)).toHaveCSS('position', 'static');
+});
+
+test('keeps buttons free of text selection and double tap zoom', async ({ page }) => {
+  await page.goto('./');
+
+  const userSelect = await page
+    .locator('.button')
+    .first()
+    .evaluate((button) => {
+      const computed = getComputedStyle(button);
+      return computed.userSelect || computed.webkitUserSelect;
+    });
+
+  expect(userSelect).toBe('none');
+  await expect(page.locator('html')).toHaveCSS('touch-action', 'manipulation');
+});

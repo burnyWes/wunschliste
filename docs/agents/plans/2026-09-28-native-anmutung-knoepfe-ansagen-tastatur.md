@@ -426,20 +426,20 @@ Abhängigkeiten: Phase 1
 Knöpfe reagieren wie native Knöpfe, und die untere Leiste weicht der Bildschirmtastatur.
 
 **Aufgaben**:
-- [ ] `src/shared/ui/onScreenKeyboard.test.ts` zuerst schreiben, dann
+- [x] `src/shared/ui/onScreenKeyboard.test.ts` zuerst schreiben, dann
   `onScreenKeyboard.svelte.ts` umsetzen. Die reine Funktion lautet
   `isOnScreenKeyboardOpen({ layoutHeight, visibleHeight, scale })`: Sie ist `true`, wenn
   `layoutHeight - visibleHeight * scale > 150`. Testfälle sind geschlossen (0), genau
   150 (`false`), 300 (`true`) und Zoom (`scale` 2 bei halber Höhe → `false`).
-- [ ] In derselben Datei die Klasse `OnScreenKeyboard` mit `isOpen = $state(...)` und
+- [x] In derselben Datei die Klasse `OnScreenKeyboard` mit `isOpen = $state(...)` und
   `follow(): () => void`. Sie hört auf `visualViewport` `resize` und liest
   `window.innerHeight`. Ohne `visualViewport` bleibt `isOpen` `false`.
-- [ ] `ActionBar.svelte`: `const keyboard = new OnScreenKeyboard()`,
+- [x] `ActionBar.svelte`: `const keyboard = new OnScreenKeyboard()`,
   `$effect(() => keyboard.follow())` und
   `class:action-bar--in-flow={keyboard.isOpen}` mit `position: static`. Der obere Rand
   und der Hintergrund bleiben, damit die Leiste als Gruppe erkennbar ist.
-- [ ] `src/app/global.css`: `html { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }`.
-- [ ] `src/shared/ui/buttons.css`: Ergänzt werden
+- [x] `src/app/global.css`: `html { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }`.
+- [x] `src/shared/ui/buttons.css`: Ergänzt werden
   ```css
   button,
   .button {
@@ -456,23 +456,23 @@ Knöpfe reagieren wie native Knöpfe, und die untere Leiste weicht der Bildschir
   ```
   Die Regel für `.back-button` liegt im globalen CSS, weil `PageHeader` sonst eine
   `:global`-Ausnahme bräuchte.
-- [ ] `src/main.ts`: leerer passiver `touchstart`-Listener auf `document`, damit iOS
+- [x] `src/main.ts`: leerer passiver `touchstart`-Listener auf `document`, damit iOS
   `:active` überhaupt anwendet. Mit Warum-Kommentar und Quelle: Apple, Safari Web Content
   Guide, „Handling Events“
   (https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html).
-- [ ] E2E `layout.spec.ts`: Ein Test simuliert die offene Tastatur, indem
+- [x] E2E `layout.spec.ts`: Ein Test simuliert die offene Tastatur, indem
   `window.visualViewport` per `addInitScript` durch ein Objekt mit reduzierter `height`
   ersetzt und ein `resize` ausgelöst wird. Erwartet wird, dass `.action-bar` die Klasse
   `action-bar--in-flow` trägt und `position: static` hat. Die bestehenden drei
   Layout-Tests bleiben grün.
-- [ ] E2E `layout.spec.ts`: Der berechnete Stil eines `.button` hat
+- [x] E2E `layout.spec.ts`: Der berechnete Stil eines `.button` hat
   `user-select: none` und `-webkit-tap-highlight-color` mit Alpha 0.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit`: `onScreenKeyboard.test.ts` grün.
-- [ ] `npm run test:e2e`: `layout.spec.ts` grün.
-- [ ] `npm run lint` und `npm run test:architecture` grün.
-- [ ] `npm run build` läuft durch.
+- [x] `npm run test:unit`: `onScreenKeyboard.test.ts` grün.
+- [x] `npm run test:e2e`: `layout.spec.ts` grün.
+- [x] `npm run lint` und `npm run test:architecture` grün.
+- [x] `npm run build` läuft durch.
 
 **Manuelle Verifikation** (iPhone, Home-Bildschirm-App):
 - [ ] Antippen eines Knopfs zeigt kein graues Rechteck, der Knopf wird kurz blasser.
@@ -498,6 +498,10 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
 - Phase 2: Die E2E-Tests prüfen Ansagen über `expectAnnouncement` in `e2e/announcement.ts`.
   Ein exakter Textvergleich scheitert an der ersten Ansage, weil ungerade Wiederholungen
   das unsichtbare Zeichen tragen.
+- Phase 3: Die Playwright-WebKit-Engine verwirft `-webkit-tap-highlight-color` schon beim
+  Parsen (`CSS.supports` liefert `false`), weil es die Eigenschaft nur im iOS-Safari gibt.
+  Der E2E-Test prüft deshalb `user-select: none` am Knopf und `touch-action: manipulation`
+  an `html`. Den grauen Blitz deckt nur die manuelle Prüfung ab.
 
 ## Verweise
 
