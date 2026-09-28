@@ -31,6 +31,12 @@ describe('architecture boundaries', () => {
     ['src/wishlist/application/CreateWish.ts', '../../shared/ui/navigation'],
     ['src/wishlist/domain/Wish.test.ts', '../../shared/ui/navigation'],
     ['src/wishlist/application/CreateWish.test.ts', '../../shared/ui/navigation'],
+    ['src/shared/ui/X.svelte', 'firebase/auth'],
+    ['src/shared/ui/x.ts', 'firebase/firestore'],
+    ['src/wishlist/domain/Wish.ts', 'firebase/firestore'],
+    ['src/wishlist/application/CreateWish.ts', 'firebase/firestore'],
+    ['src/wishlist/domain/Wish.test.ts', 'firebase/firestore'],
+    ['src/wishlist/application/CreateWish.test.ts', 'firebase/firestore'],
   ])('rejects %s importing %s', async (filePath, importedModule) => {
     expect(await boundaryViolationsIn(filePath, importedModule)).toBe(1);
   });
@@ -41,6 +47,9 @@ describe('architecture boundaries', () => {
     ['src/wishlist/domain/wish.test.ts', 'vitest'],
     ['src/shared/ui/X.svelte', 'svelte'],
     ['src/wishlist/infrastructure/ui/X.svelte', '../../../shared/ui/ActionBar.svelte'],
+    ['src/wishlist/infrastructure/firestore/X.ts', 'firebase/firestore'],
+    ['src/wishlist/infrastructure/firestore/X.ts', 'firebase/app'],
+    ['src/app/firebase/firebaseApp.ts', 'firebase/app'],
   ])('allows %s importing %s', async (filePath, importedModule) => {
     expect(await boundaryViolationsIn(filePath, importedModule)).toBe(0);
   });

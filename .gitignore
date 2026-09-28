@@ -6,3 +6,6 @@ test-results/
 playwright-report/
 .env.local
 .idea/
+dist-e2e/
+firebase-debug.log
+firestore-debug.log

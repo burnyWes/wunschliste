@@ -519,49 +519,49 @@ Sonst bricht der Produktionsbuild auf `main` absichtlich ab, und es wird nichts
 veröffentlicht.
 
 **Aufgaben**:
-- [ ] Abhängigkeiten: `firebase@^12.19.0` in `dependencies`. `firebase-tools@15.31.0`
+- [x] Abhängigkeiten: `firebase@^12.19.0` in `dependencies`. `firebase-tools@15.31.0`
       (exakt gepinnt) und `@firebase/rules-unit-testing@^5.0.2` in `devDependencies`.
-- [ ] `firebase.json`, `.firebaserc` (`{ "projects": { "default": "<echte Projekt-ID>" } }`
+- [x] `firebase.json`, `.firebaserc` (`{ "projects": { "default": "<echte Projekt-ID>" } }`
       mit dem Platzhalter `wunschliste-familie`, den die README-Anleitung ersetzen lässt)
       und `firestore.rules` wie im *Zielbild*, mit Platzhalter `FAMILY_ACCOUNT_UID`.
-- [ ] `.gitignore` um `dist-e2e/`, `firebase-debug.log`, `firestore-debug.log` erweitern.
+- [x] `.gitignore` um `dist-e2e/`, `firebase-debug.log`, `firestore-debug.log` erweitern.
       `.prettierignore` und die `ignores` in `eslint.config.js` um `dist-e2e`.
-- [ ] `.env.e2e` wie im *Zielbild*.
-- [ ] `build/firebaseEnvironment.ts`, TDD in `tests/firebaseEnvironment.test.ts`:
+- [x] `.env.e2e` wie im *Zielbild*.
+- [x] `build/firebaseEnvironment.ts`, TDD in `tests/firebaseEnvironment.test.ts`:
   - vollständige Werte ohne Emulator-Schalter → ok
   - fehlt `VITE_FIREBASE_APP_ID` → Fehler, dessen Meldung den Namen der Variable und den
     Hinweis auf `.env.local` bzw. die Actions-Variablen enthält
   - leerer Wert gilt als fehlend
   - `VITE_FIREBASE_EMULATORS=true` → Fehler „must not be set for a production build“
   - `tsconfig.node.json` nimmt `build/**/*.ts` auf
-- [ ] `vite.config.ts`: Funktionsform mit Fail-fast (siehe *Abstraktionen*),
+- [x] `vite.config.ts`: Funktionsform mit Fail-fast (siehe *Abstraktionen*),
       `test.projects`:
   - `unit`: `include: ['src/**/*.test.ts', 'tests/**/*.test.ts']`,
     `exclude: ['**/*.integration.test.ts']`, `environment: 'node'`
   - `integration`: `include: ['tests/integration/**/*.integration.test.ts']`,
     `environment: 'node'`, `fileParallelism: false`
-- [ ] `package.json`-Skripte wie in der Tabelle *Builds, Skripte, CI*.
+- [x] `package.json`-Skripte wie in der Tabelle *Builds, Skripte, CI*.
       `test:integration` läuft ab dieser Phase mit den Regeltests.
-- [ ] `playwright.config.ts`:
+- [x] `playwright.config.ts`:
   - `webServer.command` → `npm run build:e2e && npx vite preview --outDir dist-e2e --port 4173 --strictPort`
   - `workers: 1`, `fullyParallel: false`
-- [ ] `tests/familyAccount.ts`: `familyAccountUidFrom(rules)` (Muster
+- [x] `tests/familyAccount.ts`: `familyAccountUidFrom(rules)` (Muster
       `request.auth.uid == '([^']+)'`, wirft ohne Treffer) und `readFamilyRules()`. Das
       teilen sich Regeltests, Integrationstests und `e2e/emulators.ts`.
-- [ ] `tests/integration/testFirestore.ts`:
+- [x] `tests/integration/testFirestore.ts`:
   - `startTestEnvironment()` = `initializeTestEnvironment({ projectId:
     'demo-wunschliste', firestore: { rules: readFamilyRules(), host: '127.0.0.1', port:
     8080 } })`
   - `asModularFirestore(context)`: `context.firestore()` liefert laut Typen die
     Compat-Instanz. Zur Laufzeit funktioniert sie mit den modularen Funktionen, so zeigt es
     die Doku zu `@firebase/rules-unit-testing`. Der nötige Cast steht nur hier.
-- [ ] `tests/integration/firestoreRules.integration.test.ts`:
+- [x] `tests/integration/firestoreRules.integration.test.ts`:
   - Familienkonto: Lesen und Schreiben in `wishlists/a` und `wishes/b` gelingen
   - anderes Konto (`authenticatedContext('stranger')`): Lesen und Schreiben scheitern
   - ohne Anmeldung (`unauthenticatedContext()`): Lesen und Schreiben scheitern
   - Familienkonto in `other/x`: Lesen und Schreiben scheitern
   - `clearFirestore()` in `beforeEach`, `cleanup()` in `afterAll`
-- [ ] Architekturtest zuerst (`tests/architecture.test.ts`):
+- [x] Architekturtest zuerst (`tests/architecture.test.ts`):
   - verboten: `src/shared/ui/X.svelte` → `firebase/auth`, `src/shared/ui/x.ts` →
     `firebase/firestore`, `src/wishlist/domain/Wish.ts` → `firebase/firestore`,
     `src/wishlist/application/CreateWish.ts` → `firebase/firestore`
@@ -571,7 +571,7 @@ veröffentlicht.
     `src/wishlist/infrastructure/firestore/X.ts` → `firebase/app` (heute ein falscher
     Treffer von `outwardTo(['app'])`), `src/app/firebase/firebaseApp.ts` → `firebase/app`
   - Jeder verbotene Fall liefert genau **eine** Meldung, wie `toBe(1)` es verlangt.
-- [ ] `eslint.architecture.config.js`:
+- [x] `eslint.architecture.config.js`:
   - `outwardTo` trifft nur noch relative Pfade: `^\.\.?/(.*/)?(${layers})(/|$)`. Heute
     trifft `(^|/)app(/|$)` auch `firebase/app`.
   - Neu ist `firebasePackages = { regex: '^(firebase|@firebase)(/|$)', … }`. Das Muster
@@ -580,21 +580,21 @@ veröffentlicht.
     `domain` und `application` greift schon `nonRelativeImport`.
   - Bleiben alle bisherigen Fälle in `tests/architecture.test.ts` grün, ist belegt, dass
     die engere Regel nichts Bisheriges durchlässt.
-- [ ] `src/app/firebase/env.d.ts`: `ImportMetaEnv` mit den fünf `VITE_FIREBASE_*`.
-- [ ] `src/app/firebase/firebaseConfig.ts`: `firebaseOptions` (`apiKey`, `authDomain`,
+- [x] `src/app/firebase/env.d.ts`: `ImportMetaEnv` mit den fünf `VITE_FIREBASE_*`.
+- [x] `src/app/firebase/firebaseConfig.ts`: `firebaseOptions` (`apiKey`, `authDomain`,
       `projectId`, `appId`) und `useEmulators` aus `import.meta.env`.
-- [ ] `src/app/firebase/firebaseApp.ts`:
+- [x] `src/app/firebase/firebaseApp.ts`:
   - `familyAuth()`, einmalig:
     - `initializeAuth(app, { persistence: indexedDBLocalPersistence })`
     - bei `useEmulators` zusätzlich
       `connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true })`
   - `openFamilyDatabase()` und `forgetFamilyDatabase()` folgen in Phase 2
-- [ ] `src/app/access/signInProblem.ts`, TDD in `signInProblem.test.ts`:
+- [x] `src/app/access/signInProblem.ts`, TDD in `signInProblem.test.ts`:
   - `signInProblemOf(error: unknown): SignInProblem` mit `'wrongCredentials' |
     'offline' | 'tooManyAttempts' | 'unknown'` nach der Tabelle *Texte*
   - ein Fehler ohne `code` → `'unknown'`
   - `SIGN_IN_PROBLEM_MESSAGES` mit den Texten, jeder Eintrag getestet
-- [ ] `src/app/access/familyAccess.svelte.ts`:
+- [x] `src/app/access/familyAccess.svelte.ts`:
   - Klasse `FamilyAccess` mit dem Zustand `state = $state.raw<{ status: 'checking' } |
     { status: 'signedOut' } | { status: 'signedIn'; email: string }>({ status: 'checking' })`
   - `follow(): Unsubscribe` über `onAuthStateChanged`
@@ -606,7 +606,7 @@ veröffentlicht.
     - dann alle `after` (in Phase 2 `clearIndexedDbPersistence`) mit einem Zeitlimit von
       3 s, Fehler werden verschluckt
   - Kontext in `familyAccessContext.ts` per `createContext`.
-- [ ] `src/app/access/SignInPage.svelte`:
+- [x] `src/app/access/SignInPage.svelte`:
   - `PageHeader` „Anmelden“, dazu der Satz „Familienzugang für die Wunschliste.“
   - `<form novalidate>` mit `TextField`:
     - „E-Mail“: `type="email"`, `autocomplete="username"`, `autocapitalize="off"`,
@@ -622,15 +622,15 @@ veröffentlicht.
     (siehe *Fokus*).
   - `TextField` reicht weitere Attribute über `...inputAttributes` nach `type="text"`
     durch. `type` und `autocomplete` kommen also ohne Änderung an.
-- [ ] `src/app/App.svelte` wird zum Tor:
+- [x] `src/app/App.svelte` wird zum Tor:
   - `FamilyAccess` anlegen und bereitstellen, `$effect(() => access.follow())`
   - `checking` → leeres `<main>`, `signedOut` → Header nur mit dem Statusleisten-Streifen
     und `<main>` mit `SignInPage`, `signedIn` → `SignedInApp`
   - `Announcer` bleibt außerhalb der Zweige.
-- [ ] `src/app/SignedInApp.svelte`: der bisherige Inhalt von `App.svelte` (Modul,
+- [x] `src/app/SignedInApp.svelte`: der bisherige Inhalt von `App.svelte` (Modul,
       `CurrentRoute`, Header, `main`). Das Modul nutzt in dieser Phase weiter
       `localStorage`.
-- [ ] `src/app/access/FamilyAccessSettings.svelte`:
+- [x] `src/app/access/FamilyAccessSettings.svelte`:
   - `h2` „Familienzugang“, „Angemeldet als {email}“
   - [⎋ Abmelden] (Lucide `LogOut`) in einer `.button-row`
   - `ConfirmDialog` mit Überschrift „Abmelden?“, dem Text aus dem *Zielbild* und
@@ -638,7 +638,7 @@ veröffentlicht.
   - `SettingsPage.svelte` bindet es unter `ColorSchemeSettings` ein.
   - `ConfirmDialog` hat `Trash2` fest eingebaut. Es bekommt eine Prop `confirmIcon`
     (Svelte-Komponente, Standard `Trash2`). Das Abmelden übergibt `LogOut`.
-- [ ] `e2e/emulators.ts`:
+- [x] `e2e/emulators.ts`:
   - Konstanten `PROJECT_ID = 'demo-wunschliste'` und `FAMILY = { email:
     'familie@example.de', password: 'geheim-123' }`
   - `familyAccountUid()` über `tests/familyAccount.ts`
@@ -647,7 +647,7 @@ veröffentlicht.
     `POST http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/projects/demo-wunschliste/accounts`
     mit `Authorization: Bearer owner` und `{ localId, email, password }`. Laut
     firebase-tools 15.31 übernimmt der Emulator dabei die feste `localId`.
-- [ ] `e2e/fixtures.ts`:
+- [x] `e2e/fixtures.ts`:
   - `test = base.extend<{ signedIn: boolean }>`
   - Option `signedIn` (Standard `true`)
   - automatische Fixture: `resetAuth()` und `createAccount` mit dem Familienkonto
@@ -656,9 +656,9 @@ veröffentlicht.
     `page.goto('about:blank')`. So lädt das `goto` des Tests ein neues Dokument, und die
     `addInitScript`-Seeds greifen.
   - `signIn(page)` wird für eigene Kontexte exportiert.
-- [ ] Alle Specs, die heute `test` aus `@playwright/test` holen und die App öffnen,
+- [x] Alle Specs, die heute `test` aus `@playwright/test` holen und die App öffnen,
       importieren `test` aus `./fixtures`. `pwa.spec.ts` bleibt, wie es ist.
-- [ ] `e2e/access.spec.ts` (`test.use({ signedIn: false })`):
+- [x] `e2e/access.spec.ts` (`test.use({ signedIn: false })`):
   - `./#/einstellungen` ohne Anmeldung → h1 „Anmelden“, keine Navigation, Titel
     „Anmelden – Wunschliste“
   - leere Felder → „Bitte die E-Mail-Adresse eingeben.“, Fokus auf „E-Mail“
@@ -674,12 +674,12 @@ veröffentlicht.
     liegt auf „Abbrechen“. Nach „Abbrechen“ ist man weiter angemeldet, nach „Abmelden“
     erscheint die Anmeldeseite.
   - Die Felder tragen `autocomplete="username"` und `autocomplete="current-password"`.
-- [ ] `e2e/accessibility.spec.ts`:
+- [x] `e2e/accessibility.spec.ts`:
   - mit `signedOut`: Anmeldeseite leer und mit dem Fehler „E-Mail oder Passwort stimmt
     nicht.“
   - „Einstellungen mit Abmelde-Dialog“
   - alle Fälle in allen drei Farbschemata
-- [ ] `.github/workflows/deploy.yml`, Job `check`:
+- [x] `.github/workflows/deploy.yml`, Job `check`:
   - `actions/setup-java@v5` mit `distribution: temurin`, `java-version: 21`
   - `actions/cache@v5` für `~/.cache/firebase/emulators`, Schlüssel
     `firebase-emulators-${{ hashFiles('package-lock.json') }}`
@@ -689,7 +689,7 @@ veröffentlicht.
   - Hochgeladen wird `dist/` wie bisher.
   - Stimmen die Hauptversionen der Actions nicht (`setup-java`, `cache`), wird die
     aktuelle Hauptversion genommen und in den Notizen festgehalten.
-- [ ] `README.md`:
+- [x] `README.md`:
   - Stack: „Firebase (Firestore, Auth)“ statt „Später Firebase“
   - Einmalige Einrichtung: Java 21 für die Emulatoren
   - Befehlstabelle: `build:e2e`, `dev:emulators`, `test:unit`, `test:integration`,
@@ -714,16 +714,16 @@ veröffentlicht.
     test:unit` nehmen.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` grün, u. a. `firebaseEnvironment.test.ts`,
+- [x] `npm run test:unit` grün, u. a. `firebaseEnvironment.test.ts`,
       `signInProblem.test.ts`, `architecture.test.ts` mit den neuen Fällen
-- [ ] `npm run test:integration` grün mit `firestoreRules.integration.test.ts`
-- [ ] `npm run test:architecture` und `npm run lint` grün
-- [ ] `npm test` grün, inklusive `access.spec.ts`, aller bisherigen Specs (angemeldet)
+- [x] `npm run test:integration` grün mit `firestoreRules.integration.test.ts`
+- [x] `npm run test:architecture` und `npm run lint` grün
+- [x] `npm test` grün, inklusive `access.spec.ts`, aller bisherigen Specs (angemeldet)
       und der neuen axe-Fälle
-- [ ] Fail-fast ist durch `tests/firebaseEnvironment.test.ts` belegt. Die Verdrahtung in
+- [x] Fail-fast ist durch `tests/firebaseEnvironment.test.ts` belegt. Die Verdrahtung in
       `vite.config.ts` zeigt sich so: Bei vorübergehend umbenannter `.env.local` bricht
       `npm run build` mit der Meldung zur fehlenden Variable ab.
-- [ ] `dist/` löschen, dann `npm run build:e2e` → `dist/` existiert nicht, `dist-e2e/`
+- [x] `dist/` löschen, dann `npm run build:e2e` → `dist/` existiert nicht, `dist-e2e/`
       existiert.
 
 **Manuelle Verifikation** (setzt die README-Einrichtung mit einem echten Firebase-Projekt
@@ -979,6 +979,33 @@ gescheiterte Listener, im Kopf wie auf der Seite.
 ## Notizen zur Umsetzung
 
 Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalten.
+
+**Phase 1**
+- `actions/setup-java` und `actions/cache` liegen inzwischen bei v6 (Stand 2026-09-28),
+  eingesetzt ist daher `@v6` statt `@v5`.
+- npm 11 führt Install-Skripte nur nach Freigabe aus. `@firebase/util` braucht sein
+  Postinstall-Skript, sonst fehlt `dist/postinstall.mjs` und der Build scheitert. Freigegeben
+  sind `@firebase/util` und `protobufjs` über `allowScripts` in `package.json`, jeweils mit
+  exakter Version. Nach einem Update von `firebase` ist dort nachzuziehen
+  (`npm approve-scripts @firebase/util protobufjs`). `re2` (optional für firebase-tools)
+  bleibt gesperrt.
+- Kopf mit Statusleisten-Streifen und `main` liegen in `src/app/layout/AppFrame.svelte`, das
+  Tor und `SignedInApp` teilen sich diesen Rahmen.
+- Abmelden fordert vorher `requestPageFocus()` an, damit das h1 „Anmelden“ den Fokus bekommt
+  und VoiceOver nicht im Leeren steht.
+- `e2e/fixtures.ts` braucht ein leeres Objektmuster für die automatische Fixture.
+  `eslint.config.js` erlaubt das für `e2e/**` über `no-empty-pattern` mit
+  `allowObjectPatternsAsParameters`.
+- `outwardTo` hat keinen Standardwert mehr, der Parametertyp steht als JSDoc dabei
+  (`tsc -p tsconfig.node.json` prüft `checkJs`).
+- `vite.config.ts` importiert `./build/firebaseEnvironment.ts` mit Endung
+  (`allowImportingTsExtensions` in `tsconfig.node.json`), sonst warnt Vite 8 wegen
+  `configLoader: 'native'`.
+- `navigation.spec.ts` „gives both navigation buttons the same width“ wartet jetzt auf die
+  Navigation, weil die App nach dem asynchronen Auth-Check erst später rendert.
+- Es gibt lokal keine `.env.local`, deshalb bricht `npm run build` ohne Umbenennen ab.
+  Gegenprobe: mit gesetzten Variablen gelingt der Build, mit `VITE_FIREBASE_EMULATORS=true`
+  bricht er mit „must not be set for a production build“ ab.
 
 ## Verweise
 

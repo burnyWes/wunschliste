@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isFamilyAccount() {
+      return request.auth != null && request.auth.uid == 'ocIRttoe1NRYYglCT4PKBONIvN83';
+    }
+    match /wishlists/{wishlistId} {
+      allow read, write: if isFamilyAccount();
+    }
+    match /wishes/{wishId} {
+      allow read, write: if isFamilyAccount();
+    }
+  }
+}

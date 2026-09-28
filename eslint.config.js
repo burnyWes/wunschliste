@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint';
 import architectureConfig from './eslint.architecture.config.js';
 
 export default defineConfig(
-  { ignores: ['dist', 'dev-dist', 'playwright-report', 'test-results'] },
+  { ignores: ['dist', 'dist-e2e', 'dev-dist', 'playwright-report', 'test-results'] },
   js.configs.recommended,
   tseslint.configs.recommended,
   svelte.configs['flat/recommended'],
@@ -18,6 +18,10 @@ export default defineConfig(
   {
     files: ['**/*.svelte', '**/*.svelte.ts'],
     languageOptions: { parserOptions: { parser: tseslint.parser } },
+  },
+  {
+    files: ['e2e/**/*.ts'],
+    rules: { 'no-empty-pattern': ['error', { allowObjectPatternsAsParameters: true }] },
   },
   architectureConfig,
 );

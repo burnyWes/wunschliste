@@ -9,10 +9,11 @@ Projektspezifische Einstellungen stehen in `.claude/projekt.md`, die offenen Auf
 
 ## Stack
 
-TypeScript, Svelte 5, Vite, PWA auf GitHub Pages. Später Firebase (Firestore, Auth).
+TypeScript, Svelte 5, Vite, PWA auf GitHub Pages, Firebase (Firestore, Auth).
 
 Qualitäts-Gate: Prettier, ESLint (inkl. Architektur-Grenzregeln), svelte-check, Vitest,
-Playwright (WebKit, Profil „iPhone 15“) mit axe-core.
+Playwright (WebKit, Profil „iPhone 15“) mit axe-core. Integrations- und E2E-Tests laufen
+gegen die Firebase-Emulatoren (Projekt `demo-wunschliste`).
 
 ## Einmalige Einrichtung
 
@@ -21,16 +22,27 @@ npm install
 npx playwright install webkit
 ```
 
+Die Firebase-Emulatoren brauchen Java 21 (etwa Temurin oder Corretto) im `PATH`. Beim
+ersten Start laden sie sich selbst nach `~/.cache/firebase/emulators`.
+
 ## Befehle
 
 | Befehl | Zweck |
 |---|---|
 | `npm run dev` | Entwicklungsserver |
-| `npm run build` | Produktionsbuild nach `dist/` |
+| `npm run dev:emulators` | Entwicklungsserver gegen die Firebase-Emulatoren |
+| `npm run build` | Produktionsbuild nach `dist/`, bricht ohne Firebase-Konfiguration ab |
+| `npm run build:e2e` | Build gegen die Emulatoren nach `dist-e2e/` |
 | `npm run preview` | gebauten Stand lokal ausliefern |
 | `npm run format` | Prettier schreibend |
 | `npm run lint` | ESLint, svelte-check, Typprüfung der Konfiguration, Prettier-Prüfung |
-| `npm test` | Architekturtest, Vitest, Playwright gegen den gebauten Stand |
+| `npm run test:unit` | Vitest ohne Emulatoren, schnell |
+| `npm run test:integration` | Regel- und Adaptertests gegen den Firestore-Emulator |
+| `npm run test:e2e` | Playwright gegen `dist-e2e/` und die Emulatoren |
+| `npm test` | Architekturtest, Unit-, Integrations- und E2E-Tests |
+
+Ein bloßes `npx vitest` bzw. der Testlauf in der IDE startet auch die Integrationstests und
+scheitert ohne laufenden Emulator. Für schnelle Läufe `npm run test:unit` nehmen.
 
 ## Veröffentlichung
 
@@ -40,6 +52,32 @@ rot, wird nichts veröffentlicht.
 
 Einmalig im Repository einstellen: „Settings → Pages → Build and deployment → Source:
 GitHub Actions“.
+
+## Firebase einrichten
+
+Einmalig, bevor der erste Stand mit Firebase auf `main` landet. Ohne die Actions-Variablen
+bricht der Produktionsbuild absichtlich ab, und es wird nichts veröffentlicht.
+
+1. In der [Firebase-Konsole](https://console.firebase.google.com/) ein Projekt anlegen,
+   Google Analytics aus.
+2. Firestore-Datenbank anlegen: Produktionsmodus, Region `europe-west3`.
+3. Authentication → Anmeldeanbieter „E-Mail/Passwort“ aktivieren.
+4. Authentication → Nutzer → das Familienkonto anlegen und seine UID kopieren.
+5. Die UID in `firestore.rules` statt `FAMILY_ACCOUNT_UID` eintragen und committen.
+6. Die Projekt-ID in `.firebaserc` eintragen (hier `wunschliste-92c07`).
+7. `npx firebase login` und `npx firebase deploy --only firestore:rules`.
+8. Projekteinstellungen → Web-App hinzufügen. Die Werte `apiKey`, `authDomain`,
+   `projectId` und `appId` als Actions-Variablen hinterlegen („Settings → Secrets and
+   variables → Actions → Variables“): `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`,
+   `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_APP_ID`. Dieselben Werte lokal in
+   `.env.local` eintragen, damit `npm run build` auch lokal läuft.
+9. In der installierten App einmal anmelden. Sie hat einen eigenen Speicher, getrennt von
+   Safari.
+
+Die Web-Konfiguration samt API-Key ist öffentlich und steht im ausgelieferten Code.
+Geschützt wird über `firestore.rules`: Lesen und Schreiben darf nur die UID des
+Familienkontos. Die UID ist kein Geheimnis
+(<https://firebase.google.com/docs/projects/api-keys>).
 
 ## App-Icon neu erzeugen
 

@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { FAMILY } from './emulators';
+import { expect, test, type Page } from './fixtures';
 import { seed, type SeedData } from './seed';
 
 const WCAG_21_AA = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
@@ -47,6 +48,18 @@ async function openDeletionDialog(page: Page): Promise<void> {
   await expect(page.getByRole('dialog')).toBeVisible();
 }
 
+async function openSignOutDialog(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Abmelden' }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+}
+
+async function submitWrongPassword(page: Page): Promise<void> {
+  await page.getByLabel('E-Mail').fill(FAMILY.email);
+  await page.getByLabel('Passwort').fill('falsch-123');
+  await page.getByRole('button', { name: 'Anmelden' }).click();
+  await expect(page.getByRole('alert')).toHaveText('E-Mail oder Passwort stimmt nicht.');
+}
+
 type CheckedPage = {
   name: string;
   path: string;
@@ -58,6 +71,12 @@ type CheckedPage = {
 const pages: CheckedPage[] = [
   { name: 'empty overview', path: './', heading: 'Wunschlisten' },
   { name: 'settings', path: './#/einstellungen', heading: 'Einstellungen' },
+  {
+    name: 'settings with sign-out dialog',
+    path: './#/einstellungen',
+    heading: 'Einstellungen',
+    prepare: openSignOutDialog,
+  },
   { name: 'overview', path: './', heading: 'Wunschlisten', data: twoWishlists },
   { name: 'create wishlist', path: './#/liste/neu', heading: 'Wunschliste erstellen' },
   {
@@ -119,6 +138,11 @@ const pages: CheckedPage[] = [
   },
 ];
 
+const signedOutPages: CheckedPage[] = [
+  { name: 'sign-in', path: './', heading: 'Anmelden' },
+  { name: 'sign-in with problem', path: './', heading: 'Anmelden', prepare: submitWrongPassword },
+];
+
 const offerLinkOnly: { name: string; path: string; heading: string; links: string[] }[] = [
   { name: 'overview', path: './', heading: 'Wunschlisten', links: [] },
   { name: 'wishlist', path: './#/liste/birthday', heading: 'Geburtstag 2027', links: [] },
@@ -146,24 +170,34 @@ for (const { name, path, heading, links } of offerLinkOnly) {
 
 const colorSchemes = ['dark', 'light', 'inverted'];
 
-for (const colorScheme of colorSchemes) {
-  for (const { name, path, heading, data, prepare } of pages) {
-    test(`${name} page in the ${colorScheme} scheme has no accessibility violations`, async ({
-      page,
-    }) => {
-      await page.addInitScript((scheme) => {
-        localStorage.setItem('wunschliste.colorScheme', scheme);
-      }, colorScheme);
-      if (data) {
-        await seed(page, data);
-      }
-      await page.goto(path);
-      await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
-      await prepare?.(page);
+function checkAccessibility(checkedPages: readonly CheckedPage[]): void {
+  for (const colorScheme of colorSchemes) {
+    for (const { name, path, heading, data, prepare } of checkedPages) {
+      test(`${name} page in the ${colorScheme} scheme has no accessibility violations`, async ({
+        page,
+      }) => {
+        await page.addInitScript((scheme) => {
+          localStorage.setItem('wunschliste.colorScheme', scheme);
+        }, colorScheme);
+        if (data) {
+          await seed(page, data);
+        }
+        await page.goto(path);
+        await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
+        await prepare?.(page);
 
-      const results = await new AxeBuilder({ page }).withTags(WCAG_21_AA).analyze();
+        const results = await new AxeBuilder({ page }).withTags(WCAG_21_AA).analyze();
 
-      expect(results.violations).toEqual([]);
-    });
+        expect(results.violations).toEqual([]);
+      });
+    }
   }
 }
+
+checkAccessibility(pages);
+
+test.describe('signed out', () => {
+  test.use({ signedIn: false });
+
+  checkAccessibility(signedOutPages);
+});

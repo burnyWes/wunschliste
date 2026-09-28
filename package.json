@@ -8,27 +8,33 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:emulators": "firebase emulators:exec --only auth,firestore --project demo-wunschliste \"vite --mode e2e\"",
     "build": "vite build",
+    "build:e2e": "vite build --mode e2e --outDir dist-e2e",
     "preview": "vite preview",
     "format": "prettier --write .",
     "lint": "eslint . && svelte-check --tsconfig ./tsconfig.app.json --fail-on-warnings && tsc -p tsconfig.node.json && prettier --check .",
     "test:architecture": "eslint --config eslint.architecture.config.js src",
-    "test:unit": "vitest run",
-    "test:e2e": "playwright test",
-    "test": "npm run test:architecture && npm run test:unit && npm run test:e2e"
+    "test:unit": "vitest run --project unit",
+    "test:integration": "firebase emulators:exec --only auth,firestore --project demo-wunschliste \"vitest run --project integration\"",
+    "test:e2e": "firebase emulators:exec --only auth,firestore --project demo-wunschliste \"playwright test\"",
+    "test": "npm run test:architecture && npm run test:unit && npm run test:integration && npm run test:e2e"
   },
   "dependencies": {
     "@lucide/svelte": "^1.48.0",
+    "firebase": "^12.19.0",
     "svelte": "^5.57.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.1",
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@playwright/test": "^1.63.0",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@types/node": "^26.6.3",
     "eslint": "^10.11.0",
     "eslint-plugin-svelte": "^3.23.0",
+    "firebase-tools": "15.31.0",
     "globals": "^17.12.0",
     "prettier": "^3.9.9",
     "prettier-plugin-svelte": "^4.1.1",
@@ -38,5 +44,9 @@
     "vite": "^8.3.1",
     "vite-plugin-pwa": "^1.3.0",
     "vitest": "^5.0.2"
+  },
+  "allowScripts": {
+    "@firebase/util@1.15.3": true,
+    "protobufjs@7.6.6": true
   }
 }

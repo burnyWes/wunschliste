@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './fixtures';
 import { historyLength, seed } from './seed';
 
 const mainNavigation = (page: Page) => page.getByRole('navigation', { name: 'Hauptnavigation' });
@@ -67,6 +67,7 @@ for (const path of ['./#/liste/birthday', './#/liste/neu']) {
 
 test('gives both navigation buttons the same width', async ({ page }) => {
   await page.goto('./');
+  await expect(mainNavigation(page).getByRole('button')).toHaveCount(2);
 
   const widths = await mainNavigation(page)
     .getByRole('button')

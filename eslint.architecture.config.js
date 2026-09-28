@@ -16,8 +16,14 @@ const sourceParserSetup = defineConfig(
 
 const nonRelativeImport = { regex: '^[^.]', message: 'Only relative imports inside this layer.' };
 
-const outwardTo = (layers = ['']) => ({
-  regex: `(^|/)(${layers.join('|')})(/|$)`,
+const firebasePackages = {
+  regex: '^(firebase|@firebase)(/|$)',
+  message: 'Firebase belongs to infrastructure and app only.',
+};
+
+/** @param {string[]} layers */
+const outwardTo = (layers) => ({
+  regex: `^\\.\\.?/(.*/)?(${layers.join('|')})(/|$)`,
   message: `Must not depend on ${layers.join(', ')}.`,
 });
 
@@ -32,7 +38,10 @@ export default defineConfig(
   {
     files: ['src/shared/**/*.{ts,svelte}'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: [outwardTo(['app', 'wishlist'])] }],
+      'no-restricted-imports': [
+        'error',
+        { patterns: [outwardTo(['app', 'wishlist']), firebasePackages] },
+      ],
     },
   },
   {
@@ -49,7 +58,7 @@ export default defineConfig(
     rules: {
       'no-restricted-imports': [
         'error',
-        { patterns: [outwardTo(['infrastructure', 'app', 'shared/ui'])] },
+        { patterns: [outwardTo(['infrastructure', 'app', 'shared/ui']), firebasePackages] },
       ],
     },
   },
@@ -72,7 +81,12 @@ export default defineConfig(
     rules: {
       'no-restricted-imports': [
         'error',
-        { patterns: [outwardTo(['application', 'infrastructure', 'app', 'shared/ui'])] },
+        {
+          patterns: [
+            outwardTo(['application', 'infrastructure', 'app', 'shared/ui']),
+            firebasePackages,
+          ],
+        },
       ],
     },
   },

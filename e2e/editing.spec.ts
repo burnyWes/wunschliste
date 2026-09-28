@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './fixtures';
 import { expectAnnouncement } from './announcement';
 import { historyLength, seed, storedRecords, type SeedData, type WishRecord } from './seed';
 

@@ -1,15 +1,18 @@
 <script lang="ts">
   import { Trash2, X } from '@lucide/svelte';
+  import type { Component } from 'svelte';
 
   let {
     heading,
     message,
     confirmLabel,
+    confirmIcon: ConfirmIcon = Trash2,
     onconfirm,
   }: {
     heading: string;
     message: string;
     confirmLabel: string;
+    confirmIcon?: Component<{ 'aria-hidden': 'true'; size: string }>;
     onconfirm: () => void;
   } = $props();
 
@@ -45,7 +48,7 @@
   <p id="{id}-message">{message}</p>
   <div class="button-row">
     <button class="button" type="button" onclick={confirm}>
-      <Trash2 aria-hidden="true" size="1.25em" />
+      <ConfirmIcon aria-hidden="true" size="1.25em" />
       {confirmLabel}
     </button>
     <button class="button" type="button" bind:this={cancelButton} onclick={() => dialog.close()}>

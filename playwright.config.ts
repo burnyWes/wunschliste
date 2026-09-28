@@ -5,6 +5,8 @@ const baseURL = 'http://localhost:4173/wunschliste/';
 export default defineConfig({
   testDir: 'e2e',
   forbidOnly: !!process.env.CI,
+  workers: 1,
+  fullyParallel: false,
   reporter: process.env.CI ? 'github' : 'list',
   use: {
     baseURL,
@@ -12,7 +14,7 @@ export default defineConfig({
   },
   projects: [{ name: 'iphone-webkit', use: { ...devices['iPhone 15'] } }],
   webServer: {
-    command: 'npm run build && npm run preview -- --port 4173 --strictPort',
+    command: 'npm run build:e2e && npx vite preview --outDir dist-e2e --port 4173 --strictPort',
     url: baseURL,
     reuseExistingServer: false,
     timeout: 120_000,
