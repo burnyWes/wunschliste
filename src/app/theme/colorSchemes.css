@@ -1,7 +1,7 @@
 :root {
   --color-background: #000000;
   --color-text: #ffffff;
-  --color-button: #2563eb;
+  --color-button: #1d4ed8;
   --color-button-text: #ffffff;
   --color-button-border: #93c5fd;
   --color-check: #22ff22;
@@ -13,7 +13,7 @@
 :root[data-color-scheme='light'] {
   --color-background: #ffffff;
   --color-text: #000000;
-  --color-button: #2563eb;
+  --color-button: #1d4ed8;
   --color-button-text: #ffffff;
   --color-button-border: #1e3a8a;
   --color-check: #15803d;

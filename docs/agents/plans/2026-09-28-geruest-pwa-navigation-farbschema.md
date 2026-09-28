@@ -200,7 +200,7 @@ Farbtokens (aus dem Konzept):
 |---|---|---|---|
 | `--color-background` | `#000000` | `#FFFFFF` | `#FFFFFF` |
 | `--color-text` | `#FFFFFF` | `#000000` | `#000000` |
-| `--color-button` | `#2563EB` | `#2563EB` | `#DA9C14` |
+| `--color-button` | `#1D4ED8` | `#1D4ED8` | `#DA9C14` |
 | `--color-button-text` | `#FFFFFF` | `#FFFFFF` | `#000000` |
 | `--color-button-border` | `#93C5FD` | `#1E3A8A` | `#6C3A02` |
 | `--color-check` | `#22FF22` | `#15803D` | `#DD00DD` |
@@ -496,15 +496,15 @@ veröffentlicht.
 - [x] `npm test` grün inklusive `e2e/pwa.spec.ts`
 
 **Manuelle Verifikation**:
-- [ ] Nutzer stellt in GitHub „Settings → Pages → Source“ auf „GitHub Actions“
-- [ ] Nach ausdrücklicher Push-Anweisung: Actions-Lauf auf `main` grün, Deployment-Job
+- [x] Nutzer stellt in GitHub „Settings → Pages → Source“ auf „GitHub Actions“
+- [x] Nach ausdrücklicher Push-Anweisung: Actions-Lauf auf `main` grün, Deployment-Job
       veröffentlicht `https://burnywes.github.io/wunschliste/`
-- [ ] iPhone, Safari: Seite öffnen → Teilen → „Zum Home-Bildschirm“ → Name „Wunschliste“
+- [x] iPhone, Safari: Seite öffnen → Teilen → „Zum Home-Bildschirm“ → Name „Wunschliste“
       und Geschenk-Icon werden angeboten
-- [ ] Vom Home-Bildschirm gestartet: keine Safari-Leiste, die Statusleiste liegt über
+- [x] Vom Home-Bildschirm gestartet: keine Safari-Leiste, die Statusleiste liegt über
       schwarzem Hintergrund, die Überschrift wird nicht von Notch/Dynamic Island verdeckt
-- [ ] Flugmodus an, App neu starten: „Wunschlisten“ erscheint trotzdem
-- [ ] VoiceOver an: „Wunschlisten, Überschrift“ und „Noch keine Wunschlisten.“ werden
+- [x] Flugmodus an, App neu starten: „Wunschlisten“ erscheint trotzdem
+- [x] VoiceOver an: „Wunschlisten, Überschrift“ und „Noch keine Wunschlisten.“ werden
       vorgelesen
 
 ### Phase 3: Navigation und Seiten
@@ -569,10 +569,10 @@ Fixierte Hauptnavigation, Hash-Router, zwei Seiten, Fokus- und Titelverwaltung.
 - [x] `npm test` grün inklusive `navigation.spec.ts`
 
 **Manuelle Verifikation**:
-- [ ] iPhone mit VoiceOver: „Hauptnavigation“, „Wunschlisten, aktuelle Seite, Link“ und
+- [x] iPhone mit VoiceOver: „Hauptnavigation“, „Wunschlisten, aktuelle Seite, Link“ und
       „Einstellungen, Link“ werden vorgelesen. Nach dem Tippen auf „Einstellungen“ liest
       VoiceOver sofort „Einstellungen, Überschrift“.
-- [ ] iOS-Textgröße auf das Maximum (Bedienungshilfen → Größerer Text): Die Navigation
+- [x] iOS-Textgröße auf das Maximum (Bedienungshilfen → Größerer Text): Die Navigation
       bricht um und wird höher, nichts wird abgeschnitten oder verdeckt
 
 ### Phase 4: Farbschema
@@ -651,13 +651,13 @@ gespeichert pro Gerät, ab dem ersten Bild aktiv.
 - [x] `npm test` grün inklusive `colorScheme.spec.ts` und aller sechs axe-Kombinationen
 
 **Manuelle Verifikation**:
-- [ ] iPhone mit VoiceOver auf „Einstellungen“: „Farbschema“, dann „Dunkel, Optionsfeld,
+- [x] iPhone mit VoiceOver auf „Einstellungen“: „Farbschema“, dann „Dunkel, Optionsfeld,
       ausgewählt, 1 von 3“. Doppeltippen auf „Hell“ schaltet sofort um.
-- [ ] In „Hell“ und „Invertiert“: Uhrzeit und Akku in der Statusleiste sind weiß auf
+- [x] In „Hell“ und „Invertiert“: Uhrzeit und Akku in der Statusleiste sind weiß auf
       schwarzem Streifen lesbar
-- [ ] App schließen und vom Home-Bildschirm neu starten: Das gewählte Schema gilt sofort,
+- [x] App schließen und vom Home-Bildschirm neu starten: Das gewählte Schema gilt sofort,
       ohne kurzes schwarzes Aufblitzen
-- [ ] Optik der Radiobuttons: nur linke und untere Linie, großer Haken in Leuchtgrün
+- [x] Optik der Radiobuttons: nur linke und untere Linie, großer Haken in Leuchtgrün
       (Dunkel), Sattgrün (Hell) bzw. Magenta (Invertiert)
 
 ## Notizen zur Umsetzung
@@ -670,6 +670,7 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
 - Phase 2: Die Generator-Konfiguration übernimmt `resizeOptions` des Presets per Spread. `minimal2023Preset` bringt für `maskable`/`apple` keine eigenen `resizeOptions` mit, die Standardwerte (Innenabstand 0.3) greifen weiter, nur der Hintergrund wird schwarz.
 - Phase 3: Sticky ist der `<header>` in `App.svelte`. Er enthält den Safe-Area-Streifen (`.status-bar-backdrop`) und darunter `MainNavigation`. `CurrentRoute` ruft `focusPageHeading` selbst auf, wenn ein `hashchange` die Seite wirklich wechselt. `tsconfig.node.json` bindet `DOM` ein, weil die Callbacks von `page.evaluate` im Browser laufen.
 - Phase 4: `ColorSchemeSettings` nutzt `checked` + `onchange` statt `bind:group`. So ist eindeutig, dass Speichern und Anwenden erst nach der Auswahl laufen. Der Haken ist Lucide `Check` (Strichstärke 4). Die E2E-Tests wählen ein Schema durch Tippen auf die Zeile (`label`), wie ein Mensch es tut. Das visuell versteckte Input liegt unter der Beschriftung und ist nicht direkt klickbar. `saveColorScheme` trägt einen Warum-Kommentar mit MDN-Quelle, weil ESLint leere `catch`-Blöcke verbietet.
+- Manuelle Prüfung auf dem iPhone bestanden. Rückmeldung: Die blaue Buttonfläche muss dunkler sein. `--color-button` in Dunkel und Hell daher `#1D4ED8` statt `#2563EB` (weiße Schrift 6,7 : 1 statt 5,2 : 1). Der Strich des App-Icons bleibt `#2563EB`.
 
 ## Verweise
 

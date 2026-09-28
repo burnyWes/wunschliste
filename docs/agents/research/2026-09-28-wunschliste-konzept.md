@@ -168,7 +168,7 @@ Option. Standard: Dunkel. Die Wahl gilt **pro Gerät** und wird nicht synchronis
 |---|---|---|---|
 | Hintergrund | `#000000` | `#FFFFFF` | `#FFFFFF` |
 | Schrift | `#FFFFFF` | `#000000` | `#000000` |
-| Button-Fläche | `#2563EB` | `#2563EB` | `#DA9C14` |
+| Button-Fläche | `#1D4ED8` | `#1D4ED8` | `#DA9C14` |
 | Button-Schrift | `#FFFFFF` | `#FFFFFF` | `#000000` |
 | Button-Rand | `#93C5FD` | `#1E3A8A` | `#6C3A02` |
 | Haken | `#22FF22` | `#15803D` | `#DD00DD` |
