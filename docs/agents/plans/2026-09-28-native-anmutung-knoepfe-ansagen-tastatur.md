@@ -413,10 +413,10 @@ einen zentralen Ansager gesprochen.
 - [x] `npm run lint` und `npm run test:architecture` grün.
 
 **Manuelle Verifikation** (iPhone, VoiceOver):
-- [ ] „Wunschliste erstellen“ antippen: VoiceOver sagt „Name, Textfeld“ o. Ä.
-- [ ] Einen Wunsch löschen: VoiceOver sagt die Überschrift der Wunschliste und
+- [x] „Wunschliste erstellen“ antippen: VoiceOver sagt „Name, Textfeld“ o. Ä.
+- [x] Einen Wunsch löschen: VoiceOver sagt die Überschrift der Wunschliste und
   „Wunsch „…“ gelöscht.“, und keine der beiden Ansagen verschluckt die andere.
-- [ ] Zweimal hintereinander „Schenken“ und „Schenken zurücknehmen“: Jede Meldung wird
+- [x] Zweimal hintereinander „Schenken“ und „Schenken zurücknehmen“: Jede Meldung wird
   gesprochen.
 
 ### Phase 3: Berührungsgefühl und Tastatur
