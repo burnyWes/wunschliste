@@ -1,4 +1,4 @@
-import { requestHeadingFocus } from '../../shared/ui/pageFocus';
+import { requestPageFocus } from '../../shared/ui/pageFocus';
 import { hashFor, pageKeyOf, resolveRoute, type Route } from './routes';
 
 export class CurrentRoute {
@@ -19,7 +19,7 @@ export class CurrentRoute {
     this.route = route;
     this.#showCanonicalHash();
     if (isPageChange) {
-      requestHeadingFocus();
+      requestPageFocus();
     }
   }
 

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { expectAnnouncement } from './announcement';
 import { historyLength, storedRecords } from './seed';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
@@ -10,7 +11,7 @@ async function createWishlist(page: Page, name: string): Promise<void> {
   await expect(pageHeading(page, name)).toBeVisible();
 }
 
-test('opens the form from the empty overview with its heading focused', async ({ page }) => {
+test('opens the form from the empty overview with its name field focused', async ({ page }) => {
   await page.goto('./');
 
   await expect(page.getByText('Noch keine Wunschlisten.')).toBeVisible();
@@ -21,7 +22,8 @@ test('opens the form from the empty overview with its heading focused', async ({
     .click();
 
   await expect(page).toHaveURL(/#\/liste\/neu$/);
-  await expect(pageHeading(page, 'Wunschliste erstellen')).toBeFocused();
+  await expect(pageHeading(page, 'Wunschliste erstellen')).toBeVisible();
+  await expect(page.getByRole('textbox', { name: 'Name' })).toBeFocused();
 });
 
 test('points out a missing name at the focused field', async ({ page }) => {
@@ -43,6 +45,7 @@ test('replaces the form with the new wishlist', async ({ page }) => {
 
   await expect(pageHeading(page, 'Geburtstag 2027')).toBeFocused();
   await expect(page).toHaveTitle('Geburtstag 2027 – Wunschliste');
+  await expectAnnouncement(page, 'Wunschliste erstellt.');
   expect(await historyLength(page)).toBe(startLength);
 
   await page.getByRole('button', { name: 'Zurück zu Wunschlisten' }).click();

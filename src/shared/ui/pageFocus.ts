@@ -1,11 +1,11 @@
-let isHeadingFocusRequested = false;
+let isPageFocusRequested = false;
 
-export function requestHeadingFocus(): void {
-  isHeadingFocusRequested = true;
+export function requestPageFocus(): void {
+  isPageFocusRequested = true;
 }
 
-export function takeHeadingFocusRequest(): boolean {
-  const wasRequested = isHeadingFocusRequested;
-  isHeadingFocusRequested = false;
+export function takePageFocusRequest(): boolean {
+  const wasRequested = isPageFocusRequested;
+  isPageFocusRequested = false;
   return wasRequested;
 }

@@ -366,29 +366,29 @@ Die Erstellen-Seiten setzen den Fokus ins Namensfeld. Ergebnisse von Aktionen we
 einen zentralen Ansager gesprochen.
 
 **Aufgaben**:
-- [ ] `src/shared/ui/pageFocus.ts`: `requestHeadingFocus` / `takeHeadingFocusRequest` in
+- [x] `src/shared/ui/pageFocus.ts`: `requestHeadingFocus` / `takeHeadingFocusRequest` in
   `requestPageFocus` / `takePageFocusRequest` umbenennen, Aufrufer in
   `currentRoute.svelte.ts` und `PageHeader.svelte` anpassen.
-- [ ] `PageHeader.svelte`: neue Prop `takesFocus = true`. Ist sie `false`, bleibt die
+- [x] `PageHeader.svelte`: neue Prop `takesFocus = true`. Ist sie `false`, bleibt die
   Anforderung unberührt. `PageHeader` wird vor dem Formular gemountet, deshalb darf es
   die Anforderung dann nicht verbrauchen.
-- [ ] `WishlistNameForm.svelte` und `WishForm.svelte`: neue Prop `focusesName = false`.
+- [x] `WishlistNameForm.svelte` und `WishForm.svelte`: neue Prop `focusesName = false`.
   Ist sie gesetzt, bekommt `PageHeader` `takesFocus={false}`, und in `onMount` gilt
   `if (takePageFocusRequest()) nameField.focus()`.
-- [ ] `CreateWishlistPage.svelte` und `CreateWishPage.svelte`: `focusesName` setzen.
-- [ ] `src/shared/ui/announcement.test.ts` zuerst schreiben, dann `announcement.ts`
+- [x] `CreateWishlistPage.svelte` und `CreateWishPage.svelte`: `focusesName` setzen.
+- [x] `src/shared/ui/announcement.test.ts` zuerst schreiben, dann `announcement.ts`
   umsetzen: `announcementText('', n)` ergibt `''`, und eine gerade bzw. ungerade
   Wiederholung ergibt den Text ohne bzw. mit angehängtem `​`. Das Verfahren stammt
   aus `Mahlzeitenplaner/src/shared/ui/announcement.ts`.
-- [ ] `src/shared/ui/announcer.svelte.ts`: modulweiter `$state` mit `{ text, repetition }`,
+- [x] `src/shared/ui/announcer.svelte.ts`: modulweiter `$state` mit `{ text, repetition }`,
   `announce(text)` erhöht `repetition`, `spokenText()` liefert `announcementText(...)`.
-- [ ] `src/shared/ui/Announcer.svelte`: `<p class="visually-hidden" role="status">{spokenText()}</p>`.
+- [x] `src/shared/ui/Announcer.svelte`: `<p class="visually-hidden" role="status">{spokenText()}</p>`.
   Einbinden in `App.svelte` außerhalb von `{#key}`, damit der Ansager den Seitenwechsel
   übersteht.
-- [ ] `wishTexts.test.ts` zuerst ergänzen, dann `wishTexts.ts`: Konstanten und Funktionen
+- [x] `wishTexts.test.ts` zuerst ergänzen, dann `wishTexts.ts`: Konstanten und Funktionen
   für die Ansagetexte laut Tabelle im Zielbild, z. B. `wishlistDeletedAnnouncement(name)`
   und `wishDeletedAnnouncement(name)`.
-- [ ] Die Seiten rufen `announce(...)` nach dem Aufruf des Anwendungsfalls auf, direkt
+- [x] Die Seiten rufen `announce(...)` nach dem Aufruf des Anwendungsfalls auf, direkt
   nach `navigateTo`:
   - `CreateWishlistPage` (erstellt)
   - `EditWishlistPage` (gespeichert, gelöscht mit Namen)
@@ -396,21 +396,21 @@ einen zentralen Ansager gesprochen.
   - `EditWishPage` (gespeichert, gelöscht mit Namen)
   - `WishPage` (Schenken und Zurücknehmen)
   Bei Abbrechen gibt es keine Ansage.
-- [ ] `WishPage.svelte`: `statusMessage`, `<p class="status" role="status">` und die
+- [x] `WishPage.svelte`: `statusMessage`, `<p class="status" role="status">` und die
   zugehörige CSS-Regel entfernen.
-- [ ] E2E `wishlists.spec.ts:21` und die Erstellen-Seiten in `wishes.spec.ts`: Statt der
+- [x] E2E `wishlists.spec.ts:21` und die Erstellen-Seiten in `wishes.spec.ts`: Statt der
   h1 wird das Namensfeld fokussiert. Bearbeiten-Seiten behalten den Fokus auf der h1
   (neuer Testfall).
-- [ ] E2E: Ansagen prüfen über `page.getByRole('status')`. Dazu gehören je ein Test für
+- [x] E2E: Ansagen prüfen über `page.getByRole('status')`. Dazu gehören je ein Test für
   Wunschliste erstellt, Wunsch gespeichert und Wunsch gelöscht („Wunsch „Fahrradhelm“
   gelöscht.“). Die bestehenden Schenken-Tests (`gifting.spec.ts:27,73`) bleiben grün.
-- [ ] E2E `navigation.spec.ts`: Beim App-Start ist weder die h1 noch das Namensfeld
+- [x] E2E `navigation.spec.ts`: Beim App-Start ist weder die h1 noch das Namensfeld
   fokussiert, auch nicht beim Direkteinstieg auf `#/liste/neu`.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit`: `announcement.test.ts` und `wishTexts.test.ts` grün.
-- [ ] `npm run test:e2e`: Fokus- und Ansagetests grün.
-- [ ] `npm run lint` und `npm run test:architecture` grün.
+- [x] `npm run test:unit`: `announcement.test.ts` und `wishTexts.test.ts` grün.
+- [x] `npm run test:e2e`: Fokus- und Ansagetests grün.
+- [x] `npm run lint` und `npm run test:architecture` grün.
 
 **Manuelle Verifikation** (iPhone, VoiceOver):
 - [ ] „Wunschliste erstellen“ antippen: VoiceOver sagt „Name, Textfeld“ o. Ä.
@@ -492,6 +492,12 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
   prüft jetzt, dass in der `.button-row` kein Knopf „Wunsch erstellen“ steht. Die alte
   Prüfung auf `link` wäre nach dem Umbau immer grün gewesen.
 - Phase 1: `history.length` wird über den Helfer `historyLength` in `e2e/seed.ts` gelesen.
+- Phase 2: Das Modul heißt `announcements.svelte.ts` statt `announcer.svelte.ts`. Der
+  Import `./announcer.svelte` kollidierte unter Windows (Dateisystem ohne Beachtung der
+  Groß-/Kleinschreibung) mit `Announcer.svelte`, `svelte-check` meldete das als Fehler.
+- Phase 2: Die E2E-Tests prüfen Ansagen über `expectAnnouncement` in `e2e/announcement.ts`.
+  Ein exakter Textvergleich scheitert an der ersten Ansage, weil ungerade Wiederholungen
+  das unsichtbare Zeichen tragen.
 
 ## Verweise
 

@@ -1,9 +1,10 @@
 <script lang="ts">
   import { Save, X } from '@lucide/svelte';
-  import { tick, untrack, type Snippet } from 'svelte';
+  import { onMount, tick, untrack, type Snippet } from 'svelte';
   import ActionBar from '../../../shared/ui/ActionBar.svelte';
   import ChoiceGroup from '../../../shared/ui/ChoiceGroup.svelte';
   import { navigateTo } from '../../../shared/ui/navigation';
+  import { takePageFocusRequest } from '../../../shared/ui/pageFocus';
   import PageHeader from '../../../shared/ui/PageHeader.svelte';
   import TextField from '../../../shared/ui/TextField.svelte';
   import { RATINGS, type Rating } from '../../domain/Rating';
@@ -27,12 +28,14 @@
     heading,
     initialInput,
     cancelTarget,
+    focusesName = false,
     onsubmit,
     extra,
   }: {
     heading: string;
     initialInput?: WishDetailsInput;
     cancelTarget: string;
+    focusesName?: boolean;
     onsubmit: (details: WishDetails) => Promise<void>;
     extra?: Snippet;
   } = $props();
@@ -64,6 +67,12 @@
   let descriptionField: TextField;
   let priceField: TextField;
 
+  onMount(() => {
+    if (focusesName && takePageFocusRequest()) {
+      nameField.focus();
+    }
+  });
+
   function firstFieldWith(found: WishDetailsProblems): TextField | undefined {
     if (found.name) return nameField;
     if (found.link) return linkField;
@@ -93,7 +102,7 @@
 </script>
 
 <form class="page" novalidate onsubmit={save}>
-  <PageHeader {heading} />
+  <PageHeader {heading} takesFocus={!focusesName} />
   <TextField
     bind:this={nameField}
     id="wish-name"

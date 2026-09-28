@@ -1,20 +1,23 @@
 <script lang="ts">
   import { Plus, X } from '@lucide/svelte';
+  import { announce } from '../../../shared/ui/announcements.svelte';
   import { navigateTo } from '../../../shared/ui/navigation';
   import type { Name } from '../../domain/Name';
   import { hashOf } from './wishlistAddresses';
   import { useWishlistModule } from './wishlistModuleContext';
   import WishlistNameForm from './WishlistNameForm.svelte';
+  import { WISHLIST_CREATED_ANNOUNCEMENT } from './wishTexts';
 
   const { createWishlist } = useWishlistModule();
 
   async function create(name: Name): Promise<void> {
     const wishlistId = await createWishlist.execute(name);
     navigateTo(hashOf({ page: 'wishlist', wishlistId, filter: 'open' }));
+    announce(WISHLIST_CREATED_ANNOUNCEMENT);
   }
 </script>
 
-<WishlistNameForm heading="Wunschliste erstellen" onsubmit={create}>
+<WishlistNameForm heading="Wunschliste erstellen" focusesName onsubmit={create}>
   {#snippet actions()}
     <button class="button" type="submit"><Plus aria-hidden="true" size="1.25em" /> Erstellen</button
     >

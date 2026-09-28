@@ -2,20 +2,24 @@
   import { ChevronLeft } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
   import { navigateTo } from './navigation';
-  import { takeHeadingFocusRequest } from './pageFocus';
+  import { takePageFocusRequest } from './pageFocus';
   import { showPageTitle } from './pageTitle';
 
   type BackTarget = { label: string; hash: string };
 
-  let { heading, back, actions }: { heading: string; back?: BackTarget; actions?: Snippet } =
-    $props();
+  let {
+    heading,
+    back,
+    actions,
+    takesFocus = true,
+  }: { heading: string; back?: BackTarget; actions?: Snippet; takesFocus?: boolean } = $props();
 
   let headingElement: HTMLHeadingElement;
 
   $effect(() => showPageTitle(heading));
 
   onMount(() => {
-    if (takeHeadingFocusRequest()) {
+    if (takesFocus && takePageFocusRequest()) {
       headingElement.focus();
     }
   });

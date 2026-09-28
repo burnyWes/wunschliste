@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Announcer from '../shared/ui/Announcer.svelte';
   import { createWishlistModule } from '../wishlist/infrastructure/createWishlistModule';
   import WishlistPages from '../wishlist/infrastructure/ui/WishlistPages.svelte';
   import { provideWishlistModule } from '../wishlist/infrastructure/ui/wishlistModuleContext';
@@ -38,6 +39,8 @@
     {/if}
   {/key}
 </main>
+
+<Announcer />
 
 <style>
   header {

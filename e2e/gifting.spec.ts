@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { expectAnnouncement } from './announcement';
 import { historyLength, seed } from './seed';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
@@ -24,7 +25,7 @@ test('gifts a wish and moves it to the fulfilled wishes', async ({ page }) => {
   await page.getByRole('button', { name: 'Schenken', exact: true }).focus();
   await page.keyboard.press('Enter');
 
-  await expect(page.getByRole('status')).toHaveText('Als erfüllt markiert.');
+  await expectAnnouncement(page, 'Als erfüllt markiert.');
   await expect(page.getByRole('button', { name: 'Schenken zurücknehmen' })).toBeFocused();
   await expect(page.getByText('Erfüllt', { exact: true })).toBeVisible();
 
@@ -69,7 +70,7 @@ test('takes a gift back so the wish is open again', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Schenken zurücknehmen' }).click();
 
-  await expect(page.getByRole('status')).toHaveText('Wieder offen.');
+  await expectAnnouncement(page, 'Wieder offen.');
   await expect(page.getByText('Erfüllt', { exact: true })).toHaveCount(0);
 
   await page.goto('./#/liste/birthday');

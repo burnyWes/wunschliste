@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Trash2 } from '@lucide/svelte';
+  import { announce } from '../../../shared/ui/announcements.svelte';
   import ConfirmDialog from '../../../shared/ui/ConfirmDialog.svelte';
   import { navigateTo } from '../../../shared/ui/navigation';
   import { Watched } from '../../../shared/ui/watched.svelte';
@@ -11,7 +12,12 @@
   import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
   import WishForm from './WishForm.svelte';
-  import { wishDeletionMessage, wishDetailsInputOf } from './wishTexts';
+  import {
+    SAVED_ANNOUNCEMENT,
+    wishDeletedAnnouncement,
+    wishDeletionMessage,
+    wishDetailsInputOf,
+  } from './wishTexts';
 
   let { wishId }: { wishId: WishId } = $props();
 
@@ -28,12 +34,15 @@
   async function save(details: WishDetails): Promise<void> {
     await editWish.execute(wishId, details);
     navigateTo(wishHash);
+    announce(SAVED_ANNOUNCEMENT);
   }
 
   async function deleteConfirmed(wishlistHash: string): Promise<void> {
     isDeleting = true;
+    const deletedName = wish.value?.details.name.value ?? '';
     await deleteWish.execute(wishId);
     navigateTo(wishlistHash);
+    announce(wishDeletedAnnouncement(deletedName));
   }
 </script>
 

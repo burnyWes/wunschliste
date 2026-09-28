@@ -16,6 +16,14 @@ test('starts on the wishlists page without moving focus', async ({ page }) => {
   await expect(pageHeading(page, 'Wunschlisten')).not.toBeFocused();
 });
 
+test('does not move focus into the form when the app starts on it', async ({ page }) => {
+  await page.goto('./#/liste/neu');
+
+  await expect(pageHeading(page, 'Wunschliste erstellen')).toBeVisible();
+  await expect(pageHeading(page, 'Wunschliste erstellen')).not.toBeFocused();
+  await expect(page.getByRole('textbox', { name: 'Name' })).not.toBeFocused();
+});
+
 test('moves focus to the heading of each newly shown page', async ({ page }) => {
   await page.goto('./');
   const startLength = await historyLength(page);

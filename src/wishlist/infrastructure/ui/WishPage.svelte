@@ -1,5 +1,6 @@
 <script lang="ts">
   import { ExternalLink, Gift, Pencil, Undo2 } from '@lucide/svelte';
+  import { announce } from '../../../shared/ui/announcements.svelte';
   import ActionBar from '../../../shared/ui/ActionBar.svelte';
   import { navigateTo } from '../../../shared/ui/navigation';
   import PageHeader from '../../../shared/ui/PageHeader.svelte';
@@ -12,6 +13,7 @@
   import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
   import WishSummary from './WishSummary.svelte';
+  import { GIFT_TAKEN_BACK_ANNOUNCEMENT, WISH_GIFTED_ANNOUNCEMENT } from './wishTexts';
 
   let { wishId }: { wishId: WishId } = $props();
 
@@ -30,15 +32,13 @@
     }
   });
 
-  let statusMessage = $state('');
-
   async function toggleGift(currentWish: Wish): Promise<void> {
     if (currentWish.gifted) {
       await takeBackGift.execute(currentWish.id);
-      statusMessage = 'Wieder offen.';
+      announce(GIFT_TAKEN_BACK_ANNOUNCEMENT);
     } else {
       await giftWish.execute(currentWish.id);
-      statusMessage = 'Als erfüllt markiert.';
+      announce(WISH_GIFTED_ANNOUNCEMENT);
     }
   }
 
@@ -68,7 +68,6 @@
     {#if description}
       <p class="description">{description.value}</p>
     {/if}
-    <p class="status" role="status">{statusMessage}</p>
     <ActionBar>
       <button
         type="button"
@@ -91,8 +90,7 @@
 {/if}
 
 <style>
-  .fulfilled,
-  .status {
+  .fulfilled {
     font-weight: 700;
   }
 

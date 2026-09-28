@@ -18,6 +18,8 @@ test('creates a wish with every field and shows its details', async ({ page }) =
   await page.goto('./#/liste/birthday');
   await page.getByRole('button', { name: 'Wunsch erstellen' }).first().click();
 
+  await expect(pageHeading(page, 'Wunsch erstellen')).toBeVisible();
+  await expect(field(page, 'Name')).toBeFocused();
   await field(page, 'Name').fill('Fahrradhelm');
   await field(page, 'Link').fill('amazon.de/helm');
   await field(page, 'Beschreibung').fill('Größe M,\ngern in Dunkelblau.');

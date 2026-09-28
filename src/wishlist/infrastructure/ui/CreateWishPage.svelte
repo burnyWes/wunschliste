@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { announce } from '../../../shared/ui/announcements.svelte';
   import { navigateTo } from '../../../shared/ui/navigation';
   import { Watched } from '../../../shared/ui/watched.svelte';
   import type { WishlistId } from '../../domain/ids';
@@ -9,6 +10,7 @@
   import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
   import WishForm from './WishForm.svelte';
+  import { WISH_CREATED_ANNOUNCEMENT } from './wishTexts';
 
   let { wishlistId }: { wishlistId: WishlistId } = $props();
 
@@ -21,12 +23,14 @@
   async function create(details: WishDetails): Promise<void> {
     const wishId = await createWish.execute(wishlistId, details);
     navigateTo(hashOf({ page: 'wish', wishId }));
+    announce(WISH_CREATED_ANNOUNCEMENT);
   }
 </script>
 
 {#if wishlist.value}
   <WishForm
     heading="Wunsch erstellen"
+    focusesName
     cancelTarget={wishlistFilterMemory.hashOf(wishlistId)}
     onsubmit={create}
   />

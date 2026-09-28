@@ -4,14 +4,21 @@ import { parseWishDetails } from '../../domain/WishDetails';
 import { Price } from '../../domain/Price';
 import {
   DESCRIPTION_PROBLEM_MESSAGES,
+  GIFT_TAKEN_BACK_ANNOUNCEMENT,
+  SAVED_ANNOUNCEMENT,
+  WISH_CREATED_ANNOUNCEMENT,
+  WISH_GIFTED_ANNOUNCEMENT,
+  WISHLIST_CREATED_ANNOUNCEMENT,
   formatPrice,
   LINK_PROBLEM_MESSAGES,
   NAME_PROBLEM_MESSAGES,
   PRICE_PROBLEM_MESSAGES,
   ratingLabel,
   ratingStars,
+  wishDeletedAnnouncement,
   wishDeletionMessage,
   wishDetailsInputOf,
+  wishlistDeletedAnnouncement,
   wishlistDeletionMessage,
 } from './wishTexts';
 
@@ -65,6 +72,24 @@ describe('deletion messages', () => {
 
   it('names the wish', () => {
     expect(wishDeletionMessage('Fahrradhelm')).toBe('„Fahrradhelm“ wird gelöscht.');
+  });
+});
+
+describe('announcements', () => {
+  it('reports each finished action', () => {
+    expect(WISHLIST_CREATED_ANNOUNCEMENT).toBe('Wunschliste erstellt.');
+    expect(WISH_CREATED_ANNOUNCEMENT).toBe('Wunsch erstellt.');
+    expect(SAVED_ANNOUNCEMENT).toBe('Gespeichert.');
+    expect(WISH_GIFTED_ANNOUNCEMENT).toBe('Als erfüllt markiert.');
+    expect(GIFT_TAKEN_BACK_ANNOUNCEMENT).toBe('Wieder offen.');
+  });
+
+  it('names the deleted wishlist', () => {
+    expect(wishlistDeletedAnnouncement('Geburtstag')).toBe('Wunschliste „Geburtstag“ gelöscht.');
+  });
+
+  it('names the deleted wish', () => {
+    expect(wishDeletedAnnouncement('Fahrradhelm')).toBe('Wunsch „Fahrradhelm“ gelöscht.');
   });
 });
 

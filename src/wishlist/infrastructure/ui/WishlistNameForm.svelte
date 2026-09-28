@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { tick, untrack, type Snippet } from 'svelte';
+  import { onMount, tick, untrack, type Snippet } from 'svelte';
   import ActionBar from '../../../shared/ui/ActionBar.svelte';
+  import { takePageFocusRequest } from '../../../shared/ui/pageFocus';
   import PageHeader from '../../../shared/ui/PageHeader.svelte';
   import TextField from '../../../shared/ui/TextField.svelte';
   import { Name, type NameProblem } from '../../domain/Name';
@@ -9,12 +10,14 @@
   let {
     heading,
     initialName = '',
+    focusesName = false,
     onsubmit,
     extra,
     actions,
   }: {
     heading: string;
     initialName?: string;
+    focusesName?: boolean;
     onsubmit: (name: Name) => Promise<void>;
     extra?: Snippet;
     actions: Snippet;
@@ -23,6 +26,12 @@
   let name = $state(untrack(() => initialName));
   let problem = $state<NameProblem>();
   let nameField: TextField;
+
+  onMount(() => {
+    if (focusesName && takePageFocusRequest()) {
+      nameField.focus();
+    }
+  });
 
   async function submit(event: SubmitEvent): Promise<void> {
     event.preventDefault();
@@ -39,7 +48,7 @@
 </script>
 
 <form class="page" novalidate onsubmit={submit}>
-  <PageHeader {heading} />
+  <PageHeader {heading} takesFocus={!focusesName} />
   <TextField
     bind:this={nameField}
     id="wishlist-name"

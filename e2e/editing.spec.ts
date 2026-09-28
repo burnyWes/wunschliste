@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { expectAnnouncement } from './announcement';
 import { historyLength, seed, storedRecords, type SeedData, type WishRecord } from './seed';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
@@ -104,8 +105,9 @@ test('removes price and rating from a wish', async ({ page }) => {
   await page.locator('label').filter({ hasText: 'keine Angabe' }).click();
   await page.getByRole('button', { name: 'Speichern' }).click();
 
-  await expect(pageHeading(page, 'Fahrradhelm')).toBeVisible();
+  await expect(pageHeading(page, 'Fahrradhelm')).toBeFocused();
   await expect(page).toHaveURL(/#\/wunsch\/helmet$/);
+  await expectAnnouncement(page, 'Gespeichert.');
   await expect(page.getByRole('main')).not.toContainText('€');
   await expect(page.getByRole('main')).not.toContainText('★');
 });
@@ -119,6 +121,21 @@ test('deletes a wish', async ({ page }) => {
   await expect(dialog(page)).toContainText('„Fahrradhelm“ wird gelöscht.');
   await dialog(page).getByRole('button', { name: 'Löschen' }).click();
 
-  await expect(pageHeading(page, 'Geburtstag')).toBeVisible();
+  await expect(pageHeading(page, 'Geburtstag')).toBeFocused();
   await expect(page.getByRole('main').locator('.wish-name')).toHaveText(['Buch']);
+  await expectAnnouncement(page, 'Wunsch „Fahrradhelm“ gelöscht.');
+});
+
+test('focuses the heading of the edit pages', async ({ page }) => {
+  await page.goto('./#/liste/birthday');
+
+  await page.getByRole('button', { name: 'Wunschliste bearbeiten' }).click();
+
+  await expect(pageHeading(page, 'Wunschliste bearbeiten')).toBeFocused();
+
+  await page.getByRole('button', { name: 'Abbrechen' }).click();
+  await page.getByRole('button', { name: /^Fahrradhelm/ }).click();
+  await page.getByRole('button', { name: 'Bearbeiten' }).click();
+
+  await expect(pageHeading(page, 'Wunsch bearbeiten')).toBeFocused();
 });

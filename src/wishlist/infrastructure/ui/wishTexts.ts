@@ -64,6 +64,24 @@ export function wishDeletionMessage(name: string): string {
   return wishlistDeletionMessage(name, 0);
 }
 
+export const WISHLIST_CREATED_ANNOUNCEMENT = 'Wunschliste erstellt.';
+
+export const WISH_CREATED_ANNOUNCEMENT = 'Wunsch erstellt.';
+
+export const SAVED_ANNOUNCEMENT = 'Gespeichert.';
+
+export const WISH_GIFTED_ANNOUNCEMENT = 'Als erfüllt markiert.';
+
+export const GIFT_TAKEN_BACK_ANNOUNCEMENT = 'Wieder offen.';
+
+export function wishlistDeletedAnnouncement(name: string): string {
+  return `Wunschliste „${name}“ gelöscht.`;
+}
+
+export function wishDeletedAnnouncement(name: string): string {
+  return `Wunsch „${name}“ gelöscht.`;
+}
+
 function priceInputOf(price: Price): string {
   return (price.cents / CENTS_PER_EURO).toFixed(2).replace('.', ',');
 }
