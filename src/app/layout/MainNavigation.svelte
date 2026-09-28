@@ -31,15 +31,14 @@
     padding: 0.4em 0.9em;
     border: 0.1875rem solid var(--color-button-border);
     border-radius: 0.5rem;
-    background-color: var(--color-button);
-    color: var(--color-button-text);
+    background-color: var(--color-background);
+    color: var(--color-text);
     font-weight: 600;
     text-decoration: none;
   }
 
   a[aria-current='page'] {
-    text-decoration: underline;
-    text-decoration-thickness: 0.15em;
-    text-underline-offset: 0.25em;
+    background-color: var(--color-button);
+    color: var(--color-button-text);
   }
 </style>

@@ -2,7 +2,8 @@ import { expect, test, type Page } from '@playwright/test';
 
 const BLACK = 'rgb(0, 0, 0)';
 const WHITE = 'rgb(255, 255, 255)';
-const INVERTED_BUTTON = 'rgb(218, 156, 20)';
+const ROYAL_BLUE = 'rgb(0, 35, 102)';
+const INVERTED_ROYAL_BLUE = 'rgb(255, 220, 153)';
 
 const schemeOption = (page: Page, label: string) => page.getByRole('radio', { name: label });
 
@@ -47,10 +48,18 @@ test('applies the stored scheme before the application starts', async ({ page })
   await expect(page.locator('html')).toHaveAttribute('data-color-scheme', 'light');
 });
 
-test('colors the navigation buttons in the inverted scheme', async ({ page }) => {
+test('fills only the button of the current page', async ({ page }) => {
+  expect(await backgroundOf(page, 'nav a[aria-current="page"]')).toBe(ROYAL_BLUE);
+  expect(await backgroundOf(page, 'nav a:not([aria-current])')).toBe(BLACK);
+});
+
+test('fills the current page button with the inverse of royal blue in the inverted scheme', async ({
+  page,
+}) => {
   await tapSchemeRow(page, 'Invertiert');
 
-  expect(await backgroundOf(page, 'nav a')).toBe(INVERTED_BUTTON);
+  expect(await backgroundOf(page, 'nav a[aria-current="page"]')).toBe(INVERTED_ROYAL_BLUE);
+  expect(await backgroundOf(page, 'nav a:not([aria-current])')).toBe(WHITE);
 });
 
 for (const label of ['Hell', 'Invertiert']) {
