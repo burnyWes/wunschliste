@@ -72,3 +72,5 @@ m Bilder zu Wünschen (Firebase Storage, Upload)
 - "gewünscht seit <Datum>" auf Wunsch-Detailseite anzeigen
 - Schritt 4/5: Übergang für Firestore-Dokumente ohne ownerId bzw. mit altem Feld gifted einplanen (z. B. Standardwert beim Einlesen), sonst verschwinden bestehende Listen und Wünsche
 - Produktionsbuild: Firebase-Werte auf Plausibilität prüfen (API-Key beginnt mit AIza, App-ID hat die Form 1:…:web:…), damit vertauschte Werte schon in der Pipeline auffallen
+- jede Seite mit Zurück-Button versehen
+- Wunsch: optionales Textfeld "Marke / Hersteller" hinzufügen

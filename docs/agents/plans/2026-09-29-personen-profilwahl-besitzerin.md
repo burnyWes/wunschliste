@@ -5,7 +5,7 @@ branch: main
 story: WL-005
 topic: "Personen, Profilwahl, Besitzerin und gruppierte Übersicht"
 tags: [plan, wishlist, domain, application, firestore, profile, router, settings, accessibility]
-status: ready
+status: done
 ---
 
 # PLAN: WL-005 — Personen, Profilwahl, Besitzerin und gruppierte Übersicht
@@ -832,10 +832,10 @@ E2E:
 - [x] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
 
 **Manuelle Verifikation**:
-- [ ] Auf dem iPhone mit VoiceOver:
+- [x] Auf dem iPhone mit VoiceOver:
   - Profil in den Einstellungen wechseln: Ansage „Du bist …“, Fokus auf „Einstellungen“
   - Eine Person mit Liste zeigt den Hinweis statt des Löschknopfs.
-- [ ] Auf zwei Geräten: Eine Person wird auf Gerät A gelöscht, die Gerät B als Profil
+- [x] Auf zwei Geräten: Eine Person wird auf Gerät A gelöscht, die Gerät B als Profil
   nutzt. B zeigt „Wer bist du?“.
 
 ## Notizen zur Umsetzung
