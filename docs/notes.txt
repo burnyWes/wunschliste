@@ -18,59 +18,66 @@ TODO-List
 DONE 
 ----------------------------------------------------------------------------------------------------------------------------------
 x Schritt 4/5: Übergang für Firestore-Dokumente ohne ownerId bzw. mit altem Feld gifted einplanen (z. B. Standardwert beim Einlesen), sonst verschwinden bestehende Listen und Wünsche
+x iOS-App
+  x ohne Swift
+  x kein Apple-Dev-Account
+  x app mit github-pages bauen
+  x app soll Daten syncron auf mehreren Geräten zeigen können
+    x Firestore?
+    x einmaliger Login bekötigt?
+  x voiceover first
+    x alles muss gut mit Voiceover bedienbar sein
+    x starke Kontraste erwünscht aber kein muss
+  x Design
+    x Hintergrund: schwarz
+    x Schrift: weiß
+    x Buttons: mittelblau mit weißes Text und heller starker border
+    x light-mode in den Einstellungen einstellbar (invertiert alle Farben)
+  x Funktionaligät
+    x oben fixierte Navigation
+      x |Wunschlisten||Einstellungen|
+      x Einstellungen mit Zahnrad-Icon
+    x Wunschlisten-Seite
+      x rechts neben Überschrift einen "Wunschliste erstellen"-Button-Button mit +-Icon
+      x auf der Seite selbst eine Liste aller erstellten Wunschlisten (Einträge anklickbar -> Wunschliste selbst)
+    x Wunschliste erstellen Seite
+      x Textfeld für Name
+      x Erstellen-Button am unteren Rand fixiert
+    x Seite einer Wunschliste
+      x Ebenfalls eine Liste von Wünschen
+      x oben rechts ebenfalls einen Button mit +-Icon "Wunsch erstellen"
+      x Zwischen Überschrift und Liste 2 Buttons "Offene Wünsche" und "Erfüllte Wünsche"
+        x Filter für bereits geschenkt oder noch nicht
+      x Klick auf einen Wunsch kommt auf die Detailseite des Wunsches
+    x Wunsch Detailseite
+      x unten fixirt "Bearbeiten"-Button-Button (Stift-Icon) und "Schenken"-Button (Geschenk-Icon)
+      x Klich auf Bearbeiten führt auf Wunsch-Erstellen/Bearbeiten-Seite
+    x Wunsch-Erstellen/Bearbeiten-Seite
+      x Name
+      x Link
+      x Beschreibung
+      x Preis
+      x Rating
+      x alles bis auf Name optional
+      x unten fixiert "Speichern"-Buttonn (Disketten-Icon und Text) und "Abbrechen"-Button (X-Icon und Text)
+    x Einstellungen-Seite
+      x Checkbox für Darkmod ein/aus
+        x Checkbox rechts
+        x im Darkmode großer leuchtend-grüner Haken
+        x Checkbox selbst nur linke und untere Linie zeichnen
 ----------------------------------------------------------------------------------------------------------------------------------
 TODO 
 ----------------------------------------------------------------------------------------------------------------------------------
-- iSO-App
-  - ohne Swift
-  - kein Apple-Dev-Account
-  - app mit github-pages bauen
-  - app soll Daten syncron auf mehreren Geräten zeigen können
-    - Firestore?
-    - einmaliger Login bekötigt?
-  - voiceover first
-    - alles muss gut mit Voiceover bedienbar sein
-    - starke Kontraste erwünscht aber kein muss
-  - Design
-    - Hintergrund: schwarz
-    - Schrift: weiß
-    - Buttons: mittelblau mit weißes Text und heller starker border
-    - light-mode in den Einstellungen einstellbar (invertiert alle Farben)
-  - Funktionaligät
-    - oben fixierte Navigation
-      - |Wunschlisten||Einstellungen|
-      - Einstellungen mit Zahnrad-Icon
-    - Wunschlisten-Seite
-      - rechts neben Überschrift einen "Wunschliste erstellen"-Button-Button mit +-Icon
-      - auf der Seite selbst eine Liste aller erstellten Wunschlisten (Einträge anklickbar -> Wunschliste selbst)
-    - Wunschliste erstellen Seite
-      - Textfeld für Name
-      - Erstellen-Button am unteren Rand fixiert
-    - Seite einer Wunschliste
-      - Ebenfalls eine Liste von Wünschen
-      - oben rechts ebenfalls einen Button mit +-Icon "Wunsch erstellen"
-      - Zwischen Überschrift und Liste 2 Buttons "Offene Wünsche" und "Erfüllte Wünsche"
-        - Filter für bereits geschenkt oder noch nicht
-      - Klick auf einen Wunsch kommt auf die Detailseite des Wunsches
-    - Wunsch Detailseite
-      - unten fixirt "Bearbeiten"-Button-Button (Stift-Icon) und "Schenken"-Button (Geschenk-Icon)
-      - Klich auf Bearbeiten führt auf Wunsch-Erstellen/Bearbeiten-Seite
-    - Wunsch-Erstellen/Bearbeiten-Seite
-      - Name
-      - Link
-      - Beschreibung
-      - Preis
-      - Rating
-      - alles bis auf Name optional
-      - unten fixiert "Speichern"-Buttonn (Disketten-Icon und Text) und "Abbrechen"-Button (X-Icon und Text)
-    - Einstellungen-Seite
-      - Checkbox für Darkmod ein/aus
-        - Checkbox rechts
-        - im Darkmode großer leuchtend-grüner Haken
-        - Checkbox selbst nur linke und untere Linie zeichnen
+
 m Bilder zu Wünschen (Firebase Storage, Upload)
-- TypeScript auf 7 anheben, sobald typescript-eslint und svelte-check es unterstützen
+m TypeScript auf 7 anheben, sobald typescript-eslint und svelte-check es unterstützen
 - "gewünscht seit <Datum>" auf Wunsch-Detailseite anzeigen
-- Produktionsbuild: Firebase-Werte auf Plausibilität prüfen (API-Key beginnt mit AIza, App-ID hat die Form 1:…:web:…), damit vertauschte Werte schon in der Pipeline auffallen
-- jede Seite mit Zurück-Button versehen
+m Produktionsbuild: Firebase-Werte auf Plausibilität prüfen (API-Key beginnt mit AIza, App-ID hat die Form 1:…:web:…),
+damit vertauschte Werte schon in der Pipeline auffallen
+m jede Seite mit Zurück-Button versehen
 - Wunsch: optionales Textfeld "Marke / Hersteller" hinzufügen
+- Wunschlisten-Button in Navigation mit Listen-Icon
+- "Offene Wünsche"-Button und "Erfüllte Wünsche"-Button umbennenen "Noch offen", "Erfüllt" und mit Icons versehen
+(Geschenk und offenes Geschenk/offene Kiste)
+  - Die Buttons sollen nebeneinander und nicht übereinander sein.
+m Einstellungen-Seite: Alles was mit Person zu tun hat auf eine Unterseite
