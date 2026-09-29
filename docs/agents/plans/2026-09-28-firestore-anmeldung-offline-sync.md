@@ -5,7 +5,7 @@ branch: main
 story: WL-004
 topic: "Familienzugang, Firestore-Adapter, Sync und Offline"
 tags: [plan, firebase, firestore, auth, offline, sync, emulator, ci, app-shell, wishlist-infrastructure, accessibility]
-status: ready
+status: done
 ---
 
 # PLAN: WL-004 — Familienzugang, Firestore, Sync und Offline
@@ -966,13 +966,13 @@ gescheiterte Listener, im Kopf wie auf der Seite.
       axe-Fälle
 
 **Manuelle Verifikation**:
-- [ ] iPhone mit VoiceOver, Flugmodus an → VoiceOver sagt einmal „Offline – Änderungen
+- [x] iPhone mit VoiceOver, Flugmodus an → VoiceOver sagt einmal „Offline – Änderungen
       werden später abgeglichen.“. Der Hinweis steht unter der Navigation und bricht bei
       maximaler Textgröße sauber um.
-- [ ] Offline einen Wunsch anlegen und verschenken → Die App reagiert sofort. Flugmodus
+- [x] Offline einen Wunsch anlegen und verschenken → Die App reagiert sofort. Flugmodus
       aus → Der Hinweis verschwindet ohne Ansage, und das zweite Gerät zeigt den Wunsch
       als erfüllt.
-- [ ] Offline-Hinweis und Warnzeile sehen in allen drei Farbschemata stimmig aus. Die
+- [x] Offline-Hinweis und Warnzeile sehen in allen drei Farbschemata stimmig aus. Die
       Warnzeile lässt sich über ein Konto ohne Freigabe erzeugen, etwa ein zweites in der
       Firebase-Konsole angelegtes Konto.
 
