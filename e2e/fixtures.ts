@@ -1,5 +1,5 @@
 import { test as base, expect, type Page } from '@playwright/test';
-import { createAccount, FAMILY, familyAccountUid, resetAuth } from './emulators';
+import { createAccount, FAMILY, familyAccountUid, resetAuth, resetFirestore } from './emulators';
 
 export { expect };
 export type { Page } from '@playwright/test';
@@ -17,6 +17,7 @@ export const test = base.extend<{ signedIn: boolean; freshEmulators: void }>({
   freshEmulators: [
     async ({}, use) => {
       await resetAuth();
+      await resetFirestore();
       await createAccount({ uid: familyAccountUid(), ...FAMILY });
       await use();
     },

@@ -1,6 +1,7 @@
 import { expect, test, type Page } from './fixtures';
 import { expectAnnouncement } from './announcement';
-import { historyLength, seed, storedRecords, type SeedData, type WishRecord } from './seed';
+import { seed, storedWishes, storedWishlists, type SeedData } from './emulators';
+import { historyLength } from './history';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
 const field = (page: Page, name: string) => page.getByRole('textbox', { name, exact: true });
@@ -25,8 +26,8 @@ const data: SeedData = {
   ],
 };
 
-test.beforeEach(async ({ page }) => {
-  await seed(page, data);
+test.beforeEach(async () => {
+  await seed(data);
 });
 
 test('renames a wishlist and goes back to it', async ({ page }) => {
@@ -82,7 +83,7 @@ test('asks before deleting a wishlist with its wishes', async ({ page }) => {
 
   await expect(dialog(page)).toBeHidden();
   await expect(deleteButton).toBeFocused();
-  expect(await storedRecords(page, 'wunschliste.wishlists')).toHaveLength(2);
+  expect(await storedWishlists()).toHaveLength(2);
 
   await deleteButton.focus();
   await page.keyboard.press('Enter');
@@ -90,8 +91,7 @@ test('asks before deleting a wishlist with its wishes', async ({ page }) => {
 
   await expect(pageHeading(page, 'Wunschlisten')).toBeVisible();
   await expect(page.getByRole('main').getByRole('listitem')).toHaveText(['Weihnachten']);
-  const remainingWishes = await storedRecords<WishRecord>(page, 'wunschliste.wishes');
-  expect(remainingWishes.map(({ id }) => id)).toEqual(['sledge']);
+  await expect.poll(async () => (await storedWishes()).map(({ id }) => id)).toEqual(['sledge']);
   expect(await historyLength(page)).toBe(startLength);
 });
 

@@ -1,6 +1,7 @@
 import { expect, test, type Page } from './fixtures';
 import { expectAnnouncement } from './announcement';
-import { historyLength, storedRecords } from './seed';
+import { storedWishlists } from './emulators';
+import { historyLength } from './history';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
 
@@ -61,7 +62,7 @@ test('goes back to the overview on cancel without creating anything', async ({ p
 
   await expect(page).toHaveURL(/#\/$/);
   await expect(pageHeading(page, 'Wunschlisten')).toBeVisible();
-  expect(await storedRecords(page, 'wunschliste.wishlists')).toEqual([]);
+  expect(await storedWishlists()).toEqual([]);
 });
 
 test('lists wishlists alphabetically and keeps them after a restart', async ({ page }) => {

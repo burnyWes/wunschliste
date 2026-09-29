@@ -129,9 +129,14 @@ das durch, `tests/architecture.test.ts` sichert die Regel selbst ab.
 
 ## Daten
 
-In Schritt 2 liegen alle Daten nur lokal im Browser (`localStorage`) unter den Schlüsseln
-`wunschliste.wishlists` und `wunschliste.wishes`. Beim späteren Wechsel auf Firestore
-werden sie nicht übernommen.
+Die Daten liegen in Firestore in den Sammlungen `wishlists` und `wishes` und gleichen sich
+live zwischen den Geräten ab. Jedes Gerät hält sie zusätzlich in einem Offline-Zwischenspeicher
+(IndexedDB), damit die App ohne Netz bedienbar bleibt. Abmelden löscht diesen
+Zwischenspeicher.
+
+Die lokalen Daten aus Schritt 2 (`wunschliste.wishlists`, `wunschliste.wishes` in
+`localStorage`) werden nicht übernommen und beim Start entfernt. Das gewählte Farbschema
+(`wunschliste.colorScheme`) bleibt.
 
 ## Arbeitsablauf
 

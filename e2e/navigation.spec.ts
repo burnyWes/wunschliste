@@ -1,5 +1,6 @@
 import { expect, test, type Page } from './fixtures';
-import { historyLength, seed } from './seed';
+import { seed } from './emulators';
+import { historyLength } from './history';
 
 const mainNavigation = (page: Page) => page.getByRole('navigation', { name: 'Hauptnavigation' });
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
@@ -57,7 +58,7 @@ for (const path of ['./', './#/einstellungen']) {
 
 for (const path of ['./#/liste/birthday', './#/liste/neu']) {
   test(`hides the main navigation on the sub page ${path}`, async ({ page }) => {
-    await seed(page, { wishlists: [{ id: 'birthday', name: 'Geburtstag' }] });
+    await seed({ wishlists: [{ id: 'birthday', name: 'Geburtstag' }] });
     await page.goto(path);
 
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

@@ -1,10 +1,11 @@
 import { expect, test, type Page } from './fixtures';
-import { historyLength, seed } from './seed';
+import { seed } from './emulators';
+import { historyLength } from './history';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
 
-test.beforeEach(async ({ page }) => {
-  await seed(page, {
+test.beforeEach(async () => {
+  await seed({
     wishlists: [{ id: 'birthday', name: 'Geburtstag' }],
     wishes: [
       { id: 'helmet', wishlistId: 'birthday', name: 'Fahrradhelm', gifted: false },

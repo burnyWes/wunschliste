@@ -1,5 +1,5 @@
 import { expect, test, type Page } from './fixtures';
-import { seed, storedRecords, type WishRecord } from './seed';
+import { seed, storedWishes, type WishRecord } from './emulators';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
 const field = (page: Page, name: string) => page.getByRole('textbox', { name, exact: true });
@@ -10,8 +10,8 @@ async function chooseRating(page: Page, label: string): Promise<void> {
   await page.locator('label').filter({ hasText: label }).click();
 }
 
-test.beforeEach(async ({ page }) => {
-  await seed(page, { wishlists: [birthday] });
+test.beforeEach(async () => {
+  await seed({ wishlists: [birthday] });
 });
 
 test('creates a wish with every field and shows its details', async ({ page }) => {
@@ -77,8 +77,8 @@ test.describe('with wishes of different ratings', () => {
     },
   ];
 
-  test.beforeEach(async ({ page }) => {
-    await seed(page, { wishlists: [birthday], wishes });
+  test.beforeEach(async () => {
+    await seed({ wishlists: [birthday], wishes });
   });
 
   test('lists them in the order of their rating', async ({ page }) => {
@@ -106,7 +106,7 @@ test('goes back to the wishlist on cancel without creating anything', async ({ p
 
   await expect(pageHeading(page, 'Geburtstag')).toBeVisible();
   await expect(page.getByText('Verworfen')).toHaveCount(0);
-  expect(await storedRecords(page, 'wunschliste.wishes')).toEqual([]);
+  expect(await storedWishes()).toEqual([]);
 });
 
 test('stays in the app when cancelling a form opened directly', async ({ page }) => {

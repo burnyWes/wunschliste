@@ -1,7 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
-import { FAMILY } from './emulators';
+import { FAMILY, seed, type SeedData } from './emulators';
 import { expect, test, type Page } from './fixtures';
-import { seed, type SeedData } from './seed';
 
 const WCAG_21_AA = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
 
@@ -156,7 +155,7 @@ const offerLinkOnly: { name: string; path: string; heading: string; links: strin
 
 for (const { name, path, heading, links } of offerLinkOnly) {
   test(`${name} page offers buttons instead of links inside the app`, async ({ page }) => {
-    await seed(page, wishlistWithWishes);
+    await seed(wishlistWithWishes);
     await page.goto(path);
     await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
 
@@ -180,7 +179,7 @@ function checkAccessibility(checkedPages: readonly CheckedPage[]): void {
           localStorage.setItem('wunschliste.colorScheme', scheme);
         }, colorScheme);
         if (data) {
-          await seed(page, data);
+          await seed(data);
         }
         await page.goto(path);
         await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();

@@ -1,4 +1,4 @@
-import { FAMILY } from './emulators';
+import { FAMILY, seed } from './emulators';
 import { expect, signIn, test, type Page } from './fixtures';
 
 test.use({ signedIn: false });
@@ -87,4 +87,54 @@ test('signs out only after confirming', async ({ page }) => {
   await dialog.getByRole('button', { name: 'Abmelden' }).click();
 
   await expect(pageHeading(page, 'Anmelden')).toBeVisible();
+});
+
+test.describe('after signing out', () => {
+  async function signOut(page: Page): Promise<void> {
+    await page.goto('./#/einstellungen');
+    await page.getByRole('button', { name: 'Abmelden' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Abmelden' }).click();
+    await expect(pageHeading(page, 'Anmelden')).toBeVisible();
+  }
+
+  async function firestoreDatabasesOf(page: Page): Promise<string[]> {
+    return page.evaluate(async () => {
+      const databases = await indexedDB.databases();
+      return databases
+        .map(({ name }) => name ?? '')
+        .filter((name) => name.startsWith('firestore/'));
+    });
+  }
+
+  test('shows the data again after signing in anew', async ({ page }) => {
+    await seed({ wishlists: [{ id: 'birthday', name: 'Geburtstag' }] });
+    await signIn(page);
+    await expect(page.getByRole('main').getByRole('button', { name: 'Geburtstag' })).toBeVisible();
+
+    await signOut(page);
+    await signIn(page);
+
+    await expect(page.getByRole('main').getByRole('button', { name: 'Geburtstag' })).toBeVisible();
+  });
+
+  test('removes the offline cache of the device', async ({ page }) => {
+    await signIn(page);
+    await expect.poll(() => firestoreDatabasesOf(page)).not.toEqual([]);
+
+    await signOut(page);
+
+    await expect.poll(() => firestoreDatabasesOf(page)).toEqual([]);
+  });
+
+  test('signs out every tab even while another tab holds the cache', async ({ page, context }) => {
+    await signIn(page);
+    const otherTab = await context.newPage();
+    await otherTab.goto('./');
+    await expect(pageHeading(otherTab, 'Wunschlisten')).toBeVisible();
+
+    await signOut(page);
+
+    await expect(pageHeading(page, 'Anmelden')).toBeVisible({ timeout: 5000 });
+    await expect(pageHeading(otherTab, 'Anmelden')).toBeVisible({ timeout: 5000 });
+  });
 });

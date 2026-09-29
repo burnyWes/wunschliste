@@ -746,24 +746,24 @@ localStorage-Adapter und die alten Daten verschwinden. Die E2E-Seeds laufen übe
 Emulator, und ein Test mit zwei Geräten belegt den Sync.
 
 **Aufgaben**:
-- [ ] `tests/integration/testFirestore.ts` erweitern:
+- [x] `tests/integration/testFirestore.ts` erweitern:
   - `familyFirestore()` = `asModularFirestore(authenticatedContext(<UID aus
     firestore.rules>))`
   - `withoutRules(action)` = `withSecurityRulesDisabled`, zum Schreiben ungültiger
     Dokumente und Lesen der Rohdaten
   - `clearFirestore()`
-- [ ] `firestore/wishlistDocument.ts` und `firestore/wishDocument.ts`:
+- [x] `firestore/wishlistDocument.ts` und `firestore/wishDocument.ts`:
   - Prüfung und Abbildung aus den localStorage-Adaptern übernehmen
   - `toDocument` lässt `undefined`-Felder weg und nimmt kein `id` ins Dokument, die ID
     ist der Dokumentname
   - `fromDocument(id, data: unknown)` liefert die Domänenklasse oder `undefined`
-- [ ] `firestore/observedWrite.ts`:
+- [x] `firestore/observedWrite.ts`:
   - `observedWrite(write: Promise<void>, onProblem): void` hängt nur `.catch(() =>
     onProblem('writeRejected'))` an
   - `type WishlistProblem = 'writeRejected' | 'loadFailed'` liegt in einer eigenen
     Datei `src/wishlist/infrastructure/wishlistProblem.ts`. So entsteht kein Zyklus
     zwischen `createWishlistModule.ts` und den Adaptern.
-- [ ] `firestore/FirestoreWishlistRepository.ts`,
+- [x] `firestore/FirestoreWishlistRepository.ts`,
       `constructor(firestore: Firestore, onProblem: (problem: WishlistProblem) => void)`:
   - `watchAll(onChange)` über `onSnapshot(collection(firestore, 'wishlists'))`
   - `watch(id, onChange)` über `onSnapshot(doc(…))`, `exists()` → `fromDocument`, sonst
@@ -771,11 +771,11 @@ Emulator, und ein Test mit zwei Geräten belegt den Sync.
   - `get(id)` über `getDocFromCache`, bei einem Fehler `getDoc`
   - `save(wishlist)` über `observedWrite(setDoc(…))`, löst sofort auf
   - `delete(id)` über `observedWrite(deleteDoc(…))`
-- [ ] `firestore/FirestoreWishRepository.ts` analog:
+- [x] `firestore/FirestoreWishRepository.ts` analog:
   - `watchByWishlist` über `query(collection('wishes'), where('wishlistId', '==', id))`
   - `deleteAllOf(wishlistId)`: Wünsche per `getDocsFromCache(query)` holen, alle in einem
     `writeBatch` löschen, `observedWrite(batch.commit())`
-- [ ] Integrationstests `tests/integration/FirestoreWishlistRepository.integration.test.ts`
+- [x] Integrationstests `tests/integration/FirestoreWishlistRepository.integration.test.ts`
       und `tests/integration/FirestoreWishRepository.integration.test.ts`, gegen
       `familyFirestore()`:
   - gespeicherte Liste bzw. gespeicherter Wunsch ist über eine **zweite**
@@ -791,16 +791,16 @@ Emulator, und ein Test mit zwei Geräten belegt den Sync.
   - Nach `disableNetwork(firestore)` löst `save` binnen 1 s auf, und `watch` meldet den
     neuen Stand. Das belegt, dass nicht auf den Server gewartet wird.
   - `beforeEach` `clearFirestore()`
-- [ ] `createWishlistModule({ firestore, idGenerator, onProblem })` nutzt die
+- [x] `createWishlistModule({ firestore, idGenerator, onProblem })` nutzt die
       Firestore-Adapter.
-- [ ] `src/app/firebase/firebaseApp.ts`:
+- [x] `src/app/firebase/firebaseApp.ts`:
   - `openFamilyDatabase()`:
     - `initializeFirestore(app, { localCache: persistentLocalCache({ tabManager:
       persistentMultipleTabManager() }) })`
     - bei `useEmulators` zusätzlich `connectFirestoreEmulator(firestore, '127.0.0.1', 8080)`
   - `forgetFamilyDatabase(firestore)`: `clearIndexedDbPersistence(firestore)`. Das
     Zeitlimit steckt in `FamilyAccess.signOut`, siehe Phase 1.
-- [ ] `src/app/SignedInApp.svelte`:
+- [x] `src/app/SignedInApp.svelte`:
   - `const firestore = openFamilyDatabase()`
   - `provideWishlistModule(createWishlistModule({ firestore, idGenerator, onProblem }))`.
     `onProblem` wird in Phase 3 angeschlossen und bis dahin nicht verwendet.
@@ -810,32 +810,32 @@ Emulator, und ein Test mit zwei Geräten belegt den Sync.
     (`terminate(firestore)`). Das gilt auch in Tabs, die das Abmelden nur über die
     Auth-Persistenz mitbekommen. So geben sie die Datenbank frei, die der abmeldende Tab
     löschen will.
-- [ ] `src/wishlist/infrastructure/removeLegacyLocalData.ts`:
+- [x] `src/wishlist/infrastructure/removeLegacyLocalData.ts`:
       `removeLegacyLocalData(storage: Pick<Storage, 'removeItem'>)` entfernt
       `wunschliste.wishlists` und `wunschliste.wishes`. `App.svelte` ruft es beim Start
       auf.
-- [ ] Löschen: `src/wishlist/infrastructure/localStorage/` vollständig (Adapter,
+- [x] Löschen: `src/wishlist/infrastructure/localStorage/` vollständig (Adapter,
       `StoredCollection`, `testStorage`, beide Tests).
-- [ ] `e2e/emulators.ts` erweitern:
+- [x] `e2e/emulators.ts` erweitern:
   - `resetFirestore()` über `testEnvironment.clearFirestore()`
   - `seed(data)` schreibt Listen und Wünsche per `withSecurityRulesDisabled`, das
     Record-Format bleibt wie in `e2e/seed.ts`. `id` wird zum Dokumentnamen und nicht ins
     Dokument geschrieben.
   - `storedWishes()` liest alle Wünsche roh
   - Die automatische Fixture setzt zusätzlich Firestore zurück.
-- [ ] `e2e/seed.ts` auflösen:
+- [x] `e2e/seed.ts` auflösen:
   - `historyLength` wandert, falls noch genutzt, nach `e2e/emulators.ts` oder in eine
     eigene Hilfsdatei
   - Aufrufe `seed(page, data)` → `await seed(data)`
   - `storedRecords(page, 'wunschliste.wishes')` → `storedWishes()`
   - Seeds dürfen jetzt auch nach der Anmeldung erfolgen, weil die Listener live melden.
-- [ ] `e2e/sync.spec.ts`:
+- [x] `e2e/sync.spec.ts`:
   - zwei Kontexte A und B (`browser.newContext` mit `devices['iPhone 15']`), beide per
     `signIn`
   - A legt „Geburtstag 2027“ an → B sieht sie in der Übersicht ohne Neuladen
   - B öffnet die Liste, A legt einen Wunsch an → B sieht ihn in der Liste
   - A verschenkt ihn → bei B wandert er nach „Erfüllte Wünsche“
-- [ ] `e2e/access.spec.ts` ergänzen:
+- [x] `e2e/access.spec.ts` ergänzen:
   - Daten seeden, abmelden, erneut anmelden → Listen wieder sichtbar. Das belegt die
     neue Firestore-Instanz nach `terminate`.
   - Nach dem Abmelden liegt kein Firestore-Cache mehr vor: `indexedDB.databases()`
@@ -843,26 +843,26 @@ Emulator, und ein Test mit zwei Geräten belegt den Sync.
   - Zwei Tabs im selben Kontext, beide angemeldet. Tab 1 meldet sich ab → Tab 1 zeigt
     binnen 5 s die Anmeldeseite, ebenso Tab 2. Das Abmelden hängt also nicht an der
     offenen Datenbank des zweiten Tabs.
-- [ ] `e2e/legacyData.spec.ts`: `addInitScript` setzt `wunschliste.wishlists` und
+- [x] `e2e/legacyData.spec.ts`: `addInitScript` setzt `wunschliste.wishlists` und
       `wunschliste.colorScheme`. Nach dem Start fehlt `wunschliste.wishlists`, das
       Farbschema bleibt, und die Übersicht zeigt „Noch keine Wunschlisten.“.
-- [ ] `e2e/wishlists.spec.ts`: Der Test mit dem zweiten Tab bleibt und belegt jetzt
+- [x] `e2e/wishlists.spec.ts`: Der Test mit dem zweiten Tab bleibt und belegt jetzt
       `persistentMultipleTabManager`.
-- [ ] `README.md`, Abschnitt „Daten“ neu:
+- [x] `README.md`, Abschnitt „Daten“ neu:
   - Die Daten liegen in Firestore (`wishlists`, `wishes`) und werden auf dem Gerät
     offline zwischengespeichert.
   - Abmelden löscht den Zwischenspeicher.
   - Alte lokale Daten aus Schritt 2 werden beim Start entfernt.
-- [ ] `docs/agents/research/2026-09-28-wunschliste-konzept.md`, Umsetzungsreihenfolge: Im
+- [x] `docs/agents/research/2026-09-28-wunschliste-konzept.md`, Umsetzungsreihenfolge: Im
       Satz „Der lokale Adapter bleibt als In-Memory-Fake für Tests erhalten“ wird ergänzt,
       dass diese Rolle die Fakes in `application/fakes/` übernehmen.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:integration` grün, u. a. beide Adaptertests und die Regeltests
-- [ ] `npm run test:unit`, `npm run test:architecture`, `npm run lint` grün
-- [ ] `npm test` grün, inklusive `sync.spec.ts`, `legacyData.spec.ts`, der erweiterten
+- [x] `npm run test:integration` grün, u. a. beide Adaptertests und die Regeltests
+- [x] `npm run test:unit`, `npm run test:architecture`, `npm run lint` grün
+- [x] `npm test` grün, inklusive `sync.spec.ts`, `legacyData.spec.ts`, der erweiterten
       `access.spec.ts` und aller auf Emulator-Seeds umgestellten Specs
-- [ ] Im Quellcode findet sich kein `localStorage`-Adapter mehr:
+- [x] Im Quellcode findet sich kein `localStorage`-Adapter mehr:
       `src/wishlist/infrastructure/localStorage` existiert nicht
 
 **Manuelle Verifikation**:
@@ -1006,6 +1006,22 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
 - Es gibt lokal keine `.env.local`, deshalb bricht `npm run build` ohne Umbenennen ab.
   Gegenprobe: mit gesetzten Variablen gelingt der Build, mit `VITE_FIREBASE_EMULATORS=true`
   bricht er mit „must not be set for a production build“ ab.
+
+**Phase 2**
+- `get` liest zuerst aus dem Cache. Hat ein Gerät ein Dokument einmal als „nicht vorhanden“
+  gelesen und beobachtet es nicht, bleibt dieser Stand stehen, bis ein Listener ihn
+  auffrischt. In der App beobachtet jede Seite ihre Daten, deshalb prüfen die
+  Integrationstests das zweite Gerät über `watch`/`watchByWishlist` statt über `get`.
+- `isObject` liegt jetzt in `firestore/isObject.ts`, das Lesen mit Cache-Vorrang in
+  `firestore/cachedDocument.ts`.
+- `historyLength` liegt in `e2e/history.ts`. Neben `storedWishes()` gibt es
+  `storedWishlists()`, weil `editing.spec.ts` und `wishlists.spec.ts` die Listen roh lesen.
+  Rohdaten nach einer Aktion der App werden mit `expect.poll` gelesen, da die App nicht
+  auf den Server wartet.
+- Die Firestore-Datenbank im IndexedDB entsteht erst kurz nach dem Anmelden. Die
+  Vorbedingung im Abmelde-Test wartet deshalb ebenfalls per `expect.poll`.
+- Bis Phase 3 melden Listener beim Beenden von Firestore „Firestore shutting down“ auf der
+  Konsole der Integrationstests. Das verschwindet mit dem Fehler-Rückruf aus Phase 3.
 
 ## Verweise
 

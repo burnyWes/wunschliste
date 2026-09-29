@@ -227,7 +227,8 @@ Jeder Schritt bekommt einen eigenen Plan (`rpi-plan`) mit Story-Nummer `WL-NNN`.
 | 5 | Geheim-Einträge, Platzhalter, Schenken/Erhalten, „nur für die Besitzerin gelöscht“ | Überraschungslogik |
 
 - Lokale Daten aus Schritt 2 werden beim Wechsel auf Firestore **nicht** übernommen.
-- Der lokale Adapter bleibt als In-Memory-Fake für Tests erhalten.
+- Der lokale Adapter bleibt als In-Memory-Fake für Tests erhalten. Diese Rolle übernehmen
+  die Fakes in `application/fakes/`, der localStorage-Adapter selbst ist mit WL-004 entfallen.
 
 ## Offene Fragen
 

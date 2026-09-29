@@ -1,4 +1,5 @@
 import { expect, test, type Page } from './fixtures';
+import { seed } from './emulators';
 
 const actionBar = (page: Page) => page.locator('.action-bar');
 
@@ -29,12 +30,7 @@ test('keeps the action bar at the bottom of the viewport while scrolling tall co
 });
 
 test('centers the buttons in the action bar', async ({ page }) => {
-  await page.addInitScript(() => {
-    localStorage.setItem(
-      'wunschliste.wishlists',
-      JSON.stringify([{ id: 'b', name: 'Geburtstag' }]),
-    );
-  });
+  await seed({ wishlists: [{ id: 'b', name: 'Geburtstag' }] });
   await page.goto('./#/liste/b/wunsch/neu');
 
   const offCenter = await actionBar(page).evaluate((bar) => {

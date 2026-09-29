@@ -1,6 +1,63 @@
+import type { RulesTestEnvironment } from '@firebase/rules-unit-testing';
+import { collection, doc, getDocs, writeBatch, type Firestore } from 'firebase/firestore';
 import { familyAccountUidFrom, readFamilyRules } from '../tests/familyAccount';
+import { startTestEnvironment, withoutRules } from '../tests/integration/testFirestore';
 
 export const PROJECT_ID = 'demo-wunschliste';
+
+export type WishlistRecord = { id: string; name: string };
+
+export type WishRecord = {
+  id: string;
+  wishlistId: string;
+  name: string;
+  link?: string;
+  description?: string;
+  priceInCents?: number;
+  rating?: 'essential' | 'wanted' | 'nice';
+  gifted: boolean;
+};
+
+export type SeedData = { wishlists?: WishlistRecord[]; wishes?: WishRecord[] };
+
+let testEnvironment: Promise<RulesTestEnvironment> | undefined;
+
+function emulatedFirestore(): Promise<RulesTestEnvironment> {
+  testEnvironment ??= startTestEnvironment();
+  return testEnvironment;
+}
+
+export async function resetFirestore(): Promise<void> {
+  await (await emulatedFirestore()).clearFirestore();
+}
+
+export async function seed({ wishlists = [], wishes = [] }: SeedData): Promise<void> {
+  await withoutRules(await emulatedFirestore(), async (firestore) => {
+    const batch = writeBatch(firestore);
+    for (const { id, ...wishlist } of wishlists) {
+      batch.set(doc(firestore, 'wishlists', id), wishlist);
+    }
+    for (const { id, ...wish } of wishes) {
+      batch.set(doc(firestore, 'wishes', id), wish);
+    }
+    await batch.commit();
+  });
+}
+
+async function storedRecords<T>(collectionName: string): Promise<T[]> {
+  return withoutRules(await emulatedFirestore(), async (firestore: Firestore) => {
+    const snapshot = await getDocs(collection(firestore, collectionName));
+    return snapshot.docs.map((stored) => ({ id: stored.id, ...stored.data() }) as T);
+  });
+}
+
+export function storedWishlists(): Promise<WishlistRecord[]> {
+  return storedRecords<WishlistRecord>('wishlists');
+}
+
+export function storedWishes(): Promise<WishRecord[]> {
+  return storedRecords<WishRecord>('wishes');
+}
 
 export const FAMILY = { email: 'familie@example.de', password: 'geheim-123' };
 

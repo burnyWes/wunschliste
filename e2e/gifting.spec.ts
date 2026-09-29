@@ -1,14 +1,15 @@
 import { expect, test, type Page } from './fixtures';
 import { expectAnnouncement } from './announcement';
-import { historyLength, seed } from './seed';
+import { seed } from './emulators';
+import { historyLength } from './history';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
 const filterButton = (page: Page, name: string) => page.getByRole('button', { name, exact: true });
 const wishLink = (page: Page, name: string) =>
   page.getByRole('main').getByRole('button', { name: new RegExp(`^${name}`) });
 
-test.beforeEach(async ({ page }) => {
-  await seed(page, {
+test.beforeEach(async () => {
+  await seed({
     wishlists: [{ id: 'birthday', name: 'Geburtstag' }],
     wishes: [
       { id: 'helmet', wishlistId: 'birthday', name: 'Fahrradhelm', gifted: false },

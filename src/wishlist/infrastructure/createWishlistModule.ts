@@ -1,3 +1,4 @@
+import type { Firestore } from 'firebase/firestore';
 import { CreateWish } from '../application/CreateWish';
 import { CreateWishlist } from '../application/CreateWishlist';
 import { DeleteWish } from '../application/DeleteWish';
@@ -11,19 +12,19 @@ import { WatchWishesOfWishlist } from '../application/WatchWishesOfWishlist';
 import { WatchWishlist } from '../application/WatchWishlist';
 import { WatchWishlists } from '../application/WatchWishlists';
 import type { IdGenerator } from '../domain/ids';
-import { LocalStorageWishlistRepository } from './localStorage/LocalStorageWishlistRepository';
-import { LocalStorageWishRepository } from './localStorage/LocalStorageWishRepository';
-import type { KeyValueStorage, StorageEvents } from './localStorage/StoredCollection';
+import { FirestoreWishlistRepository } from './firestore/FirestoreWishlistRepository';
+import { FirestoreWishRepository } from './firestore/FirestoreWishRepository';
+import type { ReportWishlistProblem } from './wishlistProblem';
 
 export type WishlistModuleSetup = {
-  storage: KeyValueStorage;
-  storageEvents: StorageEvents;
+  firestore: Firestore;
   idGenerator: IdGenerator;
+  onProblem: ReportWishlistProblem;
 };
 
-export function createWishlistModule({ storage, storageEvents, idGenerator }: WishlistModuleSetup) {
-  const wishlists = new LocalStorageWishlistRepository(storage, storageEvents);
-  const wishes = new LocalStorageWishRepository(storage, storageEvents);
+export function createWishlistModule({ firestore, idGenerator, onProblem }: WishlistModuleSetup) {
+  const wishlists = new FirestoreWishlistRepository(firestore, onProblem);
+  const wishes = new FirestoreWishRepository(firestore, onProblem);
   return {
     createWishlist: new CreateWishlist(wishlists, idGenerator),
     watchWishlists: new WatchWishlists(wishlists),
