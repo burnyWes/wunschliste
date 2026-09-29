@@ -79,6 +79,24 @@ describe('groupWishlistsByOwner', () => {
     ]);
   });
 
+  it('leaves out my wishlists removed by me, but not those of others', () => {
+    const removed = Wishlist.restore({
+      id: wishlistIdOf('anna-Ostern'),
+      name: nameOf('Ostern'),
+      ownerId: anna.id,
+      removedByOwner: true,
+    });
+    const wishlists = [removed, wishlistOf(ben.id, 'Weihnachten')];
+
+    expect(summaryOf(groupWishlistsByOwner(wishlists, persons, anna.id))).toEqual([
+      { owner: 'Ben', isMe: false, wishlists: ['Weihnachten'] },
+    ]);
+    expect(summaryOf(groupWishlistsByOwner(wishlists, persons, grandma.id))).toEqual([
+      { owner: 'Anna', isMe: false, wishlists: ['Ostern'] },
+      { owner: 'Ben', isMe: false, wishlists: ['Weihnachten'] },
+    ]);
+  });
+
   it('has no groups without wishlists', () => {
     expect(groupWishlistsByOwner([], persons, anna.id)).toEqual([]);
   });

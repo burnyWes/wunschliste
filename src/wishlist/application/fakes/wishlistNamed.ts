@@ -10,3 +10,16 @@ export function wishlistNamed(
 ): Wishlist {
   return Wishlist.create(wishlistIdOf(id), requireValid(Name.parse(name)), ownerId);
 }
+
+export function removedWishlistNamed(
+  name: string,
+  id = name,
+  ownerId: PersonId = personIdOf('anna'),
+): Wishlist {
+  return Wishlist.restore({
+    id: wishlistIdOf(id),
+    name: requireValid(Name.parse(name)),
+    ownerId,
+    removedByOwner: true,
+  });
+}

@@ -21,6 +21,8 @@ export type NewWish = {
   secret: boolean;
 };
 
+export type WishRemoval = { kind: 'delete' } | { kind: 'hideFromOwner'; wish: Wish };
+
 type WishChange = Partial<Pick<RestoredWish, 'giverId' | 'received'>>;
 
 const CHANGE_BY_ACTION: Record<WishAction, (perspective: Perspective) => WishChange> = {
@@ -73,12 +75,30 @@ export class Wish {
     return new Wish(state);
   }
 
+  get keepsSecretFromOwner(): boolean {
+    return !this.received && (this.secret || this.giverId !== undefined);
+  }
+
+  isRemovedFor(perspective: Perspective): boolean {
+    return perspective.wishlistIsHidden || (isOwner(perspective) && this.removedByOwner);
+  }
+
   isSurpriseFor(perspective: Perspective): boolean {
     return isOwner(perspective) && this.secret && !this.received;
   }
 
   isHiddenFrom(perspective: Perspective): boolean {
-    return this.isSurpriseFor(perspective);
+    return this.isRemovedFor(perspective) || this.isSurpriseFor(perspective);
+  }
+
+  removeFor(perspective: Perspective): WishRemoval {
+    if (this.isHiddenFrom(perspective)) {
+      throw new WishHiddenFromOwner(this.id);
+    }
+    if (isOwner(perspective) && this.keepsSecretFromOwner) {
+      return { kind: 'hideFromOwner', wish: this.#changed({ removedByOwner: true }) };
+    }
+    return { kind: 'delete' };
   }
 
   edit(details: WishDetails, secret: boolean, perspective: Perspective): Wish {

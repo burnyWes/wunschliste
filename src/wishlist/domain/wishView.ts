@@ -34,10 +34,10 @@ function giverShownTo(wish: Wish, perspective: Perspective): PersonId | undefine
 }
 
 function visibilityFor(wish: Wish, perspective: Perspective): WishVisibility {
-  if (wish.isSurpriseFor(perspective)) {
-    return 'surprise';
+  if (wish.isRemovedFor(perspective)) {
+    return 'hidden';
   }
-  return wish.isHiddenFrom(perspective) ? 'hidden' : 'shown';
+  return wish.isSurpriseFor(perspective) ? 'surprise' : 'shown';
 }
 
 function secretCreatorShownTo(wish: Wish, perspective: Perspective): PersonId | undefined {
@@ -70,4 +70,8 @@ export function viewOfWishes(
     entries: views.filter(({ visibility, status }) => visibility === 'shown' && status === filter),
     surpriseCount,
   };
+}
+
+export function visibleWishCount(wishes: readonly Wish[], perspective: Perspective): number {
+  return wishes.filter((wish) => visibilityFor(wish, perspective) === 'shown').length;
 }

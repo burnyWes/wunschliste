@@ -11,6 +11,7 @@ import {
   WishCannotBecomeSecret,
   WishHiddenFromOwner,
   type RestoredWish,
+  type WishRemoval,
 } from './Wish';
 
 const helmet = { name: requireValid(Name.parse('Fahrradhelm')) };
@@ -19,9 +20,9 @@ const anna = personIdOf('anna');
 const ben = personIdOf('ben');
 const oma = personIdOf('oma');
 
-const asAnna: Perspective = { me: anna, ownerId: anna };
-const asBen: Perspective = { me: ben, ownerId: anna };
-const asOma: Perspective = { me: oma, ownerId: anna };
+const asAnna: Perspective = { me: anna, ownerId: anna, wishlistIsHidden: false };
+const asBen: Perspective = { me: ben, ownerId: anna, wishlistIsHidden: false };
+const asOma: Perspective = { me: oma, ownerId: anna, wishlistIsHidden: false };
 
 function annasWish(state: Partial<RestoredWish> = {}): Wish {
   return Wish.restore({
@@ -128,6 +129,85 @@ describe('Wish', () => {
 
     it('is no surprise when not secret', () => {
       expect(annasWish({ giverId: ben }).isSurpriseFor(asAnna)).toBe(false);
+    });
+  });
+
+  describe('keepsSecretFromOwner', () => {
+    it.each([
+      ['an open wish', {}, false],
+      ['a gifted wish', { giverId: ben }, true],
+      ['a received gift', { giverId: ben, received: true }, false],
+      ['a secret wish', { secret: true, createdBy: ben }, true],
+      ['a handed over secret wish', { secret: true, giverId: ben, received: true }, false],
+      ['a wish received without giver', { received: true }, false],
+    ] as const)('is %s: %s', (_, state, expected) => {
+      expect(annasWish(state).keepsSecretFromOwner).toBe(expected);
+    });
+  });
+
+  describe('removed by the owner', () => {
+    const removed = annasWish({ giverId: ben, removedByOwner: true });
+
+    it('is hidden from the owner', () => {
+      expect(removed.isHiddenFrom(asAnna)).toBe(true);
+      expect(removed.isSurpriseFor(asAnna)).toBe(false);
+    });
+
+    it('stays visible to everyone else', () => {
+      expect(removed.isHiddenFrom(asOma)).toBe(false);
+    });
+
+    it('offers the owner no action', () => {
+      expect(() => removed.perform('receive', asAnna)).toThrow(WishActionNotAllowed);
+    });
+
+    it('lets the giver still take the gift back', () => {
+      expect(removed.perform('takeBackGift', asBen).giverId).toBeUndefined();
+    });
+  });
+
+  it('is hidden from the owner when the wishlist is hidden from her', () => {
+    const hiddenWishlist: Perspective = { ...asAnna, wishlistIsHidden: true };
+
+    expect(annasWish().isHiddenFrom(hiddenWishlist)).toBe(true);
+    expect(() => annasWish().edit(helmet, false, hiddenWishlist)).toThrow(WishHiddenFromOwner);
+  });
+
+  describe('removeFor', () => {
+    function removalOf(state: Partial<RestoredWish>, perspective: Perspective): WishRemoval {
+      return annasWish(state).removeFor(perspective);
+    }
+
+    it('hides a gift not yet received from the owner only', () => {
+      const removal = removalOf({ giverId: ben }, asAnna);
+
+      expect(removal.kind).toBe('hideFromOwner');
+      expect(removal.kind === 'hideFromOwner' && removal.wish.removedByOwner).toBe(true);
+    });
+
+    it.each([
+      ['an open wish', {}],
+      ['a received gift', { giverId: ben, received: true }],
+      ['a wish received without giver', { received: true }],
+    ] as const)('deletes %s of the owner', (_, state) => {
+      expect(removalOf(state, asAnna)).toEqual({ kind: 'delete' });
+    });
+
+    it.each([
+      ['a gifted wish', { giverId: ben }],
+      ['a secret wish', { secret: true, createdBy: ben }],
+      ['a wish removed by the owner', { giverId: ben, removedByOwner: true }],
+    ] as const)('lets everyone else delete %s', (_, state) => {
+      expect(removalOf(state, asOma)).toEqual({ kind: 'delete' });
+    });
+
+    it('refuses a wish hidden from the owner', () => {
+      expect(() => removalOf({ secret: true, createdBy: ben }, asAnna)).toThrow(
+        WishHiddenFromOwner,
+      );
+      expect(() => removalOf({ giverId: ben, removedByOwner: true }, asAnna)).toThrow(
+        WishHiddenFromOwner,
+      );
     });
   });
 

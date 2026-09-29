@@ -37,7 +37,7 @@ function wishOf(input: WishDetailsInput, wishlistId: WishlistId, id: string): Wi
   }
   return Wish.create(
     { id: wishIdOf(id), wishlistId, details: parsed.details, secret: false },
-    { me: anna, ownerId: anna },
+    { me: anna, ownerId: anna, wishlistIsHidden: false },
   );
 }
 
@@ -106,8 +106,8 @@ describe('FirestoreWishRepository', () => {
 
   it('restores the giver and the receipt', async () => {
     const received = wishNamed('Helm')
-      .perform('gift', { me: ben, ownerId: anna })
-      .perform('receive', { me: anna, ownerId: anna });
+      .perform('gift', { me: ben, ownerId: anna, wishlistIsHidden: false })
+      .perform('receive', { me: anna, ownerId: anna, wishlistIsHidden: false });
     let restored: Wish | undefined;
     familyRepository().watch(wishIdOf('Helm'), (wish) => (restored = wish), ignoreFailure);
 
@@ -127,7 +127,7 @@ describe('FirestoreWishRepository', () => {
         details: { name: wishNamed('Konzert').details.name },
         secret: true,
       },
-      { me: ben, ownerId: anna },
+      { me: ben, ownerId: anna, wishlistIsHidden: false },
     );
     let restored: Wish | undefined;
     familyRepository().watch(wishIdOf('Konzert'), (wish) => (restored = wish), ignoreFailure);
@@ -187,6 +187,32 @@ describe('FirestoreWishRepository', () => {
     await repository.delete(wishIdOf('Helm'));
 
     await eventually(() => expect(reports.at(-1)).toBeUndefined());
+  });
+
+  it('gives the wishes of one wishlist from the server on a fresh device', async () => {
+    await withoutRules(environment, async (firestore) => {
+      await setDoc(doc(firestore, WISHES_COLLECTION, 'helmet'), {
+        wishlistId: 'birthday',
+        name: 'Helm',
+        createdBy: 'anna',
+        secret: false,
+        received: false,
+        removedByOwner: false,
+      });
+      await setDoc(doc(firestore, WISHES_COLLECTION, 'sledge'), {
+        wishlistId: 'christmas',
+        name: 'Schlitten',
+        createdBy: 'anna',
+        secret: false,
+        received: false,
+        removedByOwner: false,
+      });
+    });
+
+    const { wishes, confirmed } = await familyRepository().getByWishlist(birthday);
+
+    expect(namesOf(wishes)).toEqual(['Helm']);
+    expect(confirmed).toBe(true);
   });
 
   it('gives undefined for an unknown id', async () => {

@@ -99,6 +99,30 @@ const secretWishes: SeedData = {
   ],
 };
 
+const removedByBen: SeedData = {
+  persons: [{ id: 'ben', name: 'Ben' }],
+  wishlists: [
+    { id: 'easter', name: 'Ostern', ownerId: 'ben', removedByOwner: true },
+    { id: 'christmas', name: 'Weihnachten', ownerId: 'ben' },
+  ],
+  wishes: [
+    wishRecord({ id: 'kite', wishlistId: 'easter', name: 'Drachen', createdBy: 'ben' }),
+    wishRecord({
+      id: 'sledge',
+      wishlistId: 'christmas',
+      name: 'Schlitten',
+      createdBy: 'ben',
+      giverId: 'anna',
+      removedByOwner: true,
+    }),
+  ],
+};
+
+async function openFinalDeletionDialog(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Endgültig löschen' }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+}
+
 async function submitInvalidWish(page: Page): Promise<void> {
   await page.getByRole('textbox', { name: 'Preis in Euro' }).fill('abc');
   await page.getByRole('button', { name: 'Speichern' }).click();
@@ -229,6 +253,38 @@ const pages: CheckedPage[] = [
     path: './#/liste/easter/wunsch/neu',
     heading: 'Wunsch erstellen',
     data: secretWishes,
+  },
+  {
+    name: 'overview with removed wishlist',
+    path: './',
+    heading: 'Wunschlisten',
+    data: removedByBen,
+  },
+  {
+    name: 'wishlist removed by the owner',
+    path: './#/liste/easter',
+    heading: 'Ostern',
+    data: removedByBen,
+  },
+  {
+    name: 'wishlist removed by the owner with deletion dialog',
+    path: './#/liste/easter',
+    heading: 'Ostern',
+    data: removedByBen,
+    prepare: openFinalDeletionDialog,
+  },
+  {
+    name: 'wish removed by the owner',
+    path: './#/wunsch/sledge',
+    heading: 'Schlitten',
+    data: removedByBen,
+  },
+  {
+    name: 'wish removed by the owner with deletion dialog',
+    path: './#/wunsch/sledge',
+    heading: 'Schlitten',
+    data: removedByBen,
+    prepare: openFinalDeletionDialog,
   },
   {
     name: 'create wish with problems',

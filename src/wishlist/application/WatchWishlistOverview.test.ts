@@ -5,7 +5,7 @@ import type { WishlistGroup } from '../domain/wishlistOverview';
 import { InMemoryPersonRepository } from './fakes/InMemoryPersonRepository';
 import { InMemoryWishlistRepository } from './fakes/InMemoryWishlistRepository';
 import { personNamed } from './fakes/personNamed';
-import { wishlistNamed } from './fakes/wishlistNamed';
+import { removedWishlistNamed, wishlistNamed } from './fakes/wishlistNamed';
 import { WatchWishlistOverview } from './WatchWishlistOverview';
 
 const anna = personIdOf('anna');
@@ -46,6 +46,15 @@ describe('WatchWishlistOverview', () => {
     watch();
 
     expect(reports).toEqual([['Anna', 'Ben']]);
+  });
+
+  it('leaves out my wishlists removed by me', async () => {
+    const { wishlists, reports, watch } = await setUp();
+    await wishlists.save(removedWishlistNamed('Geburtstag', 'birthday', anna));
+
+    watch();
+
+    expect(reports).toEqual([['Ben']]);
   });
 
   it('reports again when the wishlists or the persons change', async () => {

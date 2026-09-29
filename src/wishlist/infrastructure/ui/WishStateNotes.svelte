@@ -2,13 +2,19 @@
   import type { PersonId } from '../../domain/ids';
   import type { Person } from '../../domain/Person';
   import type { WishView } from '../../domain/wishView';
-  import { fulfilledNote, giverNote, secretNote } from './wishTexts';
+  import { fulfilledNote, giverNote, removedByOwnerNote, secretNote } from './wishTexts';
 
   let {
     view,
     persons,
+    ownerName,
     variant,
-  }: { view: WishView; persons: readonly Person[]; variant: 'entry' | 'page' } = $props();
+  }: {
+    view: WishView;
+    persons: readonly Person[];
+    ownerName: string | undefined;
+    variant: 'entry' | 'page';
+  } = $props();
 
   function nameOf(personId: PersonId | undefined): string | undefined {
     return persons.find(({ id }) => id === personId)?.name.value;
@@ -18,6 +24,12 @@
   const noteElement = $derived(variant === 'page' ? 'p' : 'span');
 </script>
 
+{#if view.removedByOwner && variant === 'entry'}
+  <span class="note">
+    <span aria-hidden="true">⚠</span>
+    {removedByOwnerNote(ownerName)}
+  </span>
+{/if}
 {#if view.secretCreatorId !== undefined}
   <svelte:element this={noteElement} class="note">
     <span aria-hidden="true">🤫</span>

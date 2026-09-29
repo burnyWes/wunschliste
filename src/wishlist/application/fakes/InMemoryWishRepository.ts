@@ -1,11 +1,12 @@
 import type { WishId, WishlistId } from '../../domain/ids';
 import type { Unsubscribe } from '../../domain/Unsubscribe';
 import type { Wish } from '../../domain/Wish';
-import type { WishRepository } from '../../domain/WishRepository';
+import type { WishesOfWishlist, WishRepository } from '../../domain/WishRepository';
 import { ObservableMap } from './ObservableMap';
 
 export class InMemoryWishRepository implements WishRepository {
   readonly #wishes = new ObservableMap<WishId, Wish>();
+  #isServerReachable = true;
 
   watchByWishlist(
     wishlistId: WishlistId,
@@ -32,6 +33,17 @@ export class InMemoryWishRepository implements WishRepository {
 
   async get(id: WishId): Promise<Wish | undefined> {
     return this.#wishes.get(id);
+  }
+
+  answerFromCacheOnly(): void {
+    this.#isServerReachable = false;
+  }
+
+  async getByWishlist(wishlistId: WishlistId): Promise<WishesOfWishlist> {
+    return {
+      wishes: this.#wishes.values().filter((wish) => wish.wishlistId === wishlistId),
+      confirmed: this.#isServerReachable,
+    };
   }
 
   async save(wish: Wish): Promise<void> {

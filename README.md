@@ -90,6 +90,13 @@ Reihenfolge:
 3. In der Firebase-Konsole die alten Dokumente in `wishlists` und `wishes` löschen. Sie
    haben keine Besitzerin und werden nicht mehr angezeigt.
 
+### Umstieg auf Geheim-Einträge (WL-006)
+
+Die Regeln bleiben unverändert. Wunsch-Dokumente haben ab WL-006 ein neues Format.
+Nach dem Push deshalb in der Firebase-Konsole die alten Dokumente in `wishes` löschen. Sie
+haben das neue Format nicht und werden nicht mehr angezeigt. Wunschlisten bleiben
+erhalten.
+
 ## App-Icon neu erzeugen
 
 Quelle ist `public/icon.svg` (Lucide-Icon „gift“, ISC-Lizenz, <https://lucide.dev/icons/gift>).
@@ -149,6 +156,14 @@ Personen werden in den Einstellungen angelegt, umbenannt und gelöscht. Eine Per
 Wunschlisten lässt sich nicht löschen. Jede Wunschliste gehört genau einer Person (Feld
 `ownerId`). Dokumente in `wishlists`
 ohne gültige `ownerId` werden ignoriert.
+
+Ein Wunsch trägt `createdBy` (wer ihn angelegt hat), `secret` (Geheim-Eintrag),
+`giverId` (wer ihn schenkt), `received` (erhalten bzw. übergeben) und `removedByOwner`
+(nur für die Besitzerin gelöscht). Wunschlisten tragen ebenfalls `removedByOwner`; fehlt
+das Feld, gilt es als `false`. Dokumente in `wishes` ohne diese Felder werden ignoriert.
+
+Die Geheimhaltung ist Ehrensache: Technisch kann jede Person mit dem Familienzugang alle
+Daten lesen. Die App zeigt der Besitzerin nur nicht, was für sie geheim ist.
 
 Welche Person ein Gerät benutzt („Wer bist du?“), steht nur auf dem Gerät in
 `localStorage` unter `wunschliste.profile`. Abmelden entfernt es.

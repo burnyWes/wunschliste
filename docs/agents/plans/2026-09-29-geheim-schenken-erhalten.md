@@ -710,7 +710,7 @@ E2E:
 - [x] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
 
 **Manuelle Verifikation**:
-- [ ] Auf zwei iPhones mit VoiceOver:
+- [x] Auf zwei iPhones mit VoiceOver:
   - Ben legt in Annas Liste einen geheimen Wunsch an. Anna hört am Ende der Liste „1
     Überraschung“, und die Zeile ist nicht antippbar.
   - Ben schenkt und übergibt. Danach hört Anna den Wunsch unter „Erfüllte Wünsche“ mit
@@ -727,19 +727,19 @@ anderen werden gewarnt und können endgültig löschen.
 **Aufgaben**:
 
 Domäne (test-getrieben):
-- [ ] `Wish.ts`:
+- [x] `Wish.ts`:
   - Der Getter `keepsSecretFromOwner` gilt, wenn der Wunsch nicht erhalten ist und geheim
     ist oder einen Schenkenden hat.
   - `isHiddenFrom(p)` gilt zusätzlich bei `removedByOwner` für die Besitzerin.
   - `viewOfWish` liefert dann `visibility: 'hidden'`.
   - Tests
-- [ ] `Wish.removeFor(p): WishRemoval`, mit
+- [x] `Wish.removeFor(p): WishRemoval`, mit
   `WishRemoval = { kind: 'delete' } | { kind: 'hideFromOwner'; wish: Wish }`:
   - `isHiddenFrom(p)` → `WishHiddenFromOwner`
   - Besitzerin und `keepsSecretFromOwner` → ausblenden, sonst löschen. Bei anderen wird
     immer gelöscht.
   - Tests je Zeile der Tabelle aus Entscheidung 7
-- [ ] `Wishlist.ts`:
+- [x] `Wishlist.ts`:
   - `removedByOwner: boolean` in `create` (false) und `restore`. `rename` behält den Wert.
     `restore` bekommt ein Objekt statt Positionsparametern, mit den Aufrufern
     `wishlistDocument.ts:27`, `Wishlist.test.ts` und `fakes/wishlistNamed.ts`.
@@ -749,40 +749,40 @@ Domäne (test-getrieben):
     wenn `!confirmed` oder ein Wunsch `keepsSecretFromOwner` erfüllt. Sonst wird
     gelöscht.
   - Tests, darunter „unbestätigter Stand → ausblenden“
-- [ ] `Perspective.ts`: neues Feld `wishlistIsHidden: boolean`.
+- [x] `Perspective.ts`: neues Feld `wishlistIsHidden: boolean`.
   - `perspectiveOf(wishlist, me)` setzt es auf `!wishlist.isVisibleTo(...)`.
   - `wish.isHiddenFrom(p)` ist bei `p.wishlistIsHidden` immer wahr. Damit sind alle
     Wünsche einer ausgeblendeten Liste für Anna `hidden`, ohne dass sich die Signaturen
     von `viewOfWish`/`viewOfWishes` ändern.
   - Die Test-Perspektiven setzen das Feld auf `false`, dazu kommt eine Testhilfe
     `perspective(me, ownerId)` in `fakes/`.
-- [ ] `wishView.ts`:
+- [x] `wishView.ts`:
   - `visibleWishCount(wishes, p): number` zählt die Wünsche mit `visibility: 'shown'`,
     für den Listen-Löschdialog.
   - Tests
-- [ ] `Wishlist.ts`: `wishlistsVisibleTo(wishlists, me)` filtert über
+- [x] `Wishlist.ts`: `wishlistsVisibleTo(wishlists, me)` filtert über
   `isVisibleTo(perspectiveOf(wishlist, me))`. Test. `groupWishlistsByOwner` nutzt die
   Funktion.
-- [ ] `wishlistOverview.ts`: `groupWishlistsByOwner` blendet Listen aus, die für `me`
+- [x] `wishlistOverview.ts`: `groupWishlistsByOwner` blendet Listen aus, die für `me`
   nicht sichtbar sind. Test: Annas entfernte Liste fehlt bei Anna, bei Oma ist sie da.
   Eine Gruppe, die dadurch leer wird, fehlt.
-- [ ] `WishRepository.ts`:
+- [x] `WishRepository.ts`:
   `getByWishlist(wishlistId): Promise<{ wishes: readonly Wish[]; confirmed: boolean }>`
   (Entscheidung 15)
 
 Anwendung (test-getrieben):
-- [ ] `fakes/InMemoryWishRepository.ts`: `getByWishlist` mit `confirmed: true`, dazu ein
+- [x] `fakes/InMemoryWishRepository.ts`: `getByWishlist` mit `confirmed: true`, dazu ein
   Schalter `answerFromCacheOnly()` für den Test mit unbestätigtem Stand
-- [ ] `ChangeWishState`, `CreateWish` und `EditWish` rufen `wishlist.ensureVisibleTo(p)`
+- [x] `ChangeWishState`, `CreateWish` und `EditWish` rufen `wishlist.ensureVisibleTo(p)`
   auf. Je ein Test: Anna und ihre ausgeblendete Liste → `WishlistNotFound`.
-- [ ] `DeleteWish.execute(wishId, me)`:
+- [x] `DeleteWish.execute(wishId, me)`:
   - Wunsch und Liste laden, `ensureVisibleTo`
   - `removeFor(perspective)`: `delete` → `wishes.delete`, `hideFromOwner` →
     `wishes.save`
   - Ein unbekannter Wunsch bleibt wie heute kein Fehler.
   - Tests: Anna blendet einen geschenkten Wunsch aus, Anna löscht einen offenen, Oma
     löscht einen entfernten endgültig
-- [ ] `DeleteWishlist.execute(wishlistId, me)`:
+- [x] `DeleteWishlist.execute(wishlistId, me)`:
   - Liste laden (`WishlistNotFound`) und `wishes.getByWishlist`
   - `removeFor`: `delete` → `wishes.deleteAllOf` + `wishlists.delete`, `hideFromOwner` →
     `wishlists.save`
@@ -791,30 +791,30 @@ Anwendung (test-getrieben):
     - Anna ohne Geheimnis → gelöscht
     - Anna ohne bestätigten Stand → ausgeblendet
     - Oma → gelöscht
-- [ ] `WatchWishlistOverview`: reicht `me` an `groupWishlistsByOwner` weiter. Der Test mit
+- [x] `WatchWishlistOverview`: reicht `me` an `groupWishlistsByOwner` weiter. Der Test mit
   entfernter Liste kommt dazu.
-- [ ] `createWishlistModule.ts`: angepasste Konstruktoren von `DeleteWish` und
+- [x] `createWishlistModule.ts`: angepasste Konstruktoren von `DeleteWish` und
   `DeleteWishlist`
 
 Infrastruktur:
-- [ ] `firestore/wishlistDocument.ts`:
+- [x] `firestore/wishlistDocument.ts`:
   - `removedByOwner?: boolean`. Fehlt es, gilt `false` (Entscheidung 10), ein anderer Typ
     als Boolean ist ungültig.
   - `toWishlistDocument` schreibt das Feld immer.
-- [ ] `firestore/FirestoreWishRepository.ts` (Entscheidung 15):
+- [x] `firestore/FirestoreWishRepository.ts` (Entscheidung 15):
   - `getByWishlist` über `getDocs(#wishesOf(...))`, mit
     `confirmed: !snapshot.metadata.fromCache`
   - `deleteAllOf` liest über `getDocs` statt `getDocsFromCache`.
-- [ ] `ui/wishTexts.ts` mit Tests:
+- [x] `ui/wishTexts.ts` mit Tests:
   - `wishRemovedByOwnerMessage(ownerName)` → „Anna hat diesen Wunsch entfernt.“
   - `wishlistRemovedByOwnerMessage(ownerName)` → „Anna hat diese Wunschliste entfernt.“
   - `removedByOwnerNote(ownerName)` → „von Anna entfernt“
   - Ohne bekannten Namen lauten sie „Die Besitzerin hat …“ bzw. „von der Besitzerin
     entfernt“.
   - `FINAL_DELETION_LABEL = 'Endgültig löschen'`
-- [ ] `ui/WishStateNotes.svelte`: „⚠ von Anna entfernt“ bei `view.removedByOwner` (nur
+- [x] `ui/WishStateNotes.svelte`: „⚠ von Anna entfernt“ bei `view.removedByOwner` (nur
   Variante `entry`)
-- [ ] `ui/WishPage.svelte`:
+- [x] `ui/WishPage.svelte`:
   - bei `view.removedByOwner` für andere ein Absatz mit ⚠-Meldung, darunter
     [🗑 Endgültig löschen] + `ConfirmDialog` („Wunsch endgültig löschen?“,
     `wishDeletionMessage`)
@@ -822,12 +822,12 @@ Infrastruktur:
     `wishDeletedAnnouncement`
   - `isDeleting` wie in `EditWishPage`
   - Für Anna greift `visibility: 'hidden'` → `NotFound`.
-- [ ] `ui/EditWishPage.svelte`:
+- [x] `ui/EditWishPage.svelte`:
   - `deleteWish.execute(wishId, me.id)`
   - Ansage und Rücksprung unverändert
   - Nach dem Ausblenden meldet die Beobachtung den Wunsch als `hidden`. Durch
     `isDeleting` erscheint kein „Diesen Wunsch gibt es nicht mehr.“.
-- [ ] `ui/WishlistPage.svelte`:
+- [x] `ui/WishlistPage.svelte`:
   - `wishlist.isVisibleTo(perspective)` ist falsch → `NotFound` „Diese Wunschliste gibt es
     nicht mehr.“
   - Bei `removedByOwner` für andere folgt unter der Besitzerinnenzeile die ⚠-Meldung,
@@ -839,40 +839,40 @@ Infrastruktur:
     aufblitzt
   - Die Anzahl im Dialog kommt aus `visibleWishCount(wishes, perspective)`. Für andere
     sind das alle Wünsche.
-- [ ] `ui/CreateWishPage.svelte`: Ist die Liste für mich nicht sichtbar, erscheint
+- [x] `ui/CreateWishPage.svelte`: Ist die Liste für mich nicht sichtbar, erscheint
   `NotFound` „Diese Wunschliste gibt es nicht mehr.“. `WishPage` und `EditWishPage`
   zeigen `NotFound` bereits über `visibility: 'hidden'`, denn die Perspektive trägt
   `wishlistIsHidden`.
-- [ ] `ui/EditWishlistPage.svelte`:
+- [x] `ui/EditWishlistPage.svelte`:
   - `deleteWishlist.execute(wishlistId, me.id)`
   - Die Anzahl im Dialog kommt aus `visibleWishCount(wishes, perspective)`.
   - Ist die Liste für Anna nicht sichtbar → `NotFound`. `isDeleting` verhindert das nach
     dem eigenen Ausblenden.
-- [ ] `ui/WishlistsPage.svelte`: Für andere steht im Eintrag einer entfernten Liste unter
+- [x] `ui/WishlistsPage.svelte`: Für andere steht im Eintrag einer entfernten Liste unter
   dem Namen „⚠ von Anna entfernt“. Der Name der Besitzerin kommt aus der Gruppe.
-- [ ] `ui/EditPersonPage.svelte`:
+- [x] `ui/EditPersonPage.svelte`:
   - Bei der eigenen Person (`person.id === me.id`) zählt der Hinweis nur
     `wishlistsVisibleTo(ownedWishlists, me.id)`.
   - Sichtbar 0 und gesamt > 0 → `personTexts.personNotDeletableRightNowHint(name)` =
     „Anna kann gerade nicht gelöscht werden.“, kein Löschknopf
   - Bei anderen Personen bleibt der Hinweis unverändert.
-- [ ] `README.md`:
+- [x] `README.md`:
   - neuer Unterabschnitt „Umstieg auf Geheim-Einträge (WL-006)“: Die Regeln bleiben
     unverändert. Nach dem Push die alten Dokumente in `wishes` in der Konsole löschen,
     denn sie haben kein neues Format und werden nicht mehr angezeigt.
   - „Daten“: Wunschfelder `createdBy`, `secret`, `giverId`, `received`,
     `removedByOwner`, Listenfeld `removedByOwner`. Geheimhaltung ist Ehrensache, denn
     technisch kann jeder alles lesen.
-- [ ] `docs/agents/research/2026-09-28-wunschliste-konzept.md`, Abschnitte „Geheim-Einträge“,
+- [x] `docs/agents/research/2026-09-28-wunschliste-konzept.md`, Abschnitte „Geheim-Einträge“,
   „Schenken und Erhalten“, „Datenmodell“: die Entscheidungen 1–5 und 14 als kurze
   Ergänzungen nachtragen (Erhalten ohne Schenkenden, Übergeben, Überraschungszeile,
   `received` statt `receivedAt`)
-- [ ] `docs/notes.txt`: den Punkt „Schritt 4/5: Übergang für Firestore-Dokumente …“ auf `x`
+- [x] `docs/notes.txt`: den Punkt „Schritt 4/5: Übergang für Firestore-Dokumente …“ auf `x`
   setzen und nach DONE verschieben
 
 E2E:
-- [ ] `e2e/emulators.ts`: `WishlistRecord.removedByOwner?: boolean`
-- [ ] neu `e2e/ownerRemoval.spec.ts`:
+- [x] `e2e/emulators.ts`: `WishlistRecord.removedByOwner?: boolean`
+- [x] neu `e2e/ownerRemoval.spec.ts`:
   - Anna löscht in ihrer Liste einen von Ben geschenkten Wunsch:
     - Ansage „Wunsch „…“ gelöscht.“, Rücksprung zur Liste, Wunsch weg
     - `storedWishes()` enthält ihn mit `removedByOwner: true`.
@@ -895,19 +895,19 @@ E2E:
     - Wunschseite mit „Ben hat diesen Wunsch entfernt.“ und [Endgültig löschen] → weg
   - „Person bearbeiten“ für Anna mit nur einer für sie entfernten Liste: „Anna kann gerade
     nicht gelöscht werden.“ und kein Löschknopf
-- [ ] `tests/integration/FirestoreWishlistRepository.integration.test.ts`:
+- [x] `tests/integration/FirestoreWishlistRepository.integration.test.ts`:
   - `removedByOwner` wird geschrieben und gelesen.
   - Ein fehlendes Feld ergibt `false`.
   - `removedByOwner: 'ja'` wird übersprungen.
-- [ ] `e2e/accessibility.spec.ts`: entfernte Liste und entfernter Wunsch aus Sicht der
+- [x] `e2e/accessibility.spec.ts`: entfernte Liste und entfernter Wunsch aus Sicht der
   anderen samt Dialog, in allen drei Farbschemata
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` grün, mit den Tests für `removeFor`, `isVisibleTo`,
+- [x] `npm run test:unit` grün, mit den Tests für `removeFor`, `isVisibleTo`,
   `groupWishlistsByOwner`, `DeleteWish`, `DeleteWishlist` und den Texten
-- [ ] `tests/integration/FirestoreWishRepository.integration.test.ts`: `getByWishlist`
+- [x] `tests/integration/FirestoreWishRepository.integration.test.ts`: `getByWishlist`
   liefert auf einem frischen Gerät (leerer Cache) die Wünsche vom Server
-- [ ] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
+- [x] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
 
 **Manuelle Verifikation**:
 - [ ] Auf zwei iPhones mit VoiceOver:
@@ -932,6 +932,18 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
   `src/shared/ui/checkOption.css` (`.check-option`, `.check-option__box`) und wird von
   `ChoiceGroup` und `CheckOption` geteilt. Der Hinweis unter „Geheim“ steht als Absatz unter
   der Checkbox und ist per `aria-describedby` verknüpft.
+- Phase 3: `Wish.isRemovedFor(p)` (Liste ausgeblendet oder Wunsch von der Besitzerin
+  entfernt) trennt `hidden` von `surprise`, damit `hidden` stärker ist.
+  `allowedWishActions` liefert für ausgeblendete Wünsche keine Aktion.
+- Phase 3: `DeleteWish` wirft `WishlistNotFound`, wenn die Liste eines Wunsches fehlt. Ein
+  unbekannter Wunsch bleibt wie bisher kein Fehler. `DeleteWishlist` wirft bei unbekannter
+  Liste `WishlistNotFound`.
+- Phase 3: `WishlistPage` leitet die Besitzerin aus `watchPersons` ab statt sie zusätzlich
+  per `watchPerson` zu beobachten. `WishStateNotes` bekommt dafür `ownerName`.
+- Die Testhilfe `perspective(me, ownerId)` in `fakes/` war nicht nötig. Die
+  Anwendungstests bilden Perspektiven über die Use Cases, und die Domänentests nutzen
+  Literale mit `wishlistIsHidden: false`. Neu ist dagegen `removedWishlistNamed` in
+  `fakes/wishlistNamed.ts`.
 
 ## Verweise
 

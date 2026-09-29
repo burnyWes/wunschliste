@@ -5,7 +5,7 @@ import { WishlistNotFound } from '../domain/Wishlist';
 import { ChangeWishState } from './ChangeWishState';
 import { InMemoryWishlistRepository } from './fakes/InMemoryWishlistRepository';
 import { InMemoryWishRepository } from './fakes/InMemoryWishRepository';
-import { wishlistNamed } from './fakes/wishlistNamed';
+import { removedWishlistNamed, wishlistNamed } from './fakes/wishlistNamed';
 import { wishNamed } from './fakes/wishNamed';
 
 const anna = personIdOf('anna');
@@ -17,7 +17,7 @@ async function setUp() {
   const wishes = new InMemoryWishRepository();
   await wishlists.save(wishlistNamed('Geburtstag', 'birthday', anna));
   await wishes.save(wishNamed('Helm'));
-  return { wishes, changeWishState: new ChangeWishState(wishes, wishlists) };
+  return { wishes, wishlists, changeWishState: new ChangeWishState(wishes, wishlists) };
 }
 
 describe('ChangeWishState', () => {
@@ -44,6 +44,15 @@ describe('ChangeWishState', () => {
       WishActionNotAllowed,
     );
     expect((await wishes.get(helmet))?.giverId).toBeUndefined();
+  });
+
+  it('keeps a wishlist removed by the owner hidden from her', async () => {
+    const { wishlists, changeWishState } = await setUp();
+    await wishlists.save(removedWishlistNamed('Geburtstag', 'birthday', anna));
+
+    await expect(changeWishState.execute(helmet, anna, 'receive')).rejects.toThrow(
+      WishlistNotFound,
+    );
   });
 
   it('refuses an unknown wish', async () => {

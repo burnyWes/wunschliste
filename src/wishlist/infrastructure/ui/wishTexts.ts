@@ -112,6 +112,20 @@ export function secretHint(ownerName: string): string {
   return `${ownerName} sieht nur „Überraschung“.`;
 }
 
+export function wishRemovedByOwnerMessage(ownerName?: string): string {
+  return `${ownerName ?? 'Die Besitzerin'} hat diesen Wunsch entfernt.`;
+}
+
+export function wishlistRemovedByOwnerMessage(ownerName?: string): string {
+  return `${ownerName ?? 'Die Besitzerin'} hat diese Wunschliste entfernt.`;
+}
+
+export function removedByOwnerNote(ownerName?: string): string {
+  return `von ${ownerName ?? 'der Besitzerin'} entfernt`;
+}
+
+export const FINAL_DELETION_LABEL = 'Endgültig löschen';
+
 export function surpriseLine(count: number): string {
   return count === 1 ? '1 Überraschung' : `${count} Überraschungen`;
 }

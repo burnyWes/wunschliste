@@ -8,7 +8,7 @@
   import { hashOf } from './wishlistAddresses';
   import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
-  import { LOAD_FAILED_MESSAGE } from './wishTexts';
+  import { LOAD_FAILED_MESSAGE, removedByOwnerNote } from './wishTexts';
 
   const { watchWishlistOverview } = useWishlistModule();
   const profile = useCurrentProfile();
@@ -62,7 +62,15 @@
                 type="button"
                 onclick={() => navigateTo(wishlistFilterMemory.hashOf(wishlist.id))}
               >
-                <span>{wishlist.name.value}</span>
+                <span>
+                  <span class="wishlist-name">{wishlist.name.value}</span>
+                  {#if wishlist.removedByOwner}
+                    <span class="note">
+                      <span aria-hidden="true">⚠</span>
+                      {removedByOwnerNote(group.owner?.name.value)}
+                    </span>
+                  {/if}
+                </span>
                 <ChevronRight aria-hidden="true" size="1.25em" />
               </button>
             </li>
@@ -74,6 +82,15 @@
 </div>
 
 <style>
+  .wishlist-name,
+  .note {
+    display: block;
+  }
+
+  .note {
+    overflow-wrap: anywhere;
+  }
+
   h2 {
     margin: 1.5rem 0 0.5rem;
     font-size: 1.25em;

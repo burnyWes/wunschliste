@@ -2,6 +2,8 @@ import type { WishId, WishlistId } from './ids';
 import type { Unsubscribe } from './Unsubscribe';
 import type { Wish } from './Wish';
 
+export type WishesOfWishlist = { wishes: readonly Wish[]; confirmed: boolean };
+
 export interface WishRepository {
   watchByWishlist(
     wishlistId: WishlistId,
@@ -10,6 +12,7 @@ export interface WishRepository {
   ): Unsubscribe;
   watch(id: WishId, onChange: (wish: Wish | undefined) => void, onFailure: () => void): Unsubscribe;
   get(id: WishId): Promise<Wish | undefined>;
+  getByWishlist(wishlistId: WishlistId): Promise<WishesOfWishlist>;
   save(wish: Wish): Promise<void>;
   delete(id: WishId): Promise<void>;
   deleteAllOf(wishlistId: WishlistId): Promise<void>;

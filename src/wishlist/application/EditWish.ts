@@ -21,6 +21,8 @@ export class EditWish {
     if (wishlist === undefined) {
       throw new WishlistNotFound(wish.wishlistId);
     }
-    await this.wishes.save(wish.edit(details, secret, perspectiveOf(wishlist, me)));
+    const perspective = perspectiveOf(wishlist, me);
+    wishlist.ensureVisibleTo(perspective);
+    await this.wishes.save(wish.edit(details, secret, perspective));
   }
 }

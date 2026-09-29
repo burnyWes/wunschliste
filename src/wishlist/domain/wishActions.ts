@@ -23,6 +23,9 @@ function allowedForGiver(wish: Wish): AllowedWishActions {
 }
 
 export function allowedWishActions(wish: Wish, perspective: Perspective): AllowedWishActions {
+  if (wish.isHiddenFrom(perspective)) {
+    return {};
+  }
   if (isOwner(perspective)) {
     return allowedForOwner(wish);
   }

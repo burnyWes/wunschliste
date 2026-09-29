@@ -4,6 +4,7 @@
   import { Watched } from '../../../shared/ui/watched.svelte';
   import type { WishlistId } from '../../domain/ids';
   import type { Person } from '../../domain/Person';
+  import { perspectiveOf } from '../../domain/Perspective';
   import type { WishDetails } from '../../domain/WishDetails';
   import type { Wishlist } from '../../domain/Wishlist';
   import LoadFailed from './LoadFailed.svelte';
@@ -43,6 +44,9 @@
     }
   });
 
+  const isVisible = $derived(
+    wishlist.value !== undefined && !perspectiveOf(wishlist.value, profile.me.id).wishlistIsHidden,
+  );
   const isWishlistOfSomeoneElse = $derived(ownerId !== undefined && ownerId !== profile.me.id);
 
   async function create(details: WishDetails, secret: boolean): Promise<void> {
@@ -52,7 +56,7 @@
   }
 </script>
 
-{#if wishlist.value}
+{#if wishlist.value && isVisible}
   <WishForm
     heading="Wunsch erstellen"
     focusesName
@@ -64,6 +68,6 @@
   />
 {:else if wishlist.status === 'failed'}
   <LoadFailed />
-{:else if wishlist.status === 'missing'}
+{:else if wishlist.status === 'missing' || wishlist.value}
   <NotFound message="Diese Wunschliste gibt es nicht mehr." />
 {/if}

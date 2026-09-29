@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { Check, ExternalLink, Gift, Pencil, Undo2 } from '@lucide/svelte';
+  import { Check, ExternalLink, Gift, Pencil, Trash2, Undo2 } from '@lucide/svelte';
   import type { Component } from 'svelte';
   import { announce } from '../../../shared/ui/announcements.svelte';
   import ActionBar from '../../../shared/ui/ActionBar.svelte';
+  import ConfirmDialog from '../../../shared/ui/ConfirmDialog.svelte';
   import { navigateTo } from '../../../shared/ui/navigation';
   import PageHeader from '../../../shared/ui/PageHeader.svelte';
   import { Watched } from '../../../shared/ui/watched.svelte';
@@ -21,7 +22,14 @@
   import { useWishlistModule } from './wishlistModuleContext';
   import WishStateNotes from './WishStateNotes.svelte';
   import WishSummary from './WishSummary.svelte';
-  import { WISH_ACTION_ANNOUNCEMENTS, WISH_ACTION_LABELS } from './wishTexts';
+  import {
+    FINAL_DELETION_LABEL,
+    WISH_ACTION_ANNOUNCEMENTS,
+    WISH_ACTION_LABELS,
+    wishDeletedAnnouncement,
+    wishDeletionMessage,
+    wishRemovedByOwnerMessage,
+  } from './wishTexts';
 
   let { wishId }: { wishId: WishId } = $props();
 
@@ -37,7 +45,8 @@
     undoHandOver: Undo2,
   };
 
-  const { watchWish, watchWishlist, watchPersons, changeWishState } = useWishlistModule();
+  const { watchWish, watchWishlist, watchPersons, changeWishState, deleteWish } =
+    useWishlistModule();
   const profile = useCurrentProfile();
 
   const wish = new Watched<Wish>();
@@ -46,6 +55,8 @@
   let editButton = $state<HTMLButtonElement>();
   let stateButton = $state<HTMLButtonElement>();
   let focusesStateButtonOnChange = false;
+  let isDeleting = $state(false);
+  let deletionDialog = $state<ConfirmDialog>();
 
   $effect(() =>
     watchWish.execute(
@@ -93,6 +104,16 @@
     announce(WISH_ACTION_ANNOUNCEMENTS[action]);
   }
 
+  const ownerName = $derived(persons.find(({ id }) => id === wishlist.value?.ownerId)?.name.value);
+
+  async function deleteForGood(wishlistHash: string): Promise<void> {
+    isDeleting = true;
+    const deletedName = wish.value?.details.name.value ?? '';
+    await deleteWish.execute(wishId, profile.me.id);
+    navigateTo(wishlistHash);
+    announce(wishDeletedAnnouncement(deletedName));
+  }
+
   const backToWishlist = $derived(
     wishlist.value && {
       label: wishlist.value.name.value,
@@ -114,7 +135,31 @@
   {@const { primaryAction, secondaryAction } = view}
   <div class="page">
     <PageHeader heading={name.value} back={backToWishlist} />
-    <WishStateNotes {view} {persons} variant="page" />
+    {#if view.removedByOwner}
+      {@const wishlistHash = wishlistFilterMemory.hashOf(view.wish.wishlistId)}
+      <p class="warning">
+        <span aria-hidden="true">⚠</span>
+        {wishRemovedByOwnerMessage(ownerName)}
+      </p>
+      <div class="button-row">
+        <button
+          class="button"
+          type="button"
+          onclick={(event) => deletionDialog?.open(event.currentTarget)}
+        >
+          <Trash2 aria-hidden="true" size="1.25em" />
+          {FINAL_DELETION_LABEL}
+        </button>
+      </div>
+      <ConfirmDialog
+        bind:this={deletionDialog}
+        heading="Wunsch endgültig löschen?"
+        message={wishDeletionMessage(name.value)}
+        confirmLabel="Löschen"
+        onconfirm={() => deleteForGood(wishlistHash)}
+      />
+    {/if}
+    <WishStateNotes {view} {persons} {ownerName} variant="page" />
     <p><WishSummary details={view.wish.details} /></p>
     {#if secondaryAction}
       <div class="button-row">
@@ -154,11 +199,16 @@
       {/if}
     </ActionBar>
   </div>
-{:else if wish.status === 'missing' || wishlist.status === 'missing' || view}
+{:else if (wish.status === 'missing' || wishlist.status === 'missing' || view) && !isDeleting}
   <NotFound message="Diesen Wunsch gibt es nicht mehr." />
 {/if}
 
 <style>
+  .warning {
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
   .description {
     white-space: pre-line;
     overflow-wrap: anywhere;

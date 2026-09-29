@@ -8,7 +8,8 @@
   import type { Name } from '../../domain/Name';
   import type { Person } from '../../domain/Person';
   import { PersonNameTaken, PersonOwnsWishlists } from '../../domain/personRules';
-  import type { Wishlist } from '../../domain/Wishlist';
+  import { wishlistsVisibleTo, type Wishlist } from '../../domain/Wishlist';
+  import { useCurrentProfile } from './currentProfile.svelte';
   import LoadFailed from './LoadFailed.svelte';
   import NameForm from './NameForm.svelte';
   import NotFound from './NotFound.svelte';
@@ -16,6 +17,7 @@
     ownedWishlistsHint,
     personDeletedAnnouncement,
     personDeletionMessage,
+    personNotDeletableRightNowHint,
   } from './personTexts';
   import { useWishlistModule } from './wishlistModuleContext';
   import { SAVED_ANNOUNCEMENT } from './wishTexts';
@@ -23,6 +25,7 @@
   let { personId, settingsHash }: { personId: PersonId; settingsHash: string } = $props();
 
   const { watchPerson, watchWishlistsOwnedBy, renamePerson, deletePerson } = useWishlistModule();
+  const profile = useCurrentProfile();
 
   const person = new Watched<Person>();
   let ownedWishlists = $state.raw<readonly Wishlist[]>();
@@ -43,6 +46,12 @@
       (reported) => (ownedWishlists = reported),
       () => (haveWishlistsFailed = true),
     ),
+  );
+
+  const hintedWishlists = $derived(
+    ownedWishlists && personId === profile.me.id
+      ? wishlistsVisibleTo(ownedWishlists, personId)
+      : ownedWishlists,
   );
 
   async function save(name: Name): Promise<'taken' | void> {
@@ -103,8 +112,10 @@
           confirmLabel="Löschen"
           onconfirm={deleteConfirmed}
         />
-      {:else if ownedWishlists}
-        <p>{ownedWishlistsHint(person.value?.name.value ?? '', ownedWishlists.length)}</p>
+      {:else if hintedWishlists?.length === 0}
+        <p>{personNotDeletableRightNowHint(person.value?.name.value ?? '')}</p>
+      {:else if hintedWishlists}
+        <p>{ownedWishlistsHint(person.value?.name.value ?? '', hintedWishlists.length)}</p>
       {/if}
     {/snippet}
     {#snippet actions()}

@@ -6,6 +6,7 @@ import { Person } from '../../domain/Person';
 import {
   ownedByLabel,
   ownedWishlistsHint,
+  personNotDeletableRightNowHint,
   ownerChoiceLabel,
   ownerGroupHeading,
   ownerLine,
@@ -65,5 +66,11 @@ describe('owner texts', () => {
 
   it('names the owner of a wishlist being edited', () => {
     expect(ownedByLabel('Anna')).toBe('Für: Anna');
+  });
+});
+
+describe('personNotDeletableRightNowHint', () => {
+  it('names the person without giving a reason', () => {
+    expect(personNotDeletableRightNowHint('Anna')).toBe('Anna kann gerade nicht gelöscht werden.');
   });
 });

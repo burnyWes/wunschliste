@@ -76,6 +76,10 @@ dem Nutzer abgestimmt. Dieses Dokument ist die Quelle der Wahrheit für die Plan
   „🤫 von Ben“.
 - Die **Besitzerin** sieht pro Geheim-Eintrag einen Platzhalter „🎁 Überraschung“, nur
   unter „Offene Wünsche“, nicht antippbar, nicht bearbeit- oder löschbar.
+- Ergänzung aus WL-006: Statt einer Zeile je Eintrag gibt es **eine** Zeile
+  „🎁 N Überraschungen“ am Ende der offenen Wünsche. Die Besitzerin erreicht einen
+  Geheim-Eintrag nicht, deshalb meldet der **Schenkende** mit „Übergeben“ die Übergabe.
+  Beim Bearbeiten lässt sich „Geheim“ nur abwählen.
 
 ```
  Annas Ansicht ihrer Liste              Omas Ansicht von Annas Liste
@@ -97,6 +101,12 @@ dem Nutzer abgestimmt. Dieses Dokument ist die Quelle der Wahrheit für die Plan
   Schenken-Knopf mehr. Keine Gemeinschaftsgeschenke.
 - Gilt gleichermaßen für Geheim-Einträge: nach „Erhalten“ wird aus dem Platzhalter ein
   normaler erfüllter Wunsch.
+- Ergänzungen aus WL-006:
+  - Die Besitzerin sieht bei normalen Wünschen **immer** „Erhalten“, auch ohne
+    Schenkenden. Sonst verrieten unterschiedliche Knöpfe ein Geschenk. Ohne Schenkenden
+    heißt der Wunsch danach nur „Erfüllt“.
+  - „Schenken zurücknehmen“ gibt es nur für den Schenkenden und nur vor dem Erhalten.
+  - Nach dem Erhalten sieht auch die Besitzerin „Erfüllt – von Ben“.
 
 ```
  Ben schaut Annas Wunsch an              Anna schaut ihren Wunsch an
@@ -213,6 +223,9 @@ Option. Standard: Dunkel. Die Wahl gilt **pro Gerät** und wird nicht synchronis
 - Datenmodell (Details im Plan): Sammlungen für Personen, Wunschlisten und Wünsche. Ein
   Wunsch trägt u. a. `createdBy`, `secret`, `giftedBy`, `receivedAt` und eine Markierung
   „für die Besitzerin ausgeblendet“.
+  - Umgesetzt in WL-006 als `createdBy`, `secret`, `giverId`, `received` (Boolean statt
+    `receivedAt`, weil kein Datum angezeigt wird) und `removedByOwner`. Wunschlisten
+    tragen ebenfalls `removedByOwner`.
 
 ## Umsetzungsreihenfolge
 

@@ -7,7 +7,7 @@ import { CreateWish } from './CreateWish';
 import { InMemoryWishlistRepository } from './fakes/InMemoryWishlistRepository';
 import { InMemoryWishRepository } from './fakes/InMemoryWishRepository';
 import { SequentialIdGenerator } from './fakes/SequentialIdGenerator';
-import { wishlistNamed } from './fakes/wishlistNamed';
+import { removedWishlistNamed, wishlistNamed } from './fakes/wishlistNamed';
 
 const helmet = { name: requireValid(Name.parse('Fahrradhelm')) };
 const ben = personIdOf('ben');
@@ -18,7 +18,7 @@ async function setUp() {
   const birthday = wishlistNamed('Geburtstag', 'b');
   await wishlists.save(birthday);
   const createWish = new CreateWish(wishlists, wishes, new SequentialIdGenerator());
-  return { wishes, birthday, createWish };
+  return { wishes, wishlists, birthday, createWish };
 }
 
 describe('CreateWish', () => {
@@ -50,6 +50,15 @@ describe('CreateWish', () => {
     const id = await createWish.execute(birthday.id, helmet, false, ben);
 
     expect((await wishes.get(id))?.createdBy).toBe(ben);
+  });
+
+  it('keeps a wishlist removed by the owner hidden from her', async () => {
+    const { wishlists, createWish } = await setUp();
+    await wishlists.save(removedWishlistNamed('Geburtstag', 'b'));
+
+    await expect(
+      createWish.execute(wishlistIdOf('b'), helmet, false, personIdOf('anna')),
+    ).rejects.toThrow(WishlistNotFound);
   });
 
   it('refuses an unknown wishlist', async () => {

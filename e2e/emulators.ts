@@ -7,7 +7,12 @@ export const PROJECT_ID = 'demo-wunschliste';
 
 export type PersonRecord = { id: string; name: string };
 
-export type WishlistRecord = { id: string; name: string; ownerId: string };
+export type WishlistRecord = {
+  id: string;
+  name: string;
+  ownerId: string;
+  removedByOwner?: boolean;
+};
 
 export type WishRecord = {
   id: string;

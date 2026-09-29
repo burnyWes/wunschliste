@@ -11,7 +11,11 @@ import {
   WISHLIST_CREATED_ANNOUNCEMENT,
   formatPrice,
   fulfilledNote,
+  FINAL_DELETION_LABEL,
   giverNote,
+  removedByOwnerNote,
+  wishlistRemovedByOwnerMessage,
+  wishRemovedByOwnerMessage,
   secretHint,
   secretNote,
   surpriseLine,
@@ -147,6 +151,26 @@ describe('wish state', () => {
     [2, '2 Überraschungen'],
   ])('counts %i surprises', (count, line) => {
     expect(surpriseLine(count)).toBe(line);
+  });
+});
+
+describe('removal by the owner', () => {
+  it('names the owner who removed something', () => {
+    expect(wishRemovedByOwnerMessage('Anna')).toBe('Anna hat diesen Wunsch entfernt.');
+    expect(wishlistRemovedByOwnerMessage('Anna')).toBe('Anna hat diese Wunschliste entfernt.');
+    expect(removedByOwnerNote('Anna')).toBe('von Anna entfernt');
+  });
+
+  it('speaks of the owner when her name is unknown', () => {
+    expect(wishRemovedByOwnerMessage(undefined)).toBe('Die Besitzerin hat diesen Wunsch entfernt.');
+    expect(wishlistRemovedByOwnerMessage(undefined)).toBe(
+      'Die Besitzerin hat diese Wunschliste entfernt.',
+    );
+    expect(removedByOwnerNote(undefined)).toBe('von der Besitzerin entfernt');
+  });
+
+  it('names the final deletion', () => {
+    expect(FINAL_DELETION_LABEL).toBe('Endgültig löschen');
   });
 });
 

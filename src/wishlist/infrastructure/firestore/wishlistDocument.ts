@@ -3,19 +3,24 @@ import { Name } from '../../domain/Name';
 import { Wishlist } from '../../domain/Wishlist';
 import { isObject } from './isObject';
 
-export type WishlistDocument = { name: string; ownerId: string };
+export type WishlistDocument = { name: string; ownerId: string; removedByOwner?: boolean };
 
 function isWishlistDocument(candidate: unknown): candidate is WishlistDocument {
   return (
     isObject(candidate) &&
     typeof candidate.name === 'string' &&
     typeof candidate.ownerId === 'string' &&
-    candidate.ownerId !== ''
+    candidate.ownerId !== '' &&
+    (candidate.removedByOwner === undefined || typeof candidate.removedByOwner === 'boolean')
   );
 }
 
 export function toWishlistDocument(wishlist: Wishlist): WishlistDocument {
-  return { name: wishlist.name.value, ownerId: wishlist.ownerId };
+  return {
+    name: wishlist.name.value,
+    ownerId: wishlist.ownerId,
+    removedByOwner: wishlist.removedByOwner,
+  };
 }
 
 export function wishlistFromDocument(id: string, data: unknown): Wishlist | undefined {
@@ -24,6 +29,11 @@ export function wishlistFromDocument(id: string, data: unknown): Wishlist | unde
   }
   const name = Name.parse(data.name);
   return name.ok
-    ? Wishlist.restore(wishlistIdOf(id), name.value, personIdOf(data.ownerId))
+    ? Wishlist.restore({
+        id: wishlistIdOf(id),
+        name: name.value,
+        ownerId: personIdOf(data.ownerId),
+        removedByOwner: data.removedByOwner ?? false,
+      })
     : undefined;
 }

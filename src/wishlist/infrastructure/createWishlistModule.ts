@@ -61,7 +61,7 @@ export function createWishlistModule({
     watchWishesOfWishlist: new WatchWishesOfWishlist(wishes),
     watchWish: new WatchWish(wishes),
     editWish: new EditWish(wishes, wishlists),
-    deleteWish: new DeleteWish(wishes),
+    deleteWish: new DeleteWish(wishes, wishlists),
     changeWishState: new ChangeWishState(wishes, wishlists),
   };
 }

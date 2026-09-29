@@ -10,9 +10,9 @@ const anna = personIdOf('anna');
 const ben = personIdOf('ben');
 const oma = personIdOf('oma');
 
-const asAnna: Perspective = { me: anna, ownerId: anna };
-const asBen: Perspective = { me: ben, ownerId: anna };
-const asOma: Perspective = { me: oma, ownerId: anna };
+const asAnna: Perspective = { me: anna, ownerId: anna, wishlistIsHidden: false };
+const asBen: Perspective = { me: ben, ownerId: anna, wishlistIsHidden: false };
+const asOma: Perspective = { me: oma, ownerId: anna, wishlistIsHidden: false };
 
 function annasWish(state: Partial<RestoredWish> = {}): Wish {
   return Wish.restore({

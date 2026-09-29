@@ -7,8 +7,11 @@
   import type { WishlistId } from '../../domain/ids';
   import type { Name } from '../../domain/Name';
   import type { Person } from '../../domain/Person';
+  import { perspectiveOf } from '../../domain/Perspective';
   import type { Wish } from '../../domain/Wish';
   import type { Wishlist } from '../../domain/Wishlist';
+  import { visibleWishCount } from '../../domain/wishView';
+  import { useCurrentProfile } from './currentProfile.svelte';
   import LoadFailed from './LoadFailed.svelte';
   import NotFound from './NotFound.svelte';
   import { hashOf } from './wishlistAddresses';
@@ -26,6 +29,7 @@
 
   const { watchWishlist, watchWishesOfWishlist, watchPerson, renameWishlist, deleteWishlist } =
     useWishlistModule();
+  const profile = useCurrentProfile();
 
   const wishlist = new Watched<Wishlist>();
   let wishes = $state.raw<readonly Wish[]>([]);
@@ -61,6 +65,7 @@
     }
   });
 
+  const perspective = $derived(wishlist.value && perspectiveOf(wishlist.value, profile.me.id));
   const wishlistHash = $derived(wishlistFilterMemory.hashOf(wishlistId));
 
   async function save(name: Name): Promise<void> {
@@ -72,7 +77,7 @@
   async function deleteConfirmed(): Promise<void> {
     isDeleting = true;
     const deletedName = wishlist.value?.name.value ?? '';
-    await deleteWishlist.execute(wishlistId);
+    await deleteWishlist.execute(wishlistId, profile.me.id);
     navigateTo(hashOf({ page: 'wishlists' }));
     announce(wishlistDeletedAnnouncement(deletedName));
   }
@@ -80,7 +85,7 @@
 
 {#if wishlist.status === 'failed' || haveWishesFailed}
   <LoadFailed />
-{:else if wishlist.value}
+{:else if wishlist.value && perspective && !perspective.wishlistIsHidden}
   <NameForm
     heading="Wunschliste bearbeiten"
     fieldId="wishlist-name"
@@ -103,7 +108,10 @@
       <ConfirmDialog
         bind:this={deletionDialog}
         heading="Wunschliste löschen?"
-        message={wishlistDeletionMessage(wishlist.value?.name.value ?? '', wishes.length)}
+        message={wishlistDeletionMessage(
+          wishlist.value?.name.value ?? '',
+          perspective ? visibleWishCount(wishes, perspective) : 0,
+        )}
         confirmLabel="Löschen"
         onconfirm={deleteConfirmed}
       />
@@ -117,6 +125,6 @@
       </button>
     {/snippet}
   </NameForm>
-{:else if wishlist.status === 'missing' && !isDeleting}
+{:else if (wishlist.status === 'missing' || perspective?.wishlistIsHidden) && !isDeleting}
   <NotFound message="Diese Wunschliste gibt es nicht mehr." />
 {/if}

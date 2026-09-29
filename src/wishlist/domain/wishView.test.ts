@@ -5,15 +5,15 @@ import { requireValid } from './parsed';
 import type { Perspective } from './Perspective';
 import type { Rating } from './Rating';
 import { Wish, type RestoredWish } from './Wish';
-import { viewOfWish, viewOfWishes, type WishView } from './wishView';
+import { viewOfWish, viewOfWishes, visibleWishCount, type WishView } from './wishView';
 
 const anna = personIdOf('anna');
 const ben = personIdOf('ben');
 const oma = personIdOf('oma');
 
-const asAnna: Perspective = { me: anna, ownerId: anna };
-const asBen: Perspective = { me: ben, ownerId: anna };
-const asOma: Perspective = { me: oma, ownerId: anna };
+const asAnna: Perspective = { me: anna, ownerId: anna, wishlistIsHidden: false };
+const asBen: Perspective = { me: ben, ownerId: anna, wishlistIsHidden: false };
+const asOma: Perspective = { me: oma, ownerId: anna, wishlistIsHidden: false };
 
 function annasWish(name: string, state: Partial<RestoredWish> = {}, rating?: Rating): Wish {
   return Wish.restore({
@@ -119,6 +119,55 @@ describe('viewOfWish for secret wishes', () => {
       primaryAction: undefined,
       secondaryAction: undefined,
     });
+  });
+});
+
+describe('viewOfWish for wishes removed by the owner', () => {
+  const removed = annasWish('Helm', { giverId: ben, removedByOwner: true });
+
+  it('hides the wish from the owner', () => {
+    expect(viewOfWish(removed, asAnna)).toMatchObject({
+      visibility: 'hidden',
+      primaryAction: undefined,
+    });
+  });
+
+  it('prefers hidden over surprise', () => {
+    const removedSecret = annasWish('Helm', { secret: true, createdBy: ben, removedByOwner: true });
+
+    expect(viewOfWish(removedSecret, asAnna).visibility).toBe('hidden');
+  });
+
+  it('shows everyone else the removal with the usual actions', () => {
+    expect(viewOfWish(removed, asBen)).toMatchObject({
+      visibility: 'shown',
+      status: 'fulfilled',
+      removedByOwner: true,
+      primaryAction: 'takeBackGift',
+    });
+  });
+
+  it('hides every wish of a wishlist hidden from the owner', () => {
+    expect(viewOfWish(annasWish('Helm'), { ...asAnna, wishlistIsHidden: true }).visibility).toBe(
+      'hidden',
+    );
+  });
+});
+
+describe('visibleWishCount', () => {
+  const wishes = [
+    annasWish('A'),
+    annasWish('B', { giverId: ben, received: true }),
+    annasWish('C', { secret: true, createdBy: ben }),
+    annasWish('D', { giverId: ben, removedByOwner: true }),
+  ];
+
+  it('counts only the wishes the owner sees', () => {
+    expect(visibleWishCount(wishes, asAnna)).toBe(2);
+  });
+
+  it('counts every wish for everyone else', () => {
+    expect(visibleWishCount(wishes, asOma)).toBe(4);
   });
 });
 

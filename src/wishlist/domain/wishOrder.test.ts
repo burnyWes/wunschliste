@@ -14,7 +14,7 @@ function wish(name: string, rating?: Rating, id = name): Wish {
       details: { name: requireValid(Name.parse(name)), rating },
       secret: false,
     },
-    { me: personIdOf('anna'), ownerId: personIdOf('anna') },
+    { me: personIdOf('anna'), ownerId: personIdOf('anna'), wishlistIsHidden: false },
   );
 }
 

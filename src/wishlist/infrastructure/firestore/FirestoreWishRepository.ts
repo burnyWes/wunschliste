@@ -2,7 +2,7 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDocsFromCache,
+  getDocs,
   onSnapshot,
   query,
   setDoc,
@@ -16,7 +16,7 @@ import {
 import type { WishId, WishlistId } from '../../domain/ids';
 import type { Unsubscribe } from '../../domain/Unsubscribe';
 import type { Wish } from '../../domain/Wish';
-import type { WishRepository } from '../../domain/WishRepository';
+import type { WishesOfWishlist, WishRepository } from '../../domain/WishRepository';
 import type { ReportWishlistProblem } from '../wishlistProblem';
 import { cachedDocument } from './cachedDocument';
 import { observedWrite } from './observedWrite';
@@ -66,6 +66,14 @@ export class FirestoreWishRepository implements WishRepository {
     return wishIn(await cachedDocument(this.#reference(id)));
   }
 
+  async getByWishlist(wishlistId: WishlistId): Promise<WishesOfWishlist> {
+    const snapshot = await getDocs(this.#wishesOf(wishlistId));
+    return {
+      wishes: snapshot.docs.map(wishIn).filter((wish) => wish !== undefined),
+      confirmed: !snapshot.metadata.fromCache,
+    };
+  }
+
   async save(wish: Wish): Promise<void> {
     observedWrite(setDoc(this.#reference(wish.id), toWishDocument(wish)), this.#onProblem);
   }
@@ -75,9 +83,9 @@ export class FirestoreWishRepository implements WishRepository {
   }
 
   async deleteAllOf(wishlistId: WishlistId): Promise<void> {
-    const cachedWishes = await getDocsFromCache(this.#wishesOf(wishlistId));
+    const wishes = await getDocs(this.#wishesOf(wishlistId));
     const batch = writeBatch(this.#firestore);
-    for (const wish of cachedWishes.docs) {
+    for (const wish of wishes.docs) {
       batch.delete(wish.ref);
     }
     observedWrite(batch.commit(), this.#onProblem);

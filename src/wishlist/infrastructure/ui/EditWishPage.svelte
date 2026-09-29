@@ -92,7 +92,7 @@
   async function deleteConfirmed(wishlistHash: string): Promise<void> {
     isDeleting = true;
     const deletedName = wish.value?.details.name.value ?? '';
-    await deleteWish.execute(wishId);
+    await deleteWish.execute(wishId, profile.me.id);
     navigateTo(wishlistHash);
     announce(wishDeletedAnnouncement(deletedName));
   }

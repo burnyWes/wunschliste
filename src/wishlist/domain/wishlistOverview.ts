@@ -1,6 +1,6 @@
 import type { PersonId } from './ids';
 import { personsMeFirst, type Person } from './Person';
-import { sortWishlists, type Wishlist } from './Wishlist';
+import { sortWishlists, wishlistsVisibleTo, type Wishlist } from './Wishlist';
 
 export type WishlistGroup = {
   owner: Person | undefined;
@@ -13,7 +13,7 @@ export function groupWishlistsByOwner(
   persons: readonly Person[],
   me: PersonId,
 ): WishlistGroup[] {
-  const sorted = sortWishlists(wishlists);
+  const sorted = sortWishlists(wishlistsVisibleTo(wishlists, me));
   const ownedBy = (ownerId: PersonId) => sorted.filter((wishlist) => wishlist.ownerId === ownerId);
   const personGroups = personsMeFirst(persons, me).map((owner) => ({
     owner,

@@ -21,6 +21,8 @@ export class ChangeWishState {
     if (wishlist === undefined) {
       throw new WishlistNotFound(wish.wishlistId);
     }
-    await this.wishes.save(wish.perform(action, perspectiveOf(wishlist, me)));
+    const perspective = perspectiveOf(wishlist, me);
+    wishlist.ensureVisibleTo(perspective);
+    await this.wishes.save(wish.perform(action, perspective));
   }
 }

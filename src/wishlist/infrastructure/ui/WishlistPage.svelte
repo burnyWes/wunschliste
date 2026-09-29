@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { ChevronRight, Pencil, Plus } from '@lucide/svelte';
+  import { ChevronRight, Pencil, Plus, Trash2 } from '@lucide/svelte';
+  import { announce } from '../../../shared/ui/announcements.svelte';
+  import ConfirmDialog from '../../../shared/ui/ConfirmDialog.svelte';
   import { navigateTo } from '../../../shared/ui/navigation';
   import PageHeader from '../../../shared/ui/PageHeader.svelte';
   import { Watched } from '../../../shared/ui/watched.svelte';
@@ -8,7 +10,7 @@
   import { perspectiveOf } from '../../domain/Perspective';
   import type { Wish } from '../../domain/Wish';
   import type { Wishlist } from '../../domain/Wishlist';
-  import { viewOfWishes, type WishFilter } from '../../domain/wishView';
+  import { viewOfWishes, visibleWishCount, type WishFilter } from '../../domain/wishView';
   import { useCurrentProfile } from './currentProfile.svelte';
   import LoadFailed from './LoadFailed.svelte';
   import NotFound from './NotFound.svelte';
@@ -18,7 +20,14 @@
   import { useWishlistModule } from './wishlistModuleContext';
   import WishStateNotes from './WishStateNotes.svelte';
   import WishSummary from './WishSummary.svelte';
-  import { LOAD_FAILED_MESSAGE, surpriseLine } from './wishTexts';
+  import {
+    FINAL_DELETION_LABEL,
+    LOAD_FAILED_MESSAGE,
+    surpriseLine,
+    wishlistDeletedAnnouncement,
+    wishlistDeletionMessage,
+    wishlistRemovedByOwnerMessage,
+  } from './wishTexts';
 
   let { wishlistId, filter }: { wishlistId: WishlistId; filter: WishFilter } = $props();
 
@@ -27,14 +36,16 @@
     { value: 'fulfilled', label: 'Erfüllte Wünsche', emptyText: 'Noch keine erfüllten Wünsche.' },
   ];
 
-  const { watchWishlist, watchWishesOfWishlist, watchPerson, watchPersons } = useWishlistModule();
+  const { watchWishlist, watchWishesOfWishlist, watchPersons, deleteWishlist } =
+    useWishlistModule();
   const profile = useCurrentProfile();
 
   const wishlist = new Watched<Wishlist>();
   let wishes = $state.raw<readonly Wish[]>();
   let haveWishesFailed = $state(false);
-  let owner = $state.raw<Person>();
   let persons = $state.raw<readonly Person[]>([]);
+  let isDeleting = $state(false);
+  let deletionDialog = $state<ConfirmDialog>();
 
   $effect(() =>
     watchWishlist.execute(
@@ -51,18 +62,6 @@
     ),
   );
 
-  const ownerId = $derived(wishlist.value?.ownerId);
-
-  $effect(() => {
-    if (ownerId !== undefined) {
-      return watchPerson.execute(
-        ownerId,
-        (reported) => (owner = reported),
-        () => {},
-      );
-    }
-  });
-
   $effect(() =>
     watchPersons.execute(
       (reported) => (persons = reported),
@@ -72,13 +71,19 @@
 
   $effect(() => wishlistFilterMemory.remember(wishlistId, filter));
 
+  const owner = $derived(persons.find(({ id }) => id === wishlist.value?.ownerId));
+  const perspective = $derived(wishlist.value && perspectiveOf(wishlist.value, profile.me.id));
   const createWishHash = $derived(hashOf({ page: 'createWish', wishlistId }));
-  const wishesView = $derived(
-    wishes &&
-      wishlist.value &&
-      viewOfWishes(wishes, perspectiveOf(wishlist.value, profile.me.id), filter),
-  );
+  const wishesView = $derived(wishes && perspective && viewOfWishes(wishes, perspective, filter));
   const emptyText = $derived(FILTERS.find(({ value }) => value === filter)?.emptyText);
+
+  async function deleteForGood(): Promise<void> {
+    isDeleting = true;
+    const deletedName = wishlist.value?.name.value ?? '';
+    await deleteWishlist.execute(wishlistId, profile.me.id);
+    navigateTo(hashOf({ page: 'wishlists' }));
+    announce(wishlistDeletedAnnouncement(deletedName));
+  }
 
   function show(chosenFilter: WishFilter): void {
     navigateTo(hashOf({ page: 'wishlist', wishlistId, filter: chosenFilter }));
@@ -87,7 +92,7 @@
 
 {#if wishlist.status === 'failed'}
   <LoadFailed />
-{:else if wishlist.value}
+{:else if wishlist.value && perspective && !perspective.wishlistIsHidden}
   <div class="page">
     <PageHeader
       heading={wishlist.value.name.value}
@@ -115,6 +120,33 @@
 
     {#if owner}
       <p class="owner">{ownerLine(owner, owner.id === profile.me.id)}</p>
+    {/if}
+
+    {#if wishlist.value.removedByOwner}
+      <p class="warning">
+        <span aria-hidden="true">⚠</span>
+        {wishlistRemovedByOwnerMessage(owner?.name.value)}
+      </p>
+      <div class="button-row">
+        <button
+          class="button"
+          type="button"
+          onclick={(event) => deletionDialog?.open(event.currentTarget)}
+        >
+          <Trash2 aria-hidden="true" size="1.25em" />
+          {FINAL_DELETION_LABEL}
+        </button>
+      </div>
+      <ConfirmDialog
+        bind:this={deletionDialog}
+        heading="Wunschliste endgültig löschen?"
+        message={wishlistDeletionMessage(
+          wishlist.value.name.value,
+          visibleWishCount(wishes ?? [], perspective),
+        )}
+        confirmLabel="Löschen"
+        onconfirm={deleteForGood}
+      />
     {/if}
 
     <div class="button-row">
@@ -149,7 +181,7 @@
                 <span>
                   <span class="wish-name">{wish.details.name.value}</span>
                   <WishSummary details={wish.details} />
-                  <WishStateNotes {view} {persons} variant="entry" />
+                  <WishStateNotes {view} {persons} ownerName={owner?.name.value} variant="entry" />
                 </span>
                 <ChevronRight aria-hidden="true" size="1.25em" />
               </button>
@@ -172,13 +204,18 @@
       {/if}
     {/if}
   </div>
-{:else if wishlist.status === 'missing'}
+{:else if (wishlist.status === 'missing' || perspective?.wishlistIsHidden) && !isDeleting}
   <NotFound message="Diese Wunschliste gibt es nicht mehr." />
 {/if}
 
 <style>
   .owner {
     margin: -0.5rem 0 0;
+    overflow-wrap: anywhere;
+  }
+
+  .warning {
+    font-weight: 700;
     overflow-wrap: anywhere;
   }
 

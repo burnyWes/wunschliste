@@ -72,8 +72,39 @@ describe('FirestoreWishlistRepository', () => {
       const stored = await withoutRules(environment, async (firestore) =>
         (await getDoc(doc(firestore, WISHLISTS_COLLECTION, 'b'))).data(),
       );
-      expect(stored).toEqual({ name: 'Geburtstag', ownerId: 'ben' });
+      expect(stored).toEqual({ name: 'Geburtstag', ownerId: 'ben', removedByOwner: false });
     });
+  });
+
+  it('restores a wishlist removed by its owner', async () => {
+    const hidden = wishlistNamed('Geburtstag', 'b').removeFor(
+      { me: anna, ownerId: anna, wishlistIsHidden: false },
+      { wishes: [], confirmed: false },
+    );
+    if (hidden.kind !== 'hideFromOwner') {
+      throw new Error('Expected the wishlist to be hidden');
+    }
+    const reports: (Wishlist | undefined)[] = [];
+    familyRepository().watch(
+      wishlistIdOf('b'),
+      (wishlist) => reports.push(wishlist),
+      ignoreFailure,
+    );
+
+    await familyRepository().save(hidden.wishlist);
+
+    await eventually(() => expect(reports.at(-1)?.removedByOwner).toBe(true));
+  });
+
+  it('reads a wishlist without removal as not removed', async () => {
+    await withoutRules(environment, async (firestore) => {
+      await setDoc(doc(firestore, WISHLISTS_COLLECTION, 'b'), {
+        name: 'Geburtstag',
+        ownerId: 'anna',
+      });
+    });
+
+    expect((await familyRepository().get(wishlistIdOf('b')))?.removedByOwner).toBe(false);
   });
 
   it('gives and reports only the wishlists of one owner', async () => {
@@ -132,6 +163,7 @@ describe('FirestoreWishlistRepository', () => {
         d: { name: 'Weihnachten' },
         e: { name: 'Pfingsten', ownerId: '' },
         f: { name: 'Nikolaus', ownerId: 7 },
+        g: { name: 'Advent', ownerId: 'anna', removedByOwner: 'ja' },
       };
       for (const [id, data] of Object.entries(documents)) {
         await setDoc(doc(firestore, WISHLISTS_COLLECTION, id), data);

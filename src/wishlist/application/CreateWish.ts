@@ -29,9 +29,11 @@ export class CreateWish {
     if (wishlist === undefined) {
       throw new WishlistNotFound(wishlistId);
     }
+    const perspective = perspectiveOf(wishlist, me);
+    wishlist.ensureVisibleTo(perspective);
     const wish = Wish.create(
       { id: wishIdOf(this.ids.next()), wishlistId, details, secret },
-      perspectiveOf(wishlist, me),
+      perspective,
     );
     await this.wishes.save(wish);
     return wish.id;

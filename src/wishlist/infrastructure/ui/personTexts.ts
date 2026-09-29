@@ -20,6 +20,10 @@ export function ownedWishlistsHint(name: string, wishlistCount: number): string 
   return `${name} gehören noch ${wishlists}. Sie kann erst gelöscht werden, wenn sie keine mehr hat.`;
 }
 
+export function personNotDeletableRightNowHint(name: string): string {
+  return `${name} kann gerade nicht gelöscht werden.`;
+}
+
 export function ownerChoiceLabel(person: Person, isMe: boolean): string {
   return isMe ? `${person.name.value} (ich)` : person.name.value;
 }
