@@ -1,6 +1,6 @@
 import type { RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { disableNetwork, doc, getDoc, setDoc } from 'firebase/firestore';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { wishIdOf, wishlistIdOf, type WishlistId } from '../../src/wishlist/domain/ids';
 import { Wish } from '../../src/wishlist/domain/Wish';
 import { parseWishDetails, type WishDetailsInput } from '../../src/wishlist/domain/WishDetails';
@@ -8,6 +8,7 @@ import {
   FirestoreWishRepository,
   WISHES_COLLECTION,
 } from '../../src/wishlist/infrastructure/firestore/FirestoreWishRepository';
+import { eventually } from './eventually';
 import { familyFirestore, startTestEnvironment, withoutRules } from './testFirestore';
 
 const birthday = wishlistIdOf('birthday');
@@ -72,7 +73,7 @@ describe('FirestoreWishRepository', () => {
 
     await familyRepository().save(helmet);
 
-    await vi.waitFor(() => {
+    await eventually(() => {
       expect(restored?.wishlistId).toBe(birthday);
       expect(restored?.details.name.value).toBe('Fahrradhelm');
       expect(restored?.details.link?.href).toBe('https://amazon.de/helm');
@@ -86,7 +87,7 @@ describe('FirestoreWishRepository', () => {
   it('stores only the fields a wish has', async () => {
     await familyRepository().save(wishNamed('Buch', birthday, 'b'));
 
-    await vi.waitFor(async () => {
+    await eventually(async () => {
       const stored = await withoutRules(environment, async (firestore) =>
         (await getDoc(doc(firestore, WISHES_COLLECTION, 'b'))).data(),
       );
@@ -98,14 +99,14 @@ describe('FirestoreWishRepository', () => {
     const repository = familyRepository();
     const reports: string[][] = [];
     repository.watchByWishlist(birthday, (wishes) => reports.push(namesOf(wishes)));
-    await vi.waitFor(() => expect(reports).toEqual([[]]));
+    await eventually(() => expect(reports).toEqual([[]]));
 
     await repository.save(wishNamed('Helm'));
     await repository.save(wishNamed('Schlitten', christmas));
-    await vi.waitFor(() => expect(reports.at(-1)).toEqual(['Helm']));
+    await eventually(() => expect(reports.at(-1)).toEqual(['Helm']));
     await repository.delete(wishIdOf('Helm'));
 
-    await vi.waitFor(() => expect(reports.at(-1)).toEqual([]));
+    await eventually(() => expect(reports.at(-1)).toEqual([]));
     expect(reports.flat()).not.toContain('Schlitten');
   });
 
@@ -115,10 +116,10 @@ describe('FirestoreWishRepository', () => {
     repository.watch(wishIdOf('Helm'), (wish) => reports.push(wish?.details.name.value));
 
     await repository.save(wishNamed('Helm'));
-    await vi.waitFor(() => expect(reports.at(-1)).toBe('Helm'));
+    await eventually(() => expect(reports.at(-1)).toBe('Helm'));
     await repository.delete(wishIdOf('Helm'));
 
-    await vi.waitFor(() => expect(reports.at(-1)).toBeUndefined());
+    await eventually(() => expect(reports.at(-1)).toBeUndefined());
   });
 
   it('gives undefined for an unknown id', async () => {
@@ -140,11 +141,11 @@ describe('FirestoreWishRepository', () => {
     otherDevice.watchByWishlist(christmas, (wishes) =>
       remainingChristmasWishes.push(namesOf(wishes)),
     );
-    await vi.waitFor(() => expect(remainingBirthdayWishes.at(-1)).toEqual(['Buch', 'Helm']));
+    await eventually(() => expect(remainingBirthdayWishes.at(-1)).toEqual(['Buch', 'Helm']));
 
     await repository.deleteAllOf(birthday);
 
-    await vi.waitFor(() => expect(remainingBirthdayWishes.at(-1)).toEqual([]));
+    await eventually(() => expect(remainingBirthdayWishes.at(-1)).toEqual([]));
     expect(remainingChristmasWishes.at(-1)).toEqual(['Schlitten']);
   });
 
@@ -170,7 +171,7 @@ describe('FirestoreWishRepository', () => {
       reports.push(wishes.map(({ id }) => id)),
     );
 
-    await vi.waitFor(() => expect(reports.at(-1)).toEqual(['ok']));
+    await eventually(() => expect(reports.at(-1)).toEqual(['ok']));
   });
 
   it('does not wait for the server when saving', async () => {
@@ -178,7 +179,7 @@ describe('FirestoreWishRepository', () => {
     const repository = new FirestoreWishRepository(firestore, () => {});
     const reports: (string | undefined)[] = [];
     repository.watch(wishIdOf('Helm'), (wish) => reports.push(wish?.details.name.value));
-    await vi.waitFor(() => expect(reports).toEqual([undefined]));
+    await eventually(() => expect(reports).toEqual([undefined]));
     await disableNetwork(firestore);
 
     await expect(
@@ -188,6 +189,6 @@ describe('FirestoreWishRepository', () => {
       ]),
     ).resolves.toBeUndefined();
 
-    await vi.waitFor(() => expect(reports.at(-1)).toBe('Helm'));
+    await eventually(() => expect(reports.at(-1)).toBe('Helm'));
   });
 });

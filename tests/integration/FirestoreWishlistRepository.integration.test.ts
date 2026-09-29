@@ -1,6 +1,6 @@
 import type { RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { disableNetwork, doc, setDoc } from 'firebase/firestore';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { wishlistIdOf } from '../../src/wishlist/domain/ids';
 import { Name } from '../../src/wishlist/domain/Name';
 import { requireValid } from '../../src/wishlist/domain/parsed';
@@ -9,6 +9,7 @@ import {
   FirestoreWishlistRepository,
   WISHLISTS_COLLECTION,
 } from '../../src/wishlist/infrastructure/firestore/FirestoreWishlistRepository';
+import { eventually } from './eventually';
 import { familyFirestore, startTestEnvironment, withoutRules } from './testFirestore';
 
 function wishlistNamed(name: string, id = name): Wishlist {
@@ -44,20 +45,20 @@ describe('FirestoreWishlistRepository', () => {
 
     await familyRepository().save(wishlistNamed('Geburtstag', 'b'));
 
-    await vi.waitFor(() => expect(reports.at(-1)).toBe('Geburtstag'));
+    await eventually(() => expect(reports.at(-1)).toBe('Geburtstag'));
   });
 
   it('reports all wishlists at once and after each save and delete', async () => {
     const repository = familyRepository();
     const reports: string[][] = [];
     repository.watchAll((wishlists) => reports.push(namesOf(wishlists)));
-    await vi.waitFor(() => expect(reports).toEqual([[]]));
+    await eventually(() => expect(reports).toEqual([[]]));
 
     await repository.save(wishlistNamed('Geburtstag'));
-    await vi.waitFor(() => expect(reports.at(-1)).toEqual(['Geburtstag']));
+    await eventually(() => expect(reports.at(-1)).toEqual(['Geburtstag']));
     await repository.delete(wishlistIdOf('Geburtstag'));
 
-    await vi.waitFor(() => expect(reports.at(-1)).toEqual([]));
+    await eventually(() => expect(reports.at(-1)).toEqual([]));
   });
 
   it('reports a single wishlist and its removal', async () => {
@@ -66,10 +67,10 @@ describe('FirestoreWishlistRepository', () => {
     repository.watch(wishlistIdOf('b'), (wishlist) => reports.push(wishlist?.name.value));
 
     await repository.save(wishlistNamed('Geburtstag', 'b'));
-    await vi.waitFor(() => expect(reports.at(-1)).toBe('Geburtstag'));
+    await eventually(() => expect(reports.at(-1)).toBe('Geburtstag'));
     await repository.delete(wishlistIdOf('b'));
 
-    await vi.waitFor(() => expect(reports.at(-1)).toBeUndefined());
+    await eventually(() => expect(reports.at(-1)).toBeUndefined());
   });
 
   it('gives undefined for an unknown id', async () => {
@@ -86,7 +87,7 @@ describe('FirestoreWishlistRepository', () => {
 
     familyRepository().watchAll((wishlists) => reports.push(namesOf(wishlists)));
 
-    await vi.waitFor(() => expect(reports.at(-1)).toEqual(['Geburtstag']));
+    await eventually(() => expect(reports.at(-1)).toEqual(['Geburtstag']));
   });
 
   it('does not wait for the server when saving', async () => {
@@ -94,7 +95,7 @@ describe('FirestoreWishlistRepository', () => {
     const repository = new FirestoreWishlistRepository(firestore, () => {});
     const reports: (string | undefined)[] = [];
     repository.watch(wishlistIdOf('b'), (wishlist) => reports.push(wishlist?.name.value));
-    await vi.waitFor(() => expect(reports).toEqual([undefined]));
+    await eventually(() => expect(reports).toEqual([undefined]));
     await disableNetwork(firestore);
 
     await expect(
@@ -104,6 +105,6 @@ describe('FirestoreWishlistRepository', () => {
       ]),
     ).resolves.toBeUndefined();
 
-    await vi.waitFor(() => expect(reports.at(-1)).toBe('Geburtstag'));
+    await eventually(() => expect(reports.at(-1)).toBe('Geburtstag'));
   });
 });

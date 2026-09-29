@@ -1020,6 +1020,13 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
   auf den Server wartet.
 - Die Firestore-Datenbank im IndexedDB entsteht erst kurz nach dem Anmelden. Die
   Vorbedingung im Abmelde-Test wartet deshalb ebenfalls per `expect.poll`.
+- Auf GitHub Actions scheiterte einmal „create wish with problems … light scheme“, weil die
+  Überschrift nicht binnen 5 s erschien. Lokal braucht die Seite rund 1 s. Seit die Seiten
+  ihre Daten asynchron aus Firestore laden, setzt `playwright.config.ts` das
+  Erwartungs-Timeout auf 10 s.
+- Die Adaptertests warten über `tests/integration/eventually.ts` bis zu 5 s auf den Abgleich.
+  Die 1 s Standard von `vi.waitFor` reichte für die Übertragung auf ein zweites Gerät nicht
+  immer.
 - Bis Phase 3 melden Listener beim Beenden von Firestore „Firestore shutting down“ auf der
   Konsole der Integrationstests. Das verschwindet mit dem Fehler-Rückruf aus Phase 3.
 
