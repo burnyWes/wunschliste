@@ -365,14 +365,14 @@ Anlagedatum über eine Uhr, gespeichert als Kalendertag, mit Ersatzdatum für de
 Altbestand, angezeigt auf der Detailseite.
 
 **Aufgaben**:
-- [ ] **Test zuerst** `src/wishlist/domain/CalendarDate.test.ts`:
+- [x] **Test zuerst** `src/wishlist/domain/CalendarDate.test.ts`:
   - `CalendarDate.of(2026, 9, 29).isoString` ist `'2026-09-29'` (Monat und Tag mit
     führender Null).
   - `CalendarDate.parse('2026-09-29')` ist gültig mit Jahr 2026, Monat 9, Tag 29.
   - `parse` meldet `'invalid'` für `''`, `'29.09.2026'`, `'2026-9-29'`, `'2026-02-30'` und
     `'2026-13-01'`.
   - `CalendarDate.of(2026, 2, 30)` wirft `InvalidCalendarDate`.
-- [ ] `src/wishlist/domain/CalendarDate.ts`:
+- [x] `src/wishlist/domain/CalendarDate.ts`:
   ```ts
   export type CalendarDateProblem = 'invalid';
   export class CalendarDate {
@@ -384,23 +384,23 @@ Altbestand, angezeigt auf der Detailseite.
   ```
   Ob ein Tag existiert, wird per `Date.UTC(year, month - 1, day)` und Rückvergleich von
   `getUTCFullYear/Month/Date` geprüft.
-- [ ] `src/wishlist/domain/Clock.ts`: `export interface Clock { today(): CalendarDate; }`.
-- [ ] `src/wishlist/application/fakes/FixedClock.ts`:
+- [x] `src/wishlist/domain/Clock.ts`: `export interface Clock { today(): CalendarDate; }`.
+- [x] `src/wishlist/application/fakes/FixedClock.ts`:
   `class FixedClock implements Clock { constructor(private readonly date: CalendarDate) {} today() { return this.date; } }`.
-- [ ] **Test zuerst** `src/wishlist/domain/Wish.test.ts`: `Wish.create` übernimmt
+- [x] **Test zuerst** `src/wishlist/domain/Wish.test.ts`: `Wish.create` übernimmt
   `createdOn`. `edit`, `perform('gift')` und `removeFor` (Variante `hideFromOwner`) behalten
   es.
-- [ ] `src/wishlist/domain/Wish.ts`: `createdOn: CalendarDate` in `RestoredWish` und
+- [x] `src/wishlist/domain/Wish.ts`: `createdOn: CalendarDate` in `RestoredWish` und
   `NewWish`, als `readonly`-Feld, im Konstruktor, in `create` und in `#changed`.
-- [ ] `src/wishlist/application/fakes/wishNamed.ts`: Vorgabe
+- [x] `src/wishlist/application/fakes/wishNamed.ts`: Vorgabe
   `createdOn: CalendarDate.of(2026, 9, 29)`.
-- [ ] **Test zuerst** `src/wishlist/application/CreateWish.test.ts`: `setUp` baut
+- [x] **Test zuerst** `src/wishlist/application/CreateWish.test.ts`: `setUp` baut
   `new CreateWish(wishlists, wishes, new SequentialIdGenerator(), new FixedClock(CalendarDate.of(2027, 3, 14)))`.
   Neuer Test „remembers the day the wish was created“ prüft `saved?.createdOn` gleich
   `CalendarDate.of(2027, 3, 14)`.
-- [ ] `src/wishlist/application/CreateWish.ts`: vierter Konstruktorparameter
+- [x] `src/wishlist/application/CreateWish.ts`: vierter Konstruktorparameter
   `private readonly clock: Clock`, `createdOn: this.clock.today()` an `Wish.create`.
-- [ ] `src/wishlist/infrastructure/SystemClock.ts`:
+- [x] `src/wishlist/infrastructure/SystemClock.ts`:
   ```ts
   export class SystemClock implements Clock {
     today(): CalendarDate {
@@ -409,9 +409,9 @@ Altbestand, angezeigt auf der Detailseite.
     }
   }
   ```
-- [ ] `src/wishlist/infrastructure/createWishlistModule.ts`:
+- [x] `src/wishlist/infrastructure/createWishlistModule.ts`:
   `createWish: new CreateWish(wishlists, wishes, idGenerator, new SystemClock())`.
-- [ ] `src/wishlist/infrastructure/firestore/wishDocument.ts`:
+- [x] `src/wishlist/infrastructure/firestore/wishDocument.ts`:
   - `createdOn?: string` in `WishDocument`, `isOptional(candidate.createdOn, 'string')` in
     `isWishDocument`
   - `export const CREATION_DATE_OF_EARLIER_WISHES = CalendarDate.of(2026, 9, 29);`
@@ -421,30 +421,30 @@ Altbestand, angezeigt auf der Detailseite.
   - `toWishDocument`: `createdOn: wish.createdOn.isoString` (immer geschrieben, also
     bekommt ein alter Wunsch beim nächsten Speichern den Stichtag fest eingetragen, was
     gewollt ist)
-- [ ] Integrationstest-Helfer anpassen: `wishOf` in
+- [x] Integrationstest-Helfer anpassen: `wishOf` in
   `tests/integration/FirestoreWishRepository.integration.test.ts` übergibt
   `createdOn: CalendarDate.of(2026, 10, 1)` an `Wish.create`. Neue Tests: Speichern schreibt
   `createdOn: '2026-10-01'` und liest es wieder. Ein Dokument ohne `createdOn` wird mit
   `CREATION_DATE_OF_EARLIER_WISHES` gelesen, und im gespeicherten Dokument fehlt das Feld
   weiterhin (kein Zurückschreiben). Ein Dokument mit `createdOn: 'gestern'` wird nicht
   gelesen.
-- [ ] `src/wishlist/infrastructure/ui/wishTexts.ts`:
+- [x] `src/wishlist/infrastructure/ui/wishTexts.ts`:
   ```ts
   const longDates = new Intl.DateTimeFormat('de-DE', { dateStyle: 'long', timeZone: 'UTC' });
   export function wishedSinceNote(date: CalendarDate): string {
     return `gewünscht seit ${longDates.format(Date.UTC(date.year, date.month - 1, date.day))}`;
   }
   ```
-- [ ] `src/wishlist/infrastructure/ui/wishTexts.test.ts`:
+- [x] `src/wishlist/infrastructure/ui/wishTexts.test.ts`:
   `wishedSinceNote(CalendarDate.of(2026, 9, 29))` ergibt
   `'gewünscht seit 29. September 2026'`, `CalendarDate.of(2027, 1, 1)` ergibt
   `'gewünscht seit 1. Januar 2027'`.
-- [ ] `src/wishlist/infrastructure/ui/WishPage.svelte`: Direkt nach dem Absatz mit
+- [x] `src/wishlist/infrastructure/ui/WishPage.svelte`: Direkt nach dem Absatz mit
   `WishSummary`, vor dem Knopf für die Zweitaktion,
   `<p>{wishedSinceNote(view.wish.createdOn)}</p>`.
-- [ ] `e2e/emulators.ts`: `createdOn?: string` in `WishRecord`. `wishRecord` bleibt ohne
+- [x] `e2e/emulators.ts`: `createdOn?: string` in `WishRecord`. `wishRecord` bleibt ohne
   Vorgabe, damit Seeds den Altbestand abbilden.
-- [ ] `e2e/wishes.spec.ts`: Neuer Test „shows the day a new wish was created“ mit
+- [x] `e2e/wishes.spec.ts`: Neuer Test „shows the day a new wish was created“ mit
   `await page.clock.setFixedTime(new Date('2027-03-14T10:00:00'))` vor `page.goto`, Wunsch
   anlegen, Detailseite zeigt „gewünscht seit 14. März 2027“, `storedWishes()` enthält
   `createdOn: '2027-03-14'`. Stört die feste Zeit die Anmeldung am Auth-Emulator
@@ -453,23 +453,23 @@ Altbestand, angezeigt auf der Detailseite.
   creation day“: per `seed` einen Wunsch ohne `createdOn` anlegen, Detailseite zeigt
   „gewünscht seit 29. September 2026“. Neuer Test: Bearbeiten eines Wunsches mit
   `createdOn: '2027-03-14'` lässt das Datum unverändert.
-- [ ] `docs/agents/research/2026-09-28-wunschliste-konzept.md`: In der Tabelle „Wünsche“
+- [x] `docs/agents/research/2026-09-28-wunschliste-konzept.md`: In der Tabelle „Wünsche“
   ergänzen: „Anlagedatum | – | automatisch, Kalendertag des Geräts; Detailseite:
   „gewünscht seit 29. September 2026“; ältere Wünsche ohne Datum gelten ab 29.09.2026“. Im
   Abschnitt „Datenmodell“ `createdOn` (Zeichenkette `JJJJ-MM-TT`) und `brand` nennen.
-- [ ] `docs/notes.txt`: Die vier umgesetzten Punkte samt Unterpunkt „nebeneinander“ auf `x`
+- [x] `docs/notes.txt`: Die vier umgesetzten Punkte samt Unterpunkt „nebeneinander“ auf `x`
   setzen und unverändert nach DONE verschieben. Die `m`-Punkte bleiben unberührt.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` läuft durch, einschließlich `CalendarDate.test.ts`,
+- [x] `npm run test:unit` läuft durch, einschließlich `CalendarDate.test.ts`,
   `Wish.test.ts`, `CreateWish.test.ts` und `wishTexts.test.ts`.
-- [ ] `npm run test:integration` läuft durch (Speichern mit Datum, Ersatzdatum ohne
+- [x] `npm run test:integration` läuft durch (Speichern mit Datum, Ersatzdatum ohne
   Zurückschreiben, ungültiges Datum).
-- [ ] `npm run test:e2e` läuft durch (`wishes.spec.ts` mit fester Uhr, Altbestand,
+- [x] `npm run test:e2e` läuft durch (`wishes.spec.ts` mit fester Uhr, Altbestand,
   Bearbeiten).
-- [ ] `npm run test:architecture` bestätigt: `Clock` und `CalendarDate` in `domain` ohne
+- [x] `npm run test:architecture` bestätigt: `Clock` und `CalendarDate` in `domain` ohne
   Framework-Importe, `SystemClock` nur in `infrastructure`.
-- [ ] `npm run lint` und `npm test` laufen durch.
+- [x] `npm run lint` und `npm test` laufen durch.
 
 **Manuelle Verifikation**:
 - [ ] Nach dem Ausrollen auf dem iPhone: Ein vorhandener Wunsch zeigt „gewünscht seit
@@ -479,7 +479,13 @@ Altbestand, angezeigt auf der Detailseite.
 
 ## Notizen zur Umsetzung
 
-Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalten.
+- Phase 2: Svelte entfernt Leerraum am Ende eines Elements, deshalb enthält
+  `BRAND_PREFIX` das Leerzeichen selbst (`'Marke: '`). Sonst hätte VoiceOver „Marke:Uvex“
+  bekommen.
+- Phase 2: Die Markenzeile auf der Detailseite steht nach den Zustandshinweisen
+  (entfernt, geheim, erfüllt), direkt vor Bewertung und Preis.
+- Phase 3: `page.clock.setFixedTime` verträgt sich mit der Anmeldung am Auth-Emulator.
+  Die Ausweichlösung ohne Clock-API war nicht nötig.
 
 ## Verweise
 

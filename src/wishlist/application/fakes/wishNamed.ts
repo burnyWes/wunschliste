@@ -1,3 +1,4 @@
+import { CalendarDate } from '../../domain/CalendarDate';
 import { personIdOf, wishIdOf, wishlistIdOf } from '../../domain/ids';
 import { Name } from '../../domain/Name';
 import { requireValid } from '../../domain/parsed';
@@ -8,6 +9,7 @@ export function wishNamed(name: string, state: Partial<RestoredWish> = {}): Wish
     id: wishIdOf(name),
     wishlistId: wishlistIdOf('birthday'),
     details: { name: requireValid(Name.parse(name)) },
+    createdOn: CalendarDate.of(2026, 9, 29),
     createdBy: personIdOf('anna'),
     secret: false,
     giverId: undefined,

@@ -24,6 +24,7 @@ import type { ProfileStore } from '../domain/ProfileStore';
 import { FirestorePersonRepository } from './firestore/FirestorePersonRepository';
 import { FirestoreWishlistRepository } from './firestore/FirestoreWishlistRepository';
 import { FirestoreWishRepository } from './firestore/FirestoreWishRepository';
+import { SystemClock } from './SystemClock';
 import type { ReportWishlistProblem } from './wishlistProblem';
 
 export type WishlistModuleSetup = {
@@ -57,7 +58,7 @@ export function createWishlistModule({
     watchWishlist: new WatchWishlist(wishlists),
     renameWishlist: new RenameWishlist(wishlists),
     deleteWishlist: new DeleteWishlist(wishlists, wishes),
-    createWish: new CreateWish(wishlists, wishes, idGenerator),
+    createWish: new CreateWish(wishlists, wishes, idGenerator, new SystemClock()),
     watchWishesOfWishlist: new WatchWishesOfWishlist(wishes),
     watchWish: new WatchWish(wishes),
     editWish: new EditWish(wishes, wishlists),

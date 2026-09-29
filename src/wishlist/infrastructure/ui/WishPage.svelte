@@ -29,6 +29,7 @@
     WISH_ACTION_LABELS,
     wishDeletedAnnouncement,
     wishDeletionMessage,
+    wishedSinceNote,
     wishRemovedByOwnerMessage,
   } from './wishTexts';
 
@@ -167,6 +168,7 @@
     {#if rating || price}
       <p><WishSummary details={view.wish.details} includesBrand={false} /></p>
     {/if}
+    <p>{wishedSinceNote(view.wish.createdOn)}</p>
     {#if secondaryAction}
       <div class="button-row">
         <button class="button" type="button" onclick={() => perform(secondaryAction)}>

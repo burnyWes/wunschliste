@@ -100,6 +100,45 @@ test('points out every problem and focuses the name', async ({ page }) => {
   await expect(field(page, 'Name')).toBeFocused();
 });
 
+test('shows the day a new wish was created', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2027-03-14T10:00:00'));
+  await page.goto('./#/liste/birthday/wunsch/neu');
+
+  await field(page, 'Name').fill('Fahrradhelm');
+  await page.getByRole('button', { name: 'Speichern' }).click();
+
+  await expect(pageHeading(page, 'Fahrradhelm')).toBeVisible();
+  await expect(page.getByText('gewünscht seit 14. März 2027', { exact: true })).toBeVisible();
+  await expect.poll(async () => (await storedWishes())[0]?.createdOn).toBe('2027-03-14');
+});
+
+test('dates a wish without creation day to the reference day', async ({ page }) => {
+  await seed({
+    wishes: [wishRecord({ id: 'helmet', wishlistId: 'birthday', name: 'Fahrradhelm' })],
+  });
+  await page.goto('./#/wunsch/helmet');
+
+  await expect(pageHeading(page, 'Fahrradhelm')).toBeVisible();
+  await expect(page.getByText('gewünscht seit 29. September 2026', { exact: true })).toBeVisible();
+});
+
+test('keeps the creation day when editing a wish', async ({ page }) => {
+  await seed({
+    wishes: [
+      wishRecord({ id: 'helmet', wishlistId: 'birthday', name: 'Helm', createdOn: '2027-03-14' }),
+    ],
+  });
+  await page.goto('./#/wunsch/helmet/bearbeiten');
+
+  await field(page, 'Name').fill('Fahrradhelm');
+  await page.getByRole('button', { name: 'Speichern' }).click();
+
+  await expect(pageHeading(page, 'Fahrradhelm')).toBeVisible();
+  await expect(page.getByText('gewünscht seit 14. März 2027', { exact: true })).toBeVisible();
+  await expect.poll(async () => (await storedWishes())[0]?.name).toBe('Fahrradhelm');
+  expect((await storedWishes())[0]?.createdOn).toBe('2027-03-14');
+});
+
 test.describe('with wishes of different ratings', () => {
   const wishes: WishRecord[] = [
     wishRecord({ id: 'book', wishlistId: 'birthday', name: 'Buch' }),

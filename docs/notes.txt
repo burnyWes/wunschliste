@@ -65,19 +65,19 @@ x iOS-App
         x Checkbox rechts
         x im Darkmode großer leuchtend-grüner Haken
         x Checkbox selbst nur linke und untere Linie zeichnen
+x "gewünscht seit <Datum>" auf Wunsch-Detailseite anzeigen
+x Wunsch: optionales Textfeld "Marke / Hersteller" hinzufügen
+x Wunschlisten-Button in Navigation mit Listen-Icon
+x "Offene Wünsche"-Button und "Erfüllte Wünsche"-Button umbennenen "Noch offen", "Erfüllt" und mit Icons versehen
+(Geschenk und offenes Geschenk/offene Kiste)
+  x Die Buttons sollen nebeneinander und nicht übereinander sein.
 ----------------------------------------------------------------------------------------------------------------------------------
 TODO 
 ----------------------------------------------------------------------------------------------------------------------------------
 
 m Bilder zu Wünschen (Firebase Storage, Upload)
 m TypeScript auf 7 anheben, sobald typescript-eslint und svelte-check es unterstützen
-- "gewünscht seit <Datum>" auf Wunsch-Detailseite anzeigen
 m Produktionsbuild: Firebase-Werte auf Plausibilität prüfen (API-Key beginnt mit AIza, App-ID hat die Form 1:…:web:…),
 damit vertauschte Werte schon in der Pipeline auffallen
 m jede Seite mit Zurück-Button versehen
-- Wunsch: optionales Textfeld "Marke / Hersteller" hinzufügen
-- Wunschlisten-Button in Navigation mit Listen-Icon
-- "Offene Wünsche"-Button und "Erfüllte Wünsche"-Button umbennenen "Noch offen", "Erfüllt" und mit Icons versehen
-(Geschenk und offenes Geschenk/offene Kiste)
-  - Die Buttons sollen nebeneinander und nicht übereinander sein.
 m Einstellungen-Seite: Alles was mit Person zu tun hat auf eine Unterseite

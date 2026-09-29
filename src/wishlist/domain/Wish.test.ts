@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CalendarDate } from './CalendarDate';
 import { personIdOf, wishIdOf, wishlistIdOf } from './ids';
 import { Name } from './Name';
 import { requireValid } from './parsed';
@@ -16,6 +17,8 @@ import {
 
 const helmet = { name: requireValid(Name.parse('Fahrradhelm')) };
 
+const createdOn = CalendarDate.of(2026, 10, 1);
+
 const anna = personIdOf('anna');
 const ben = personIdOf('ben');
 const oma = personIdOf('oma');
@@ -29,6 +32,7 @@ function annasWish(state: Partial<RestoredWish> = {}): Wish {
     id: wishIdOf('w'),
     wishlistId: wishlistIdOf('l'),
     details: helmet,
+    createdOn,
     createdBy: anna,
     secret: false,
     giverId: undefined,
@@ -41,11 +45,18 @@ function annasWish(state: Partial<RestoredWish> = {}): Wish {
 describe('Wish', () => {
   it('is created open and not secret by me', () => {
     const wish = Wish.create(
-      { id: wishIdOf('w'), wishlistId: wishlistIdOf('l'), details: helmet, secret: false },
+      {
+        id: wishIdOf('w'),
+        wishlistId: wishlistIdOf('l'),
+        details: helmet,
+        secret: false,
+        createdOn,
+      },
       asBen,
     );
 
     expect(wish.createdBy).toBe(ben);
+    expect(wish.createdOn).toBe(createdOn);
     expect(wish.secret).toBe(false);
     expect(wish.giverId).toBeUndefined();
     expect(wish.received).toBe(false);
@@ -54,7 +65,13 @@ describe('Wish', () => {
 
   it('is created secret in the wishlist of someone else', () => {
     const wish = Wish.create(
-      { id: wishIdOf('w'), wishlistId: wishlistIdOf('l'), details: helmet, secret: true },
+      {
+        id: wishIdOf('w'),
+        wishlistId: wishlistIdOf('l'),
+        details: helmet,
+        secret: true,
+        createdOn,
+      },
       asBen,
     );
 
@@ -64,7 +81,13 @@ describe('Wish', () => {
   it('cannot be created secret in my own wishlist', () => {
     expect(() =>
       Wish.create(
-        { id: wishIdOf('w'), wishlistId: wishlistIdOf('l'), details: helmet, secret: true },
+        {
+          id: wishIdOf('w'),
+          wishlistId: wishlistIdOf('l'),
+          details: helmet,
+          secret: true,
+          createdOn,
+        },
         asAnna,
       ),
     ).toThrow(OwnerCannotKeepSecrets);
@@ -80,9 +103,18 @@ describe('Wish', () => {
     expect(edited.id).toBe('w');
     expect(edited.wishlistId).toBe('l');
     expect(edited.createdBy).toBe(anna);
+    expect(edited.createdOn).toBe(createdOn);
     expect(edited.giverId).toBe(ben);
     expect(edited.received).toBe(true);
     expect(wish.details).toBe(helmet);
+  });
+
+  it('keeps the day it was created when gifted or hidden from the owner', () => {
+    const gifted = annasWish().perform('gift', asBen);
+    const removal = annasWish({ giverId: ben }).removeFor(asAnna);
+
+    expect(gifted.createdOn).toBe(createdOn);
+    expect(removal.kind === 'hideFromOwner' && removal.wish.createdOn).toBe(createdOn);
   });
 
   describe('edit of the secret', () => {

@@ -1,3 +1,4 @@
+import type { CalendarDate } from './CalendarDate';
 import type { PersonId, WishId, WishlistId } from './ids';
 import { isOwner, type Perspective } from './Perspective';
 import { allowedWishActions, type WishAction } from './wishActions';
@@ -7,6 +8,7 @@ export type RestoredWish = {
   id: WishId;
   wishlistId: WishlistId;
   details: WishDetails;
+  createdOn: CalendarDate;
   createdBy: PersonId;
   secret: boolean;
   giverId: PersonId | undefined;
@@ -19,6 +21,7 @@ export type NewWish = {
   wishlistId: WishlistId;
   details: WishDetails;
   secret: boolean;
+  createdOn: CalendarDate;
 };
 
 export type WishRemoval = { kind: 'delete' } | { kind: 'hideFromOwner'; wish: Wish };
@@ -38,6 +41,7 @@ export class Wish {
   readonly id: WishId;
   readonly wishlistId: WishlistId;
   readonly details: WishDetails;
+  readonly createdOn: CalendarDate;
   readonly createdBy: PersonId;
   readonly secret: boolean;
   readonly giverId: PersonId | undefined;
@@ -48,6 +52,7 @@ export class Wish {
     this.id = state.id;
     this.wishlistId = state.wishlistId;
     this.details = state.details;
+    this.createdOn = state.createdOn;
     this.createdBy = state.createdBy;
     this.secret = state.secret;
     this.giverId = state.giverId;
@@ -55,7 +60,10 @@ export class Wish {
     this.removedByOwner = state.removedByOwner;
   }
 
-  static create({ id, wishlistId, details, secret }: NewWish, perspective: Perspective): Wish {
+  static create(
+    { id, wishlistId, details, secret, createdOn }: NewWish,
+    perspective: Perspective,
+  ): Wish {
     if (secret && isOwner(perspective)) {
       throw new OwnerCannotKeepSecrets(id);
     }
@@ -63,6 +71,7 @@ export class Wish {
       id,
       wishlistId,
       details,
+      createdOn,
       createdBy: perspective.me,
       secret,
       giverId: undefined,
@@ -124,6 +133,7 @@ export class Wish {
       id: this.id,
       wishlistId: this.wishlistId,
       details: this.details,
+      createdOn: this.createdOn,
       createdBy: this.createdBy,
       secret: this.secret,
       giverId: this.giverId,

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CalendarDate } from '../../domain/CalendarDate';
 import { requireValid } from '../../domain/parsed';
 import { parseWishDetails } from '../../domain/WishDetails';
 import { Price } from '../../domain/Price';
@@ -30,6 +31,7 @@ import {
   wishDeletedAnnouncement,
   wishDeletionMessage,
   wishDetailsInputOf,
+  wishedSinceNote,
   wishlistDeletedAnnouncement,
   wishlistDeletionMessage,
 } from './wishTexts';
@@ -203,5 +205,14 @@ describe('wishDetailsInputOf', () => {
 describe('brand', () => {
   it('names the brand for screen readers', () => {
     expect(BRAND_PREFIX).toBe('Marke: ');
+  });
+});
+
+describe('wishedSinceNote', () => {
+  it.each([
+    [CalendarDate.of(2026, 9, 29), 'gewünscht seit 29. September 2026'],
+    [CalendarDate.of(2027, 1, 1), 'gewünscht seit 1. Januar 2027'],
+  ])('names the day %o in words', (date, note) => {
+    expect(wishedSinceNote(date)).toBe(note);
   });
 });

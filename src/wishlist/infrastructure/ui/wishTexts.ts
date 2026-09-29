@@ -1,4 +1,5 @@
 import type { BrandProblem } from '../../domain/Brand';
+import type { CalendarDate } from '../../domain/CalendarDate';
 import type { DescriptionProblem } from '../../domain/Description';
 import type { NameProblem } from '../../domain/Name';
 import type { Price, PriceProblem } from '../../domain/Price';
@@ -57,6 +58,12 @@ const CENTS_PER_EURO = 100;
 
 export function formatPrice(price: Price): string {
   return euros.format(price.cents / CENTS_PER_EURO);
+}
+
+const longDates = new Intl.DateTimeFormat('de-DE', { dateStyle: 'long', timeZone: 'UTC' });
+
+export function wishedSinceNote(date: CalendarDate): string {
+  return `gewünscht seit ${longDates.format(Date.UTC(date.year, date.month - 1, date.day))}`;
 }
 
 export function ratingLabel(rating: Rating): string {

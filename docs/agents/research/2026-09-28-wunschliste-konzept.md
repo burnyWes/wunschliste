@@ -62,6 +62,7 @@ dem Nutzer abgestimmt. Dieses Dokument ist die Quelle der Wahrheit für die Plan
 | Beschreibung | nein | mehrzeiliger Freitext ohne Formatierung |
 | Preis | nein | Eurobetrag, Kommaeingabe, Zifferntastatur |
 | Rating | nein | „Wie sehr gewünscht“: nett / gern / unbedingt / keine Angabe |
+| Anlagedatum | – | automatisch, Kalendertag des Geräts; Detailseite „gewünscht seit 29. September 2026“; ältere Wünsche ohne Datum gelten ab 29.09.2026 (WL-007) |
 | Geheim | – | Häkchen, nur in fremden Listen sichtbar, dort Voreinstellung „geheim“ |
 
 - Sortierung: unbedingt → gern → nett → ohne Angabe, innerhalb einer Stufe alphabetisch.
@@ -231,6 +232,8 @@ Option. Standard: Dunkel. Die Wahl gilt **pro Gerät** und wird nicht synchronis
   - Umgesetzt in WL-006 als `createdBy`, `secret`, `giverId`, `received` (Boolean statt
     `receivedAt`, weil kein Datum angezeigt wird) und `removedByOwner`. Wunschlisten
     tragen ebenfalls `removedByOwner`.
+  - Ergänzt in WL-007: `brand` (optionaler Text) und `createdOn` (Zeichenkette
+    `JJJJ-MM-TT`; fehlt es, gilt beim Einlesen der 29.09.2026, ohne Zurückschreiben).
 
 ## Umsetzungsreihenfolge
 

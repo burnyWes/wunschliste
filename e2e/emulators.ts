@@ -23,6 +23,7 @@ export type WishRecord = {
   description?: string;
   priceInCents?: number;
   rating?: 'essential' | 'wanted' | 'nice';
+  createdOn?: string;
   createdBy: string;
   secret: boolean;
   giverId?: string;

@@ -1,6 +1,7 @@
 import type { RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { disableNetwork, doc, getDoc, setDoc } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { CalendarDate } from '../../src/wishlist/domain/CalendarDate';
 import { personIdOf, wishIdOf, wishlistIdOf, type WishlistId } from '../../src/wishlist/domain/ids';
 import { Wish } from '../../src/wishlist/domain/Wish';
 import { parseWishDetails, type WishDetailsInput } from '../../src/wishlist/domain/WishDetails';
@@ -8,6 +9,7 @@ import {
   FirestoreWishRepository,
   WISHES_COLLECTION,
 } from '../../src/wishlist/infrastructure/firestore/FirestoreWishRepository';
+import { CREATION_DATE_OF_EARLIER_WISHES } from '../../src/wishlist/infrastructure/firestore/wishDocument';
 import type { WishlistProblem } from '../../src/wishlist/infrastructure/wishlistProblem';
 import { eventually } from './eventually';
 import {
@@ -22,6 +24,7 @@ const birthday = wishlistIdOf('birthday');
 const christmas = wishlistIdOf('christmas');
 const anna = personIdOf('anna');
 const ben = personIdOf('ben');
+const firstOfOctober = CalendarDate.of(2026, 10, 1);
 
 const ONLY_A_NAME: Omit<WishDetailsInput, 'name'> = {
   brand: '',
@@ -37,7 +40,13 @@ function wishOf(input: WishDetailsInput, wishlistId: WishlistId, id: string): Wi
     throw new Error(`Invalid test wish ${input.name}`);
   }
   return Wish.create(
-    { id: wishIdOf(id), wishlistId, details: parsed.details, secret: false },
+    {
+      id: wishIdOf(id),
+      wishlistId,
+      details: parsed.details,
+      secret: false,
+      createdOn: firstOfOctober,
+    },
     { me: anna, ownerId: anna, wishlistIsHidden: false },
   );
 }
@@ -99,6 +108,7 @@ describe('FirestoreWishRepository', () => {
       expect(restored?.details.description?.value).toBe('Größe M');
       expect(restored?.details.price?.cents).toBe(4999);
       expect(restored?.details.rating).toBe('essential');
+      expect(restored?.createdOn).toEqual(firstOfOctober);
       expect(restored?.createdBy).toBe(anna);
       expect(restored?.secret).toBe(false);
       expect(restored?.giverId).toBeUndefined();
@@ -129,6 +139,7 @@ describe('FirestoreWishRepository', () => {
         wishlistId: birthday,
         details: { name: wishNamed('Konzert').details.name },
         secret: true,
+        createdOn: firstOfOctober,
       },
       { me: ben, ownerId: anna, wishlistIsHidden: false },
     );
@@ -153,12 +164,36 @@ describe('FirestoreWishRepository', () => {
       expect(stored).toEqual({
         wishlistId: 'birthday',
         name: 'Buch',
+        createdOn: '2026-10-01',
         createdBy: 'anna',
         secret: false,
         received: false,
         removedByOwner: false,
       });
     });
+  });
+
+  it('dates a wish without creation day to the reference day without writing it back', async () => {
+    const earlier = {
+      wishlistId: 'birthday',
+      name: 'Helm',
+      createdBy: 'anna',
+      secret: false,
+      received: false,
+      removedByOwner: false,
+    };
+    await withoutRules(environment, (firestore) =>
+      setDoc(doc(firestore, WISHES_COLLECTION, 'earlier'), earlier),
+    );
+
+    const restored = await familyRepository().get(wishIdOf('earlier'));
+
+    expect(restored?.createdOn).toEqual(CREATION_DATE_OF_EARLIER_WISHES);
+    expect(CREATION_DATE_OF_EARLIER_WISHES.isoString).toBe('2026-09-29');
+    const stored = await withoutRules(environment, async (firestore) =>
+      (await getDoc(doc(firestore, WISHES_COLLECTION, 'earlier'))).data(),
+    );
+    expect(stored).toEqual(earlier);
   });
 
   it('reports only the wishes of one wishlist, at once and after each save and delete', async () => {
@@ -266,6 +301,8 @@ describe('FirestoreWishRepository', () => {
         link: { ...valid, link: 'javascript:alert(1)' },
         rating: { ...valid, rating: 'sehr' },
         name: { ...valid, name: ' ' },
+        createdOn: { ...valid, createdOn: 'gestern' },
+        createdOnType: { ...valid, createdOn: 20261001 },
         brand: { ...valid, brand: 'a'.repeat(101) },
         brandType: { ...valid, brand: 5 },
         legacy: { wishlistId: 'birthday', name: 'Helm', gifted: true },

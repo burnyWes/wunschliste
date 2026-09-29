@@ -1,3 +1,4 @@
+import { CalendarDate } from './CalendarDate';
 import { describe, expect, it } from 'vitest';
 import { personIdOf, wishIdOf, wishlistIdOf } from './ids';
 import { Name } from './Name';
@@ -13,6 +14,7 @@ function wish(name: string, rating?: Rating, id = name): Wish {
       wishlistId: wishlistIdOf('l'),
       details: { name: requireValid(Name.parse(name)), rating },
       secret: false,
+      createdOn: CalendarDate.of(2026, 9, 29),
     },
     { me: personIdOf('anna'), ownerId: personIdOf('anna'), wishlistIsHidden: false },
   );

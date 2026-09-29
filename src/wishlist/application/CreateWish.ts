@@ -1,3 +1,4 @@
+import type { Clock } from '../domain/Clock';
 import {
   wishIdOf,
   type IdGenerator,
@@ -17,6 +18,7 @@ export class CreateWish {
     private readonly wishlists: WishlistRepository,
     private readonly wishes: WishRepository,
     private readonly ids: IdGenerator,
+    private readonly clock: Clock,
   ) {}
 
   async execute(
@@ -32,7 +34,13 @@ export class CreateWish {
     const perspective = perspectiveOf(wishlist, me);
     wishlist.ensureVisibleTo(perspective);
     const wish = Wish.create(
-      { id: wishIdOf(this.ids.next()), wishlistId, details, secret },
+      {
+        id: wishIdOf(this.ids.next()),
+        wishlistId,
+        details,
+        secret,
+        createdOn: this.clock.today(),
+      },
       perspective,
     );
     await this.wishes.save(wish);

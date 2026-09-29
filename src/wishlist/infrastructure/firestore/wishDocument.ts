@@ -1,4 +1,5 @@
 import { Brand } from '../../domain/Brand';
+import { CalendarDate } from '../../domain/CalendarDate';
 import { Description } from '../../domain/Description';
 import { personIdOf, wishIdOf, wishlistIdOf } from '../../domain/ids';
 import { Name } from '../../domain/Name';
@@ -18,6 +19,7 @@ export type WishDocument = {
   description?: string;
   priceInCents?: number;
   rating?: Rating;
+  createdOn?: string;
   createdBy: string;
   secret: boolean;
   giverId?: string;
@@ -43,12 +45,23 @@ function isWishDocument(candidate: unknown): candidate is WishDocument {
     isOptional(candidate.description, 'string') &&
     isOptional(candidate.priceInCents, 'number') &&
     (candidate.rating === undefined || isRating(candidate.rating)) &&
+    isOptional(candidate.createdOn, 'string') &&
     isPersonReference(candidate.createdBy) &&
     typeof candidate.secret === 'boolean' &&
     (candidate.giverId === undefined || isPersonReference(candidate.giverId)) &&
     typeof candidate.received === 'boolean' &&
     typeof candidate.removedByOwner === 'boolean'
   );
+}
+
+export const CREATION_DATE_OF_EARLIER_WISHES = CalendarDate.of(2026, 9, 29);
+
+function creationDateOf(document: WishDocument): CalendarDate | undefined {
+  if (document.createdOn === undefined) {
+    return CREATION_DATE_OF_EARLIER_WISHES;
+  }
+  const parsed = CalendarDate.parse(document.createdOn);
+  return parsed.ok ? parsed.value : undefined;
 }
 
 function detailsOf(document: WishDocument): WishDetails | undefined {
@@ -81,6 +94,7 @@ export function toWishDocument(wish: Wish): WishDocument {
     ...(details.description && { description: details.description.value }),
     ...(details.price && { priceInCents: details.price.cents }),
     ...(details.rating && { rating: details.rating }),
+    createdOn: wish.createdOn.isoString,
     createdBy: wish.createdBy,
     secret: wish.secret,
     ...(wish.giverId && { giverId: wish.giverId }),
@@ -94,12 +108,15 @@ export function wishFromDocument(id: string, data: unknown): Wish | undefined {
     return undefined;
   }
   const details = detailsOf(data);
+  const createdOn = creationDateOf(data);
   return (
     details &&
+    createdOn &&
     Wish.restore({
       id: wishIdOf(id),
       wishlistId: wishlistIdOf(data.wishlistId),
       details,
+      createdOn,
       createdBy: personIdOf(data.createdBy),
       secret: data.secret,
       giverId: data.giverId === undefined ? undefined : personIdOf(data.giverId),

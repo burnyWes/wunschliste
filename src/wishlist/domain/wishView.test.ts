@@ -1,3 +1,4 @@
+import { CalendarDate } from './CalendarDate';
 import { describe, expect, it } from 'vitest';
 import { personIdOf, wishIdOf, wishlistIdOf } from './ids';
 import { Name } from './Name';
@@ -20,6 +21,7 @@ function annasWish(name: string, state: Partial<RestoredWish> = {}, rating?: Rat
     id: wishIdOf(name),
     wishlistId: wishlistIdOf('birthday'),
     details: { name: requireValid(Name.parse(name)), rating },
+    createdOn: CalendarDate.of(2026, 9, 29),
     createdBy: anna,
     secret: false,
     giverId: undefined,
