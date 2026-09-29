@@ -78,6 +78,17 @@ test('gives both navigation buttons the same width', async ({ page }) => {
   expect(Math.abs(widths[0] - widths[1])).toBeLessThan(1);
 });
 
+test('shows a list icon on the wishlists button', async ({ page }) => {
+  await page.goto('./');
+  const wishlistsButton = mainNavigation(page).getByRole('button', {
+    name: 'Wunschlisten',
+    exact: true,
+  });
+
+  await expect(wishlistsButton).toBeVisible();
+  await expect(wishlistsButton.locator('svg[aria-hidden="true"]')).toHaveCount(1);
+});
+
 test('redirects unknown addresses to the wishlists page', async ({ page }) => {
   await page.goto('./#/quatsch');
 

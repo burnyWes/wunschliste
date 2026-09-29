@@ -84,3 +84,24 @@ test('keeps buttons free of text selection and double tap zoom', async ({ page }
   expect(userSelect).toBe('none');
   await expect(page.locator('html')).toHaveCSS('touch-action', 'manipulation');
 });
+
+test('keeps both filter buttons side by side with equal width, even with doubled text size', async ({
+  page,
+}) => {
+  await seed({ wishlists: [{ id: 'b', name: 'Geburtstag', ownerId: 'anna' }] });
+  await page.goto('./#/liste/b');
+  const openFilter = page.getByRole('button', { name: 'Noch offen', exact: true });
+  const fulfilledFilter = page.getByRole('button', { name: 'Erfüllt', exact: true });
+  await expect(openFilter).toBeVisible();
+
+  for (const fontSize of ['100%', '200%']) {
+    await page.evaluate((size) => (document.documentElement.style.fontSize = size), fontSize);
+    const open = await openFilter.boundingBox();
+    const fulfilled = await fulfilledFilter.boundingBox();
+    if (open === null || fulfilled === null) {
+      throw new Error('Both filter buttons must be rendered.');
+    }
+    expect(Math.abs(open.y - fulfilled.y)).toBeLessThan(1);
+    expect(Math.abs(open.width - fulfilled.width)).toBeLessThan(1);
+  }
+});

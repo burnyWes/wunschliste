@@ -57,17 +57,17 @@ test('gifts a wish and moves it to the fulfilled wishes', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Zurück zu Geburtstag' }).click();
 
-  await expect(filterButton(page, 'Offene Wünsche')).toHaveAttribute('aria-pressed', 'true');
+  await expect(filterButton(page, 'Noch offen')).toHaveAttribute('aria-pressed', 'true');
   await expect(wishLink(page, 'Fahrradhelm')).toHaveCount(0);
 
-  await filterButton(page, 'Erfüllte Wünsche').focus();
+  await filterButton(page, 'Erfüllt').focus();
   await page.keyboard.press('Space');
 
   await expect(page).toHaveURL(/#\/liste\/birthday\/erfuellt$/);
   await expect(wishLink(page, 'Fahrradhelm')).toBeVisible();
   await expect(wishLink(page, 'Fahrradhelm')).toContainText('von Anna');
-  await expect(filterButton(page, 'Erfüllte Wünsche')).toBeFocused();
-  await expect(filterButton(page, 'Erfüllte Wünsche')).toHaveAttribute('aria-pressed', 'true');
+  await expect(filterButton(page, 'Erfüllt')).toBeFocused();
+  await expect(filterButton(page, 'Erfüllt')).toHaveAttribute('aria-pressed', 'true');
   await expect(pageHeading(page, 'Geburtstag')).not.toBeFocused();
   await expect(page).toHaveTitle('Geburtstag – Wunschliste');
 
@@ -83,9 +83,9 @@ test('switches the filter without adding history entries', async ({ page }) => {
   const startLength = await historyLength(page);
   await page.getByRole('button', { name: 'Geburtstag' }).click();
 
-  await filterButton(page, 'Erfüllte Wünsche').click();
-  await filterButton(page, 'Offene Wünsche').click();
-  await filterButton(page, 'Erfüllte Wünsche').click();
+  await filterButton(page, 'Erfüllt').click();
+  await filterButton(page, 'Noch offen').click();
+  await filterButton(page, 'Erfüllt').click();
   await expect(page).toHaveURL(/\/erfuellt$/);
 
   expect(await historyLength(page)).toBe(startLength);

@@ -5,7 +5,7 @@ branch: main
 story: WL-007
 topic: "Navigation mit Listen-Icon, Filterknöpfe nebeneinander, Marke / Hersteller und „gewünscht seit“"
 tags: [plan, wishlist, wish, navigation, filter, firestore, ui]
-status: ready
+status: in-progress
 ---
 
 # PLAN: WL-007 — Listen-Icon, Filterknöpfe, Marke und „gewünscht seit“
@@ -216,10 +216,10 @@ Reine Oberflächenänderung: Icon in der Navigation, neue Namen und Icons der Fi
 Zeile mit gleich breiten Knöpfen.
 
 **Aufgaben**:
-- [ ] `src/app/layout/MainNavigation.svelte`: `List` aus `@lucide/svelte` importieren und
+- [x] `src/app/layout/MainNavigation.svelte`: `List` aus `@lucide/svelte` importieren und
   vor „Wunschlisten“ setzen, wie beim Zahnrad:
   `<List aria-hidden="true" size="1.25em" /> Wunschlisten`.
-- [ ] `src/wishlist/infrastructure/ui/WishlistPage.svelte`: `FILTERS` um ein Icon
+- [x] `src/wishlist/infrastructure/ui/WishlistPage.svelte`: `FILTERS` um ein Icon
   erweitern und umbenennen:
   ```ts
   const FILTERS: readonly { value: WishFilter; label: string; icon: typeof Gift; emptyText: string }[] = [
@@ -229,37 +229,37 @@ Zeile mit gleich breiten Knöpfen.
   ```
   Im `{#each}` das Icon mit `{@const Icon = icon}` und
   `<Icon aria-hidden="true" size="1.25em" />` vor das Label setzen.
-- [ ] `WishlistPage.svelte`: Den Container der Filterknöpfe von `button-row` auf eine
+- [x] `WishlistPage.svelte`: Den Container der Filterknöpfe von `button-row` auf eine
   eigene Klasse `filters` umstellen, mit lokalem Stil:
   ```css
   .filters { display: flex; gap: 0.5rem; margin: 1rem 0; }
   .filters > .button { flex: 1 1 0; min-width: 0; overflow-wrap: anywhere; }
   ```
   Kein `flex-wrap`, damit beide Knöpfe immer in einer Zeile stehen.
-- [ ] E2E-Tests auf die neuen Namen umstellen: `e2e/gifting.spec.ts` (`'Offene Wünsche'`
+- [x] E2E-Tests auf die neuen Namen umstellen: `e2e/gifting.spec.ts` (`'Offene Wünsche'`
   → `'Noch offen'`, `'Erfüllte Wünsche'` → `'Erfüllt'`), `e2e/backLinks.spec.ts:31` und
   `e2e/sync.spec.ts:48`. Danach mit `grep -rn "Offene Wünsche\|Erfüllte Wünsche" e2e src`
   prüfen, dass nichts übrig ist.
-- [ ] `e2e/navigation.spec.ts`: Test „shows a list icon on the wishlists button“. Der Knopf
+- [x] `e2e/navigation.spec.ts`: Test „shows a list icon on the wishlists button“. Der Knopf
   „Wunschlisten“ enthält genau ein `svg[aria-hidden="true"]`, sein zugänglicher Name bleibt
   „Wunschlisten“.
-- [ ] `e2e/gifting.spec.ts` (oder `e2e/layout.spec.ts`, neben den übrigen Layout-Tests):
+- [x] `e2e/gifting.spec.ts` (oder `e2e/layout.spec.ts`, neben den übrigen Layout-Tests):
   Test „keeps both filter buttons side by side with equal width, even with doubled text
   size“. Seed mit einer Wunschliste. Einmal normal und einmal nach
   `document.documentElement.style.fontSize = '200%'` prüfen: gleicher `top` beider Knöpfe
   (Abweichung < 1) und gleiche Breite (Abweichung < 1).
-- [ ] `docs/agents/research/2026-09-28-wunschliste-konzept.md`: Im Abschnitt „Oberfläche“
+- [x] `docs/agents/research/2026-09-28-wunschliste-konzept.md`: Im Abschnitt „Oberfläche“
   die Filter auf „Noch offen / Erfüllt“ mit Icons ändern. Im Skizzenblock „Seite einer
   Wunschliste“ `[Offene] [Erfüllte]` durch `[🎁 Noch offen] [📦 Erfüllt]` ersetzen und den
   Knopf der Navigation mit Icon zeigen. Die Erwähnung „Offene Wünsche“ bei den
   Geheim-Einträgen auf „Noch offen“ anpassen.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run lint` läuft durch.
-- [ ] `npm run test:e2e` läuft durch, einschließlich der neuen Tests in
+- [x] `npm run lint` läuft durch.
+- [x] `npm run test:e2e` läuft durch, einschließlich der neuen Tests in
   `navigation.spec.ts` und des Filter-Layout-Tests. `accessibility.spec.ts` bleibt grün
   (axe).
-- [ ] `npm test` läuft durch.
+- [x] `npm test` läuft durch.
 
 **Manuelle Verifikation**:
 - [ ] Auf dem iPhone mit VoiceOver: Der Knopf in der Navigation wird als „Wunschlisten“

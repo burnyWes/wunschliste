@@ -75,7 +75,7 @@ dem Nutzer abgestimmt. Dieses Dokument ist die Quelle der Wahrheit für die Plan
 - **Alle außer der Besitzerin** sehen den Eintrag im Klartext mit Kennzeichnung
   „🤫 von Ben“.
 - Die **Besitzerin** sieht pro Geheim-Eintrag einen Platzhalter „🎁 Überraschung“, nur
-  unter „Offene Wünsche“, nicht antippbar, nicht bearbeit- oder löschbar.
+  unter „Noch offen“, nicht antippbar, nicht bearbeit- oder löschbar.
 - Ergänzung aus WL-006: Statt einer Zeile je Eintrag gibt es **eine** Zeile
   „🎁 N Überraschungen“ am Ende der offenen Wünsche. Die Besitzerin erreicht einen
   Geheim-Eintrag nicht, deshalb meldet der **Schenkende** mit „Übergeben“ die Übergabe.
@@ -128,12 +128,12 @@ dem Nutzer abgestimmt. Dieses Dokument ist die Quelle der Wahrheit für die Plan
 
 ```
  ┌─────────────────────────────────────┐
- │ [Wunschlisten]        [⚙ Einstellungen] │  ← oben fixiert
+ │ [☰ Wunschlisten]    [⚙ Einstellungen] │  ← oben fixiert
  └─────────────────────────────────────┘
 
  Wunschlisten                     [+]      Seite einer Wunschliste
  ── Anna (ich) ──                          Geburtstag 2027      [✏] [+]
- • Geburtstag 2027                         [Offene] [Erfüllte]
+ • Geburtstag 2027                         [🎁 Noch offen] [📦 Erfüllt]
  ── Ben ──                                 • Fahrradhelm
  • Weihnachten                               ★★★ unbedingt · 49,99 €
 
@@ -156,8 +156,10 @@ dem Nutzer abgestimmt. Dieses Dokument ist die Quelle der Wahrheit für die Plan
  [Abmelden]
 ```
 
-- Filter „Offene / Erfüllte Wünsche“: zwei Umschaltknöpfe, genau einer aktiv
-  (VoiceOver: „Offene Wünsche, ausgewählt“).
+- Filter „Noch offen / Erfüllt“ (Icons Geschenk und offene Kiste): zwei gleich breite
+  Umschaltknöpfe nebeneinander in einer Zeile, genau einer aktiv
+  (VoiceOver: „Noch offen, ausgewählt“). Ergänzung aus WL-007.
+- Der Knopf „Wunschlisten“ in der Navigation trägt ein Listen-Icon (WL-007).
 - Leere Zustände: ein Satz plus Knopf („Noch keine Wunschlisten. [+ Wunschliste erstellen]“).
 - Offline: dezenter Hinweis „Offline – Änderungen werden später abgeglichen“, von
   VoiceOver einmal angesagt.

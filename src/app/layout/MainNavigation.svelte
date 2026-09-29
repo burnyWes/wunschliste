@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Settings } from '@lucide/svelte';
+  import { List, Settings } from '@lucide/svelte';
   import { navigateTo } from '../../shared/ui/navigation';
   import { hashFor, type MainPage } from '../router/routes';
 
@@ -14,7 +14,7 @@
     aria-current={active === 'wishlists' ? 'page' : undefined}
     onclick={() => navigateTo(hashFor({ page: 'wishlists' }))}
   >
-    Wunschlisten
+    <List aria-hidden="true" size="1.25em" /> Wunschlisten
   </button>
   <button
     type="button"

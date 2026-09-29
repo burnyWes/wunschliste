@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ChevronRight, Pencil, Plus, Trash2 } from '@lucide/svelte';
+  import { ChevronRight, Gift, PackageOpen, Pencil, Plus, Trash2 } from '@lucide/svelte';
   import { announce } from '../../../shared/ui/announcements.svelte';
   import ConfirmDialog from '../../../shared/ui/ConfirmDialog.svelte';
   import { navigateTo } from '../../../shared/ui/navigation';
@@ -31,9 +31,19 @@
 
   let { wishlistId, filter }: { wishlistId: WishlistId; filter: WishFilter } = $props();
 
-  const FILTERS: readonly { value: WishFilter; label: string; emptyText: string }[] = [
-    { value: 'open', label: 'Offene Wünsche', emptyText: 'Noch keine offenen Wünsche.' },
-    { value: 'fulfilled', label: 'Erfüllte Wünsche', emptyText: 'Noch keine erfüllten Wünsche.' },
+  const FILTERS: readonly {
+    value: WishFilter;
+    label: string;
+    icon: typeof Gift;
+    emptyText: string;
+  }[] = [
+    { value: 'open', label: 'Noch offen', icon: Gift, emptyText: 'Noch keine offenen Wünsche.' },
+    {
+      value: 'fulfilled',
+      label: 'Erfüllt',
+      icon: PackageOpen,
+      emptyText: 'Noch keine erfüllten Wünsche.',
+    },
   ];
 
   const { watchWishlist, watchWishesOfWishlist, watchPersons, deleteWishlist } =
@@ -149,8 +159,8 @@
       />
     {/if}
 
-    <div class="button-row">
-      {#each FILTERS as { value, label } (value)}
+    <div class="filters">
+      {#each FILTERS as { value, label, icon: Icon } (value)}
         <button
           class="button"
           class:button--quiet={value !== filter}
@@ -158,6 +168,7 @@
           aria-pressed={value === filter}
           onclick={() => show(value)}
         >
+          <Icon aria-hidden="true" size="1.25em" />
           {label}
         </button>
       {/each}
@@ -209,6 +220,18 @@
 {/if}
 
 <style>
+  .filters {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .filters > .button {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
   .owner {
     margin: -0.5rem 0 0;
     overflow-wrap: anywhere;
