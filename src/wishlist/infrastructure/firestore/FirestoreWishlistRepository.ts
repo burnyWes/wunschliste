@@ -15,6 +15,7 @@ import type { WishlistRepository } from '../../domain/WishlistRepository';
 import type { ReportWishlistProblem } from '../wishlistProblem';
 import { cachedDocument } from './cachedDocument';
 import { observedWrite } from './observedWrite';
+import { reportedFailure } from './reportedFailure';
 import { toWishlistDocument, wishlistFromDocument } from './wishlistDocument';
 
 export const WISHLISTS_COLLECTION = 'wishlists';
@@ -32,14 +33,25 @@ export class FirestoreWishlistRepository implements WishlistRepository {
     this.#onProblem = onProblem;
   }
 
-  watchAll(onChange: (wishlists: readonly Wishlist[]) => void): Unsubscribe {
-    return onSnapshot(collection(this.#firestore, WISHLISTS_COLLECTION), (snapshot) =>
-      onChange(snapshot.docs.map(wishlistIn).filter((wishlist) => wishlist !== undefined)),
+  watchAll(onChange: (wishlists: readonly Wishlist[]) => void, onFailure: () => void): Unsubscribe {
+    return onSnapshot(
+      collection(this.#firestore, WISHLISTS_COLLECTION),
+      (snapshot) =>
+        onChange(snapshot.docs.map(wishlistIn).filter((wishlist) => wishlist !== undefined)),
+      reportedFailure(onFailure, this.#onProblem),
     );
   }
 
-  watch(id: WishlistId, onChange: (wishlist: Wishlist | undefined) => void): Unsubscribe {
-    return onSnapshot(this.#reference(id), (snapshot) => onChange(wishlistIn(snapshot)));
+  watch(
+    id: WishlistId,
+    onChange: (wishlist: Wishlist | undefined) => void,
+    onFailure: () => void,
+  ): Unsubscribe {
+    return onSnapshot(
+      this.#reference(id),
+      (snapshot) => onChange(wishlistIn(snapshot)),
+      reportedFailure(onFailure, this.#onProblem),
+    );
   }
 
   async get(id: WishlistId): Promise<Wishlist | undefined> {

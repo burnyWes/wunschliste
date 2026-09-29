@@ -95,3 +95,5 @@ export function wishDetailsInputOf(details: WishDetails): WishDetailsInput {
     rating: details.rating,
   };
 }
+
+export const LOAD_FAILED_MESSAGE = 'Die Daten konnten nicht geladen werden.';

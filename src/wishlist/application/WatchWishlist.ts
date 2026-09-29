@@ -6,7 +6,11 @@ import type { WishlistRepository } from '../domain/WishlistRepository';
 export class WatchWishlist {
   constructor(private readonly wishlists: WishlistRepository) {}
 
-  execute(id: WishlistId, onChange: (wishlist: Wishlist | undefined) => void): Unsubscribe {
-    return this.wishlists.watch(id, onChange);
+  execute(
+    id: WishlistId,
+    onChange: (wishlist: Wishlist | undefined) => void,
+    onFailure: () => void,
+  ): Unsubscribe {
+    return this.wishlists.watch(id, onChange, onFailure);
   }
 }

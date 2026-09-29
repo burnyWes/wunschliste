@@ -5,7 +5,7 @@ import type { WishlistRepository } from '../domain/WishlistRepository';
 export class WatchWishlists {
   constructor(private readonly wishlists: WishlistRepository) {}
 
-  execute(onChange: (wishlists: readonly Wishlist[]) => void): Unsubscribe {
-    return this.wishlists.watchAll((wishlists) => onChange(sortWishlists(wishlists)));
+  execute(onChange: (wishlists: readonly Wishlist[]) => void, onFailure: () => void): Unsubscribe {
+    return this.wishlists.watchAll((wishlists) => onChange(sortWishlists(wishlists)), onFailure);
   }
 }

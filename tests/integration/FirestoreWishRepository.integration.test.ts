@@ -8,8 +8,15 @@ import {
   FirestoreWishRepository,
   WISHES_COLLECTION,
 } from '../../src/wishlist/infrastructure/firestore/FirestoreWishRepository';
+import type { WishlistProblem } from '../../src/wishlist/infrastructure/wishlistProblem';
 import { eventually } from './eventually';
-import { familyFirestore, startTestEnvironment, withoutRules } from './testFirestore';
+import {
+  asModularFirestore,
+  familyFirestore,
+  ignoreFailure,
+  startTestEnvironment,
+  withoutRules,
+} from './testFirestore';
 
 const birthday = wishlistIdOf('birthday');
 const christmas = wishlistIdOf('christmas');
@@ -69,7 +76,7 @@ describe('FirestoreWishRepository', () => {
       'h',
     );
     let restored: Wish | undefined;
-    familyRepository().watch(wishIdOf('h'), (wish) => (restored = wish));
+    familyRepository().watch(wishIdOf('h'), (wish) => (restored = wish), ignoreFailure);
 
     await familyRepository().save(helmet);
 
@@ -98,7 +105,7 @@ describe('FirestoreWishRepository', () => {
   it('reports only the wishes of one wishlist, at once and after each save and delete', async () => {
     const repository = familyRepository();
     const reports: string[][] = [];
-    repository.watchByWishlist(birthday, (wishes) => reports.push(namesOf(wishes)));
+    repository.watchByWishlist(birthday, (wishes) => reports.push(namesOf(wishes)), ignoreFailure);
     await eventually(() => expect(reports).toEqual([[]]));
 
     await repository.save(wishNamed('Helm'));
@@ -113,7 +120,11 @@ describe('FirestoreWishRepository', () => {
   it('reports a single wish and its removal', async () => {
     const repository = familyRepository();
     const reports: (string | undefined)[] = [];
-    repository.watch(wishIdOf('Helm'), (wish) => reports.push(wish?.details.name.value));
+    repository.watch(
+      wishIdOf('Helm'),
+      (wish) => reports.push(wish?.details.name.value),
+      ignoreFailure,
+    );
 
     await repository.save(wishNamed('Helm'));
     await eventually(() => expect(reports.at(-1)).toBe('Helm'));
@@ -135,11 +146,15 @@ describe('FirestoreWishRepository', () => {
     const otherDevice = familyRepository();
     const remainingBirthdayWishes: string[][] = [];
     const remainingChristmasWishes: string[][] = [];
-    otherDevice.watchByWishlist(birthday, (wishes) =>
-      remainingBirthdayWishes.push(namesOf(wishes)),
+    otherDevice.watchByWishlist(
+      birthday,
+      (wishes) => remainingBirthdayWishes.push(namesOf(wishes)),
+      ignoreFailure,
     );
-    otherDevice.watchByWishlist(christmas, (wishes) =>
-      remainingChristmasWishes.push(namesOf(wishes)),
+    otherDevice.watchByWishlist(
+      christmas,
+      (wishes) => remainingChristmasWishes.push(namesOf(wishes)),
+      ignoreFailure,
     );
     await eventually(() => expect(remainingBirthdayWishes.at(-1)).toEqual(['Buch', 'Helm']));
 
@@ -167,8 +182,10 @@ describe('FirestoreWishRepository', () => {
     });
     const reports: string[][] = [];
 
-    familyRepository().watchByWishlist(birthday, (wishes) =>
-      reports.push(wishes.map(({ id }) => id)),
+    familyRepository().watchByWishlist(
+      birthday,
+      (wishes) => reports.push(wishes.map(({ id }) => id)),
+      ignoreFailure,
     );
 
     await eventually(() => expect(reports.at(-1)).toEqual(['ok']));
@@ -178,7 +195,11 @@ describe('FirestoreWishRepository', () => {
     const firestore = familyFirestore(environment);
     const repository = new FirestoreWishRepository(firestore, () => {});
     const reports: (string | undefined)[] = [];
-    repository.watch(wishIdOf('Helm'), (wish) => reports.push(wish?.details.name.value));
+    repository.watch(
+      wishIdOf('Helm'),
+      (wish) => reports.push(wish?.details.name.value),
+      ignoreFailure,
+    );
     await eventually(() => expect(reports).toEqual([undefined]));
     await disableNetwork(firestore);
 
@@ -190,5 +211,25 @@ describe('FirestoreWishRepository', () => {
     ).resolves.toBeUndefined();
 
     await eventually(() => expect(reports.at(-1)).toBe('Helm'));
+  });
+
+  it('reports the wishes of a wishlist that cannot be loaded', async () => {
+    const problems: WishlistProblem[] = [];
+    let failures = 0;
+    const visitorRepository = new FirestoreWishRepository(
+      asModularFirestore(environment.unauthenticatedContext()),
+      (problem) => problems.push(problem),
+    );
+
+    visitorRepository.watchByWishlist(
+      birthday,
+      () => {},
+      () => (failures += 1),
+    );
+
+    await eventually(() => {
+      expect(failures).toBe(1);
+      expect(problems).toEqual(['loadFailed']);
+    });
   });
 });

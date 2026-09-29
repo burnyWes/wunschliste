@@ -5,6 +5,7 @@
   import type { WishlistId } from '../../domain/ids';
   import type { WishDetails } from '../../domain/WishDetails';
   import type { Wishlist } from '../../domain/Wishlist';
+  import LoadFailed from './LoadFailed.svelte';
   import NotFound from './NotFound.svelte';
   import { hashOf } from './wishlistAddresses';
   import { wishlistFilterMemory } from './wishlistFilterMemory';
@@ -18,7 +19,13 @@
 
   const wishlist = new Watched<Wishlist>();
 
-  $effect(() => watchWishlist.execute(wishlistId, (reported) => wishlist.show(reported)));
+  $effect(() =>
+    watchWishlist.execute(
+      wishlistId,
+      (reported) => wishlist.show(reported),
+      () => wishlist.fail(),
+    ),
+  );
 
   async function create(details: WishDetails): Promise<void> {
     const wishId = await createWish.execute(wishlistId, details);
@@ -34,6 +41,8 @@
     cancelTarget={wishlistFilterMemory.hashOf(wishlistId)}
     onsubmit={create}
   />
+{:else if wishlist.status === 'failed'}
+  <LoadFailed />
 {:else if wishlist.status === 'missing'}
   <NotFound message="Diese Wunschliste gibt es nicht mehr." />
 {/if}

@@ -1,4 +1,5 @@
 import { requestPageFocus } from '../../shared/ui/pageFocus';
+import { clearProblems } from '../../shared/ui/reportedProblems.svelte';
 import { hashFor, pageKeyOf, resolveRoute, type Route } from './routes';
 
 export class CurrentRoute {
@@ -19,6 +20,7 @@ export class CurrentRoute {
     this.route = route;
     this.#showCanonicalHash();
     if (isPageChange) {
+      clearProblems();
       requestPageFocus();
     }
   }

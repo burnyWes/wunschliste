@@ -7,6 +7,7 @@
   import type { WishId } from '../../domain/ids';
   import type { Wish } from '../../domain/Wish';
   import type { WishDetails } from '../../domain/WishDetails';
+  import LoadFailed from './LoadFailed.svelte';
   import NotFound from './NotFound.svelte';
   import { hashOf } from './wishlistAddresses';
   import { wishlistFilterMemory } from './wishlistFilterMemory';
@@ -27,7 +28,13 @@
   let isDeleting = $state(false);
   let deletionDialog = $state<ConfirmDialog>();
 
-  $effect(() => watchWish.execute(wishId, (reported) => wish.show(reported)));
+  $effect(() =>
+    watchWish.execute(
+      wishId,
+      (reported) => wish.show(reported),
+      () => wish.fail(),
+    ),
+  );
 
   const wishHash = $derived(hashOf({ page: 'wish', wishId }));
 
@@ -73,6 +80,8 @@
       />
     {/snippet}
   </WishForm>
+{:else if wish.status === 'failed'}
+  <LoadFailed />
 {:else if wish.status === 'missing' && !isDeleting}
   <NotFound message="Diesen Wunsch gibt es nicht mehr." />
 {/if}

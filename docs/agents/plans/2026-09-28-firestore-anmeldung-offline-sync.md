@@ -728,12 +728,12 @@ veröffentlicht.
 
 **Manuelle Verifikation** (setzt die README-Einrichtung mit einem echten Firebase-Projekt
 voraus):
-- [ ] iPhone, installierte App nach dem Deploy: Die Anmeldeseite erscheint. Der
+- [x] iPhone, installierte App nach dem Deploy: Die Anmeldeseite erscheint. Der
       Schlüsselbund bietet an, das Passwort zu speichern bzw. einzusetzen, und die
       Anmeldung gelingt.
-- [ ] App schließen und neu starten → ohne erneute Anmeldung auf der Übersicht
-- [ ] Flugmodus, App neu starten → weiter angemeldet
-- [ ] VoiceOver: Falsches Passwort → die Fehlermeldung wird vorgelesen. „Abmelden“ →
+- [x] App schließen und neu starten → ohne erneute Anmeldung auf der Übersicht
+- [x] Flugmodus, App neu starten → weiter angemeldet
+- [x] VoiceOver: Falsches Passwort → die Fehlermeldung wird vorgelesen. „Abmelden“ →
       Dialog mit Fokus auf „Abbrechen“, „Abmelden“ → Anmeldeseite.
 
 ### Phase 2: Firestore-Adapter und Sync
@@ -866,12 +866,12 @@ Emulator, und ein Test mit zwei Geräten belegt den Sync.
       `src/wishlist/infrastructure/localStorage` existiert nicht
 
 **Manuelle Verifikation**:
-- [ ] iPhone und zweites Gerät (oder ein Desktop-Browser), beide angemeldet: Eine auf dem
+- [x] iPhone und zweites Gerät (oder ein Desktop-Browser), beide angemeldet: Eine auf dem
       iPhone angelegte Liste erscheint auf dem anderen Gerät ohne Neuladen und umgekehrt.
-- [ ] iPhone: App in den Hintergrund, auf dem anderen Gerät etwas ändern, App wieder
+- [x] iPhone: App in den Hintergrund, auf dem anderen Gerät etwas ändern, App wieder
       öffnen → die Änderung erscheint. Verstummt der Listener (firebase-js-sdk #4948),
       wird das in `docs/notes.txt` als Bug festgehalten.
-- [ ] Abmelden und wieder anmelden → die Daten sind wieder da
+- [x] Abmelden und wieder anmelden → die Daten sind wieder da
 
 ### Phase 3: Offline-Hinweis und Fehlermeldungen
 
@@ -881,59 +881,59 @@ Die App zeigt an, dass sie offline ist, und meldet abgelehnte Änderungen und
 gescheiterte Listener, im Kopf wie auf der Seite.
 
 **Aufgaben**:
-- [ ] Ports, TDD über die Use Cases:
+- [x] Ports, TDD über die Use Cases:
   - `WishlistRepository.watchAll(onChange, onFailure)`, `watch(id, onChange, onFailure)`,
     `WishRepository.watchByWishlist(id, onChange, onFailure)`,
     `watch(id, onChange, onFailure)`
   - `onFailure: () => void`
-- [ ] `application/fakes/ObservableMap.ts`: `observe(onChange, onFailure)` und
+- [x] `application/fakes/ObservableMap.ts`: `observe(onChange, onFailure)` und
       `failObservers()` für Tests. Beide Fakes reichen das durch.
-- [ ] Use-Case-Tests zuerst: `WatchWishlists`, `WatchWishlist`,
+- [x] Use-Case-Tests zuerst: `WatchWishlists`, `WatchWishlist`,
       `WatchWishesOfWishlist` und `WatchWish` rufen `onFailure` auf, wenn der Fake scheitert.
       `execute(…, onChange, onFailure)`.
-- [ ] Firestore-Adapter: `onSnapshot(…, next, () => { onFailure();
+- [x] Firestore-Adapter: `onSnapshot(…, next, () => { onFailure();
       onProblem('loadFailed'); })`
-- [ ] Integrationstests ergänzen, mit einer Firestore-Instanz aus
+- [x] Integrationstests ergänzen, mit einer Firestore-Instanz aus
       `unauthenticatedContext()`:
   - `watchAll` ruft `onFailure` auf, `onProblem` erhält `'loadFailed'`
   - `save` löst auf, danach erhält `onProblem` `'writeRejected'` (mit `vi.waitFor`)
-- [ ] `src/shared/ui/watched.svelte.ts`: `WatchStatus` um `'failed'` erweitern,
+- [x] `src/shared/ui/watched.svelte.ts`: `WatchStatus` um `'failed'` erweitern,
       Methode `fail()`
-- [ ] `src/wishlist/infrastructure/ui/LoadFailed.svelte`: `PageHeader` „Laden
+- [x] `src/wishlist/infrastructure/ui/LoadFailed.svelte`: `PageHeader` „Laden
       fehlgeschlagen“, der Satz „Die Daten konnten nicht geladen werden.“ und
       [Zur Übersicht] (`navigateTo('#/')`) in einer `.button-row`
-- [ ] Seiten:
+- [x] Seiten:
   - `WishPage`, `WishlistPage`, `CreateWishPage`, `EditWishPage` und `EditWishlistPage`
     zeigen bei `status === 'failed'` `LoadFailed`.
   - `WishlistsPage` zeigt statt der Liste den Satz „Die Daten konnten nicht geladen
     werden.“.
   - `WishlistPage` zeigt ihn auch, wenn nur die Wünsche nicht laden.
-- [ ] `src/shared/ui/problemNotice.svelte.ts`: `reportProblem(text)` merkt sich den Text,
+- [x] `src/shared/ui/problemNotice.svelte.ts`: `reportProblem(text)` merkt sich den Text,
       doppelte nur einmal, in der Reihenfolge des Eintreffens. Dazu `clearProblems()` und
       `problemTexts(): readonly string[]`.
-- [ ] `src/shared/ui/ProblemNotice.svelte`: ein immer vorhandener Container mit
+- [x] `src/shared/ui/ProblemNotice.svelte`: ein immer vorhandener Container mit
       `role="alert"`, darin eine Zeile je Problem mit Warnsymbol (Lucide `TriangleAlert`,
       stumm), Rand oben und unten in `--color-outline`. Ohne Problem ist er leer und ohne
       Rand.
-- [ ] `src/app/router/currentRoute.svelte.ts`: Bei einem Seitenwechsel wird zusätzlich
+- [x] `src/app/router/currentRoute.svelte.ts`: Bei einem Seitenwechsel wird zusätzlich
       `clearProblems()` aufgerufen.
-- [ ] `src/app/problemTexts.ts` (mit Test): `WishlistProblem` → Text laut Tabelle.
+- [x] `src/app/problemTexts.ts` (mit Test): `WishlistProblem` → Text laut Tabelle.
       `SignedInApp` übergibt `onProblem: (problem) => reportProblem(problemText(problem))`.
       Beim Abmelden wird `clearProblems()` aufgerufen.
-- [ ] `src/shared/ui/connectivity.svelte.ts`: Klasse `Connectivity` mit
+- [x] `src/shared/ui/connectivity.svelte.ts`: Klasse `Connectivity` mit
       `isOnline = $state(navigator.onLine)` und `follow(): () => void` für `online` und
       `offline`
-- [ ] `src/shared/ui/OfflineNotice.svelte`:
+- [x] `src/shared/ui/OfflineNotice.svelte`:
   - Container mit `role="status"`, immer vorhanden
   - offline: Lucide `CloudOff` (stumm) und „Offline – Änderungen werden später
     abgeglichen.“
   - kleinere Schrift (`0.875em`), Rand oben und unten in `--color-outline`, Innenabstand
     `0.25rem 1rem`
-- [ ] Einbau:
+- [x] Einbau:
   - `SignedInApp`: Header mit Streifen, `MainNavigation`, `OfflineNotice` und
     `ProblemNotice`
   - `App.svelte`: im Zweig `signedOut` ebenfalls `OfflineNotice`
-- [ ] `e2e/offline.spec.ts`:
+- [x] `e2e/offline.spec.ts`:
   - `context.setOffline(true)` → der Hinweis ist sichtbar, und der Container mit
     `role="status"` enthält den Text. Nach `setOffline(false)` ist er leer.
   - Erwartungen, die auf den Abgleich nach dem Wiederverbinden warten, bekommen ein
@@ -943,7 +943,7 @@ gescheiterte Listener, im Kopf wie auf der Seite.
     Wunsch nicht. A geht online → B sieht den verschenkten Wunsch unter „Erfüllte
     Wünsche“.
   - A offline löscht eine Liste → die Übersicht erscheint sofort ohne sie
-- [ ] `e2e/problems.spec.ts` mit einem zweiten Konto `fremd@example.de`, dessen UID nicht
+- [x] `e2e/problems.spec.ts` mit einem zweiten Konto `fremd@example.de`, dessen UID nicht
       in den Regeln steht:
   - anmelden → die Übersicht zeigt „Die Daten konnten nicht geladen werden.“, die
     Warnzeile mit `role="alert"` ebenso
@@ -952,17 +952,17 @@ gescheiterte Listener, im Kopf wie auf der Seite.
     Änderung konnte nicht gespeichert werden.“. Daneben darf „Die Daten konnten nicht
     geladen werden.“ der neuen Listenseite stehen, die Reihenfolge ist offen.
   - `#/liste/<seeded id>` → „Laden fehlgeschlagen“
-- [ ] `e2e/accessibility.spec.ts`:
+- [x] `e2e/accessibility.spec.ts`:
   - Übersicht offline mit Offline-Hinweis und der Warnzeile, als fremdes Konto
   - „Laden fehlgeschlagen“
   - jeweils in allen drei Farbschemata
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` grün, u. a. die Use-Case-Tests mit `onFailure` und
+- [x] `npm run test:unit` grün, u. a. die Use-Case-Tests mit `onFailure` und
       `problemTexts.test.ts`
-- [ ] `npm run test:integration` grün mit den Fehlerfällen der Adapter
-- [ ] `npm run test:architecture` und `npm run lint` grün
-- [ ] `npm test` grün, inklusive `offline.spec.ts`, `problems.spec.ts` und der neuen
+- [x] `npm run test:integration` grün mit den Fehlerfällen der Adapter
+- [x] `npm run test:architecture` und `npm run lint` grün
+- [x] `npm test` grün, inklusive `offline.spec.ts`, `problems.spec.ts` und der neuen
       axe-Fälle
 
 **Manuelle Verifikation**:
@@ -1029,6 +1029,24 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
   immer.
 - Bis Phase 3 melden Listener beim Beenden von Firestore „Firestore shutting down“ auf der
   Konsole der Integrationstests. Das verschwindet mit dem Fehler-Rückruf aus Phase 3.
+
+**Phase 3**
+- Das Modul der Warnzeile heißt `src/shared/ui/reportedProblems.svelte.ts` statt
+  `problemNotice.svelte.ts`. Unter Windows unterscheidet das Dateisystem Groß- und
+  Kleinschreibung nicht, `./problemNotice.svelte` hätte `ProblemNotice.svelte` getroffen.
+- `terminate` beendet laufende Listener mit `aborted`. Das hätte beim Abmelden kurz „Laden
+  fehlgeschlagen“ gezeigt und die Warnzeile vorlesen lassen. `SignedInApp` hängt deshalb
+  im Abmelde-Schritt `before` zuerst die Seiten aus (`isLeaving`, `tick`) und beendet
+  Firestore erst danach. Beim Aushängen leert es außerdem die Warnzeile.
+- Den Satz „Die Daten konnten nicht geladen werden.“ gibt es nur einmal
+  (`LOAD_FAILED_MESSAGE` in `wishTexts.ts`). `app/problemTexts.ts` und die Seiten nutzen ihn.
+- Listener-Fehler gehen im Adapter über `firestore/reportedFailure.ts` an `onFailure` und
+  als `loadFailed` an `onProblem`.
+- Es gibt jetzt zwei `role="status"`-Regionen (Ansagen und Offline-Hinweis).
+  `expectAnnouncement` in `e2e/announcement.ts` sucht deshalb die Region mit dem erwarteten
+  Text.
+- `EditWishlistPage` zeigt „Laden fehlgeschlagen“ auch, wenn nur die Wünsche nicht laden.
+  Sonst stimmte die Anzahl im Lösch-Dialog nicht, und `deleteAllOf` fände nichts.
 
 ## Verweise
 

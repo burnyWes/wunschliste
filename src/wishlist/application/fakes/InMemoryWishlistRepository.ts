@@ -7,12 +7,20 @@ import { ObservableMap } from './ObservableMap';
 export class InMemoryWishlistRepository implements WishlistRepository {
   readonly #wishlists = new ObservableMap<WishlistId, Wishlist>();
 
-  watchAll(onChange: (wishlists: readonly Wishlist[]) => void): Unsubscribe {
-    return this.#wishlists.observe(() => onChange(this.#wishlists.values()));
+  watchAll(onChange: (wishlists: readonly Wishlist[]) => void, onFailure: () => void): Unsubscribe {
+    return this.#wishlists.observe(() => onChange(this.#wishlists.values()), onFailure);
   }
 
-  watch(id: WishlistId, onChange: (wishlist: Wishlist | undefined) => void): Unsubscribe {
-    return this.#wishlists.observe(() => onChange(this.#wishlists.get(id)));
+  watch(
+    id: WishlistId,
+    onChange: (wishlist: Wishlist | undefined) => void,
+    onFailure: () => void,
+  ): Unsubscribe {
+    return this.#wishlists.observe(() => onChange(this.#wishlists.get(id)), onFailure);
+  }
+
+  failWatchers(): void {
+    this.#wishlists.failObservers();
   }
 
   async get(id: WishlistId): Promise<Wishlist | undefined> {

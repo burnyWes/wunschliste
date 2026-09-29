@@ -6,12 +6,19 @@
   import { hashOf } from './wishlistAddresses';
   import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
+  import { LOAD_FAILED_MESSAGE } from './wishTexts';
 
   const { watchWishlists } = useWishlistModule();
 
   let wishlists = $state.raw<readonly Wishlist[]>();
+  let haveWishlistsFailed = $state(false);
 
-  $effect(() => watchWishlists.execute((reported) => (wishlists = reported)));
+  $effect(() =>
+    watchWishlists.execute(
+      (reported) => (wishlists = reported),
+      () => (haveWishlistsFailed = true),
+    ),
+  );
 
   const createWishlistHash = hashOf({ page: 'createWishlist' });
 </script>
@@ -30,7 +37,9 @@
     {/snippet}
   </PageHeader>
 
-  {#if wishlists?.length === 0}
+  {#if haveWishlistsFailed}
+    <p>{LOAD_FAILED_MESSAGE}</p>
+  {:else if wishlists?.length === 0}
     <p>Noch keine Wunschlisten.</p>
     <div class="button-row">
       <button type="button" class="button" onclick={() => navigateTo(createWishlistHash)}>

@@ -7,7 +7,15 @@ import type { WishRepository } from '../domain/WishRepository';
 export class WatchWishesOfWishlist {
   constructor(private readonly wishes: WishRepository) {}
 
-  execute(wishlistId: WishlistId, onChange: (wishes: readonly Wish[]) => void): Unsubscribe {
-    return this.wishes.watchByWishlist(wishlistId, (wishes) => onChange(sortWishes(wishes)));
+  execute(
+    wishlistId: WishlistId,
+    onChange: (wishes: readonly Wish[]) => void,
+    onFailure: () => void,
+  ): Unsubscribe {
+    return this.wishes.watchByWishlist(
+      wishlistId,
+      (wishes) => onChange(sortWishes(wishes)),
+      onFailure,
+    );
   }
 }

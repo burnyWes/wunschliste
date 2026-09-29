@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
-import { FAMILY, seed, type SeedData } from './emulators';
-import { expect, test, type Page } from './fixtures';
+import { createAccount, FAMILY, seed, STRANGER, type SeedData } from './emulators';
+import { expect, signIn, test, type Page } from './fixtures';
 
 const WCAG_21_AA = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
 
@@ -199,4 +199,54 @@ test.describe('signed out', () => {
   test.use({ signedIn: false });
 
   checkAccessibility(signedOutPages);
+});
+
+async function goOfflineWithProblems(page: Page): Promise<void> {
+  await expect(page.locator('header').getByRole('alert')).toHaveText(
+    'Die Daten konnten nicht geladen werden.',
+  );
+  await page.context().setOffline(true);
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Offline – Änderungen werden später abgeglichen.' }),
+  ).toBeVisible();
+}
+
+const strangerPages: CheckedPage[] = [
+  {
+    name: 'overview offline with problems',
+    path: './',
+    heading: 'Wunschlisten',
+    prepare: goOfflineWithProblems,
+  },
+  {
+    name: 'load failed',
+    path: './#/liste/birthday',
+    heading: 'Laden fehlgeschlagen',
+  },
+];
+
+test.describe('as an account without access', () => {
+  test.use({ signedIn: false });
+
+  for (const colorScheme of colorSchemes) {
+    for (const { name, path, heading, prepare } of strangerPages) {
+      test(`${name} page in the ${colorScheme} scheme has no accessibility violations`, async ({
+        page,
+      }) => {
+        await page.addInitScript((scheme) => {
+          localStorage.setItem('wunschliste.colorScheme', scheme);
+        }, colorScheme);
+        await seed(twoWishlists);
+        await createAccount(STRANGER);
+        await signIn(page, STRANGER);
+        await page.goto(path);
+        await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
+        await prepare?.(page);
+
+        const results = await new AxeBuilder({ page }).withTags(WCAG_21_AA).analyze();
+
+        expect(results.violations).toEqual([]);
+      });
+    }
+  }
 });

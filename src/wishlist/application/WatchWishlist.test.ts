@@ -13,7 +13,11 @@ describe('WatchWishlist', () => {
     await wishlists.save(birthday);
     let reported: Wishlist | undefined;
 
-    new WatchWishlist(wishlists).execute(birthday.id, (wishlist) => (reported = wishlist));
+    new WatchWishlist(wishlists).execute(
+      birthday.id,
+      (wishlist) => (reported = wishlist),
+      () => {},
+    );
 
     expect(reported).toBe(birthday);
   });
@@ -24,8 +28,23 @@ describe('WatchWishlist', () => {
     new WatchWishlist(new InMemoryWishlistRepository()).execute(
       wishlistIdOf('unknown'),
       (wishlist) => reports.push(wishlist),
+      () => {},
     );
 
     expect(reports).toEqual([undefined]);
+  });
+
+  it('reports when the wishlist cannot be watched', () => {
+    const wishlists = new InMemoryWishlistRepository();
+    let failures = 0;
+    new WatchWishlist(wishlists).execute(
+      wishlistIdOf('b'),
+      () => {},
+      () => (failures += 1),
+    );
+
+    wishlists.failWatchers();
+
+    expect(failures).toBe(1);
   });
 });

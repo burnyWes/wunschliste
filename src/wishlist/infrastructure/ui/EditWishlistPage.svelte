@@ -8,6 +8,7 @@
   import type { Name } from '../../domain/Name';
   import type { Wish } from '../../domain/Wish';
   import type { Wishlist } from '../../domain/Wishlist';
+  import LoadFailed from './LoadFailed.svelte';
   import NotFound from './NotFound.svelte';
   import { hashOf } from './wishlistAddresses';
   import { wishlistFilterMemory } from './wishlistFilterMemory';
@@ -26,11 +27,24 @@
 
   const wishlist = new Watched<Wishlist>();
   let wishes = $state.raw<readonly Wish[]>([]);
+  let haveWishesFailed = $state(false);
   let isDeleting = $state(false);
   let deletionDialog = $state<ConfirmDialog>();
 
-  $effect(() => watchWishlist.execute(wishlistId, (reported) => wishlist.show(reported)));
-  $effect(() => watchWishesOfWishlist.execute(wishlistId, (reported) => (wishes = reported)));
+  $effect(() =>
+    watchWishlist.execute(
+      wishlistId,
+      (reported) => wishlist.show(reported),
+      () => wishlist.fail(),
+    ),
+  );
+  $effect(() =>
+    watchWishesOfWishlist.execute(
+      wishlistId,
+      (reported) => (wishes = reported),
+      () => (haveWishesFailed = true),
+    ),
+  );
 
   const wishlistHash = $derived(wishlistFilterMemory.hashOf(wishlistId));
 
@@ -49,7 +63,9 @@
   }
 </script>
 
-{#if wishlist.value}
+{#if wishlist.status === 'failed' || haveWishesFailed}
+  <LoadFailed />
+{:else if wishlist.value}
   <WishlistNameForm
     heading="Wunschliste bearbeiten"
     initialName={wishlist.value.name.value}

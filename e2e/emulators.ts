@@ -61,6 +61,8 @@ export function storedWishes(): Promise<WishRecord[]> {
 
 export const FAMILY = { email: 'familie@example.de', password: 'geheim-123' };
 
+export const STRANGER = { uid: 'stranger', email: 'fremd@example.de', password: 'fremd-123' };
+
 const AUTH_EMULATOR = 'http://127.0.0.1:9099';
 
 export type Account = { uid: string; email: string; password: string };

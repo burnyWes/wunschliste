@@ -10,14 +10,24 @@ export class InMemoryWishRepository implements WishRepository {
   watchByWishlist(
     wishlistId: WishlistId,
     onChange: (wishes: readonly Wish[]) => void,
+    onFailure: () => void,
   ): Unsubscribe {
-    return this.#wishes.observe(() =>
-      onChange(this.#wishes.values().filter((wish) => wish.wishlistId === wishlistId)),
+    return this.#wishes.observe(
+      () => onChange(this.#wishes.values().filter((wish) => wish.wishlistId === wishlistId)),
+      onFailure,
     );
   }
 
-  watch(id: WishId, onChange: (wish: Wish | undefined) => void): Unsubscribe {
-    return this.#wishes.observe(() => onChange(this.#wishes.get(id)));
+  watch(
+    id: WishId,
+    onChange: (wish: Wish | undefined) => void,
+    onFailure: () => void,
+  ): Unsubscribe {
+    return this.#wishes.observe(() => onChange(this.#wishes.get(id)), onFailure);
+  }
+
+  failWatchers(): void {
+    this.#wishes.failObservers();
   }
 
   async get(id: WishId): Promise<Wish | undefined> {

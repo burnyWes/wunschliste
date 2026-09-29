@@ -6,7 +6,11 @@ import type { WishRepository } from '../domain/WishRepository';
 export class WatchWish {
   constructor(private readonly wishes: WishRepository) {}
 
-  execute(id: WishId, onChange: (wish: Wish | undefined) => void): Unsubscribe {
-    return this.wishes.watch(id, onChange);
+  execute(
+    id: WishId,
+    onChange: (wish: Wish | undefined) => void,
+    onFailure: () => void,
+  ): Unsubscribe {
+    return this.wishes.watch(id, onChange, onFailure);
   }
 }

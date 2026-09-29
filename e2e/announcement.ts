@@ -7,7 +7,6 @@ function escapedForPattern(text: string): string {
 }
 
 export async function expectAnnouncement(page: Page, text: string): Promise<void> {
-  await expect(page.getByRole('status')).toHaveText(
-    new RegExp(`^${escapedForPattern(text)}${OPTIONAL_REPETITION_MARKER}$`),
-  );
+  const announcedText = new RegExp(`^${escapedForPattern(text)}${OPTIONAL_REPETITION_MARKER}$`);
+  await expect(page.getByRole('status').filter({ hasText: announcedText })).toHaveCount(1);
 }

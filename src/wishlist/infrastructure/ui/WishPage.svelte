@@ -8,6 +8,7 @@
   import type { WishId } from '../../domain/ids';
   import type { Wish } from '../../domain/Wish';
   import type { Wishlist } from '../../domain/Wishlist';
+  import LoadFailed from './LoadFailed.svelte';
   import NotFound from './NotFound.svelte';
   import { hashOf } from './wishlistAddresses';
   import { wishlistFilterMemory } from './wishlistFilterMemory';
@@ -22,13 +23,23 @@
   const wish = new Watched<Wish>();
   const wishlist = new Watched<Wishlist>();
 
-  $effect(() => watchWish.execute(wishId, (reported) => wish.show(reported)));
+  $effect(() =>
+    watchWish.execute(
+      wishId,
+      (reported) => wish.show(reported),
+      () => wish.fail(),
+    ),
+  );
 
   const wishlistId = $derived(wish.value?.wishlistId);
 
   $effect(() => {
     if (wishlistId !== undefined) {
-      return watchWishlist.execute(wishlistId, (reported) => wishlist.show(reported));
+      return watchWishlist.execute(
+        wishlistId,
+        (reported) => wishlist.show(reported),
+        () => wishlist.fail(),
+      );
     }
   });
 
@@ -50,7 +61,9 @@
   );
 </script>
 
-{#if wish.value && wishlist.status !== 'loading'}
+{#if wish.status === 'failed' || wishlist.status === 'failed'}
+  <LoadFailed />
+{:else if wish.value && wishlist.status !== 'loading'}
   {@const { name, link, description } = wish.value.details}
   <div class="page">
     <PageHeader heading={name.value} back={backToWishlist} />

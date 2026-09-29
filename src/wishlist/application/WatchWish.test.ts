@@ -15,7 +15,11 @@ describe('WatchWish', () => {
     await wishes.save(helmet);
     let reported: Wish | undefined;
 
-    new WatchWish(wishes).execute(helmet.id, (wish) => (reported = wish));
+    new WatchWish(wishes).execute(
+      helmet.id,
+      (wish) => (reported = wish),
+      () => {},
+    );
 
     expect(reported).toBe(helmet);
   });
@@ -23,10 +27,26 @@ describe('WatchWish', () => {
   it('reports undefined for an unknown id', () => {
     const reports: (Wish | undefined)[] = [];
 
-    new WatchWish(new InMemoryWishRepository()).execute(wishIdOf('unknown'), (wish) =>
-      reports.push(wish),
+    new WatchWish(new InMemoryWishRepository()).execute(
+      wishIdOf('unknown'),
+      (wish) => reports.push(wish),
+      () => {},
     );
 
     expect(reports).toEqual([undefined]);
+  });
+
+  it('reports when the wish cannot be watched', () => {
+    const wishes = new InMemoryWishRepository();
+    let failures = 0;
+    new WatchWish(wishes).execute(
+      wishIdOf('h'),
+      () => {},
+      () => (failures += 1),
+    );
+
+    wishes.failWatchers();
+
+    expect(failures).toBe(1);
   });
 });

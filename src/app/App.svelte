@@ -1,5 +1,6 @@
 <script lang="ts">
   import Announcer from '../shared/ui/Announcer.svelte';
+  import OfflineNotice from '../shared/ui/OfflineNotice.svelte';
   import { removeLegacyLocalData } from '../wishlist/infrastructure/removeLegacyLocalData';
   import { FamilyAccess } from './access/familyAccess.svelte';
   import { provideFamilyAccess } from './access/familyAccessContext';
@@ -19,6 +20,9 @@
   <SignedInApp />
 {:else if access.state.status === 'signedOut'}
   <AppFrame>
+    {#snippet header()}
+      <OfflineNotice />
+    {/snippet}
     <SignInPage />
   </AppFrame>
 {:else}

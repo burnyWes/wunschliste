@@ -22,10 +22,28 @@ describe('WatchWishesOfWishlist', () => {
     await wishes.save(wish('Helm', birthday, 'essential'));
     let reportedNames: string[] = [];
 
-    new WatchWishesOfWishlist(wishes).execute(birthday, (reported) => {
-      reportedNames = reported.map(({ details }) => details.name.value);
-    });
+    new WatchWishesOfWishlist(wishes).execute(
+      birthday,
+      (reported) => {
+        reportedNames = reported.map(({ details }) => details.name.value);
+      },
+      () => {},
+    );
 
     expect(reportedNames).toEqual(['Helm', 'Buch']);
+  });
+
+  it('reports when the wishes cannot be watched', () => {
+    const wishes = new InMemoryWishRepository();
+    let failures = 0;
+    new WatchWishesOfWishlist(wishes).execute(
+      birthday,
+      () => {},
+      () => (failures += 1),
+    );
+
+    wishes.failWatchers();
+
+    expect(failures).toBe(1);
   });
 });

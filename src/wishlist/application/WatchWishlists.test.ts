@@ -16,13 +16,27 @@ describe('WatchWishlists', () => {
     await wishlists.save(wishlistNamed('Weihnachten'));
     const reportedNames: string[][] = [];
 
-    const unsubscribe = new WatchWishlists(wishlists).execute((reported) =>
-      reportedNames.push(reported.map((wishlist) => wishlist.name.value)),
+    const unsubscribe = new WatchWishlists(wishlists).execute(
+      (reported) => reportedNames.push(reported.map((wishlist) => wishlist.name.value)),
+      () => {},
     );
     await wishlists.save(wishlistNamed('Geburtstag'));
     unsubscribe();
     await wishlists.save(wishlistNamed('Ostern'));
 
     expect(reportedNames).toEqual([['Weihnachten'], ['Geburtstag', 'Weihnachten']]);
+  });
+
+  it('reports when the wishlists cannot be watched', () => {
+    const wishlists = new InMemoryWishlistRepository();
+    let failures = 0;
+    new WatchWishlists(wishlists).execute(
+      () => {},
+      () => (failures += 1),
+    );
+
+    wishlists.failWatchers();
+
+    expect(failures).toBe(1);
   });
 });

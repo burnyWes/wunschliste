@@ -7,11 +7,13 @@
   import type { Wish } from '../../domain/Wish';
   import type { Wishlist } from '../../domain/Wishlist';
   import { wishesMatching, type WishFilter } from '../../domain/wishOrder';
+  import LoadFailed from './LoadFailed.svelte';
   import NotFound from './NotFound.svelte';
   import { hashOf } from './wishlistAddresses';
   import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
   import WishSummary from './WishSummary.svelte';
+  import { LOAD_FAILED_MESSAGE } from './wishTexts';
 
   let { wishlistId, filter }: { wishlistId: WishlistId; filter: WishFilter } = $props();
 
@@ -24,9 +26,22 @@
 
   const wishlist = new Watched<Wishlist>();
   let wishes = $state.raw<readonly Wish[]>();
+  let haveWishesFailed = $state(false);
 
-  $effect(() => watchWishlist.execute(wishlistId, (reported) => wishlist.show(reported)));
-  $effect(() => watchWishesOfWishlist.execute(wishlistId, (reported) => (wishes = reported)));
+  $effect(() =>
+    watchWishlist.execute(
+      wishlistId,
+      (reported) => wishlist.show(reported),
+      () => wishlist.fail(),
+    ),
+  );
+  $effect(() =>
+    watchWishesOfWishlist.execute(
+      wishlistId,
+      (reported) => (wishes = reported),
+      () => (haveWishesFailed = true),
+    ),
+  );
 
   $effect(() => wishlistFilterMemory.remember(wishlistId, filter));
 
@@ -39,7 +54,9 @@
   }
 </script>
 
-{#if wishlist.value}
+{#if wishlist.status === 'failed'}
+  <LoadFailed />
+{:else if wishlist.value}
   <div class="page">
     <PageHeader
       heading={wishlist.value.name.value}
@@ -79,7 +96,9 @@
       {/each}
     </div>
 
-    {#if shownWishes?.length === 0}
+    {#if haveWishesFailed}
+      <p>{LOAD_FAILED_MESSAGE}</p>
+    {:else if shownWishes?.length === 0}
       <p>{emptyText}</p>
       {#if filter === 'open'}
         <div class="button-row">

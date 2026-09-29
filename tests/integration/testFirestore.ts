@@ -8,6 +8,8 @@ import { familyAccountUidFrom, readFamilyRules } from '../familyAccount';
 
 export const EMULATED_PROJECT_ID = 'demo-wunschliste';
 
+export const ignoreFailure = () => {};
+
 export function startTestEnvironment(): Promise<RulesTestEnvironment> {
   return initializeTestEnvironment({
     projectId: EMULATED_PROJECT_ID,

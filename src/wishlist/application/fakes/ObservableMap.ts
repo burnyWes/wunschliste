@@ -1,8 +1,10 @@
 import type { Unsubscribe } from '../../domain/Unsubscribe';
 
+type Observer = { onChange: () => void; onFailure: () => void };
+
 export class ObservableMap<K, V> {
   readonly #entries = new Map<K, V>();
-  readonly #observers = new Set<() => void>();
+  readonly #observers = new Set<Observer>();
 
   values(): V[] {
     return [...this.#entries.values()];
@@ -31,15 +33,22 @@ export class ObservableMap<K, V> {
     this.#notifyObservers();
   }
 
-  observe(onChange: () => void): Unsubscribe {
-    this.#observers.add(onChange);
+  observe(onChange: () => void, onFailure: () => void): Unsubscribe {
+    const observer = { onChange, onFailure };
+    this.#observers.add(observer);
     onChange();
-    return () => this.#observers.delete(onChange);
+    return () => this.#observers.delete(observer);
+  }
+
+  failObservers(): void {
+    for (const { onFailure } of this.#observers) {
+      onFailure();
+    }
   }
 
   #notifyObservers(): void {
-    for (const notify of this.#observers) {
-      notify();
+    for (const { onChange } of this.#observers) {
+      onChange();
     }
   }
 }
