@@ -1,4 +1,4 @@
-import type { WishlistId } from '../../domain/ids';
+import type { PersonId, WishlistId } from '../../domain/ids';
 import type { Unsubscribe } from '../../domain/Unsubscribe';
 import type { Wishlist } from '../../domain/Wishlist';
 import type { WishlistRepository } from '../../domain/WishlistRepository';
@@ -19,6 +19,14 @@ export class InMemoryWishlistRepository implements WishlistRepository {
     return this.#wishlists.observe(() => onChange(this.#wishlists.get(id)), onFailure);
   }
 
+  watchOwnedBy(
+    ownerId: PersonId,
+    onChange: (wishlists: readonly Wishlist[]) => void,
+    onFailure: () => void,
+  ): Unsubscribe {
+    return this.#wishlists.observe(() => onChange(this.#ownedBy(ownerId)), onFailure);
+  }
+
   failWatchers(): void {
     this.#wishlists.failObservers();
   }
@@ -27,11 +35,19 @@ export class InMemoryWishlistRepository implements WishlistRepository {
     return this.#wishlists.get(id);
   }
 
+  async getOwnedBy(ownerId: PersonId): Promise<readonly Wishlist[]> {
+    return this.#ownedBy(ownerId);
+  }
+
   async save(wishlist: Wishlist): Promise<void> {
     this.#wishlists.set(wishlist.id, wishlist);
   }
 
   async delete(id: WishlistId): Promise<void> {
     this.#wishlists.delete(id);
+  }
+
+  #ownedBy(ownerId: PersonId): Wishlist[] {
+    return this.#wishlists.values().filter((wishlist) => wishlist.ownerId === ownerId);
   }
 }

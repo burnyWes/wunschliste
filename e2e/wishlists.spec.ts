@@ -1,6 +1,6 @@
 import { expect, test, type Page } from './fixtures';
 import { expectAnnouncement } from './announcement';
-import { storedWishlists } from './emulators';
+import { seed, seedDocument, storedWishlists } from './emulators';
 import { historyLength } from './history';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
@@ -65,7 +65,7 @@ test('goes back to the overview on cancel without creating anything', async ({ p
   expect(await storedWishlists()).toEqual([]);
 });
 
-test('lists wishlists alphabetically and keeps them after a restart', async ({ page }) => {
+test('keeps created wishlists after a restart', async ({ page }) => {
   await page.goto('./');
   await createWishlist(page, 'Weihnachten');
   await page.getByRole('button', { name: 'Zurück zu Wunschlisten' }).click();
@@ -78,6 +78,89 @@ test('lists wishlists alphabetically and keeps them after a restart', async ({ p
   await page.reload();
 
   await expect(wishlistLinks).toHaveText(['Geburtstag 2027', 'Weihnachten']);
+});
+
+test.describe('with several owners', () => {
+  test.beforeEach(async () => {
+    await seed({
+      persons: [
+        { id: 'ben', name: 'Ben' },
+        { id: 'grandma', name: 'Oma' },
+      ],
+      wishlists: [
+        { id: 'christmas', name: 'Weihnachten', ownerId: 'ben' },
+        { id: 'easter', name: 'Ostern', ownerId: 'ben' },
+        { id: 'birthday', name: 'Geburtstag 2027', ownerId: 'anna' },
+        { id: 'camping', name: 'Zelten', ownerId: 'gone' },
+      ],
+    });
+  });
+
+  const groupNamed = (page: Page, heading: string) =>
+    page.getByRole('main').getByRole('region', { name: heading });
+
+  test('groups the overview by owner, my own group first', async ({ page }) => {
+    await page.goto('./');
+
+    await expect(page.getByRole('main').getByRole('heading', { level: 2 })).toHaveText([
+      'Anna (ich)',
+      'Ben',
+      'Unbekannt',
+    ]);
+    await expect(groupNamed(page, 'Anna (ich)').getByRole('listitem')).toHaveText([
+      'Geburtstag 2027',
+    ]);
+    await expect(groupNamed(page, 'Ben').getByRole('listitem')).toHaveText([
+      'Ostern',
+      'Weihnachten',
+    ]);
+    await expect(groupNamed(page, 'Unbekannt').getByRole('listitem')).toHaveText(['Zelten']);
+  });
+
+  test('creates a wishlist for another person', async ({ page }) => {
+    await page.goto('./#/liste/neu');
+    await expect(page.getByRole('radio', { name: 'Anna (ich)' })).toBeChecked();
+    await expect(page.getByRole('group', { name: 'Für' }).getByRole('radio')).toHaveCount(3);
+
+    await page.getByRole('textbox', { name: 'Name' }).fill('Nikolaus');
+    await page.locator('label').filter({ hasText: 'Oma' }).click();
+    await page.getByRole('button', { name: 'Erstellen' }).click();
+
+    await expect(pageHeading(page, 'Nikolaus')).toBeVisible();
+    await expect(page.getByText('für Oma')).toBeVisible();
+    await page.getByRole('button', { name: 'Zurück zu Wunschlisten' }).click();
+    await expect(groupNamed(page, 'Oma').getByRole('listitem')).toHaveText(['Nikolaus']);
+  });
+
+  test('names the owner on the wishlist page', async ({ page }) => {
+    await page.goto('./#/liste/birthday');
+    await expect(page.getByRole('main').getByText('für mich')).toBeVisible();
+
+    await page.goto('./#/liste/easter');
+    await expect(page.getByRole('main').getByText('für Ben')).toBeVisible();
+  });
+
+  test('shows the owner on the edit page without letting it change', async ({ page }) => {
+    await page.goto('./#/liste/birthday/bearbeiten');
+
+    await expect(page.getByText('Für: Anna')).toBeVisible();
+    await expect(page.getByRole('radio')).toHaveCount(0);
+  });
+});
+
+test('hides a person without wishlists and a wishlist without owner', async ({ page }) => {
+  await seed({
+    persons: [{ id: 'ben', name: 'Ben' }],
+    wishlists: [{ id: 'birthday', name: 'Geburtstag', ownerId: 'anna' }],
+  });
+  await seedDocument('wishlists', 'old', { name: 'Alte Liste' });
+
+  await page.goto('./');
+
+  await expect(page.getByRole('main').getByRole('heading', { level: 2 })).toHaveText([
+    'Anna (ich)',
+  ]);
+  await expect(page.getByRole('main').getByRole('listitem')).toHaveText(['Geburtstag']);
 });
 
 test('explains an unknown wishlist and leads to the overview', async ({ page }) => {

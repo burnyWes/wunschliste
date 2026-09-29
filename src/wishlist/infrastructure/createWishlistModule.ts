@@ -11,11 +11,12 @@ import { GiftWish } from '../application/GiftWish';
 import { RenameWishlist } from '../application/RenameWishlist';
 import { TakeBackGift } from '../application/TakeBackGift';
 import { WatchCurrentPerson } from '../application/WatchCurrentPerson';
+import { WatchPerson } from '../application/WatchPerson';
 import { WatchPersons } from '../application/WatchPersons';
 import { WatchWish } from '../application/WatchWish';
 import { WatchWishesOfWishlist } from '../application/WatchWishesOfWishlist';
 import { WatchWishlist } from '../application/WatchWishlist';
-import { WatchWishlists } from '../application/WatchWishlists';
+import { WatchWishlistOverview } from '../application/WatchWishlistOverview';
 import type { IdGenerator } from '../domain/ids';
 import type { ProfileStore } from '../domain/ProfileStore';
 import { FirestorePersonRepository } from './firestore/FirestorePersonRepository';
@@ -42,11 +43,12 @@ export function createWishlistModule({
   return {
     createPerson: new CreatePerson(persons, idGenerator),
     watchPersons: new WatchPersons(persons),
+    watchPerson: new WatchPerson(persons),
     chooseProfile: new ChooseProfile(persons, profileStore),
     forgetProfile: new ForgetProfile(profileStore),
     watchCurrentPerson: new WatchCurrentPerson(persons, profileStore),
-    createWishlist: new CreateWishlist(wishlists, idGenerator),
-    watchWishlists: new WatchWishlists(wishlists),
+    createWishlist: new CreateWishlist(wishlists, persons, idGenerator),
+    watchWishlistOverview: new WatchWishlistOverview(wishlists, persons),
     watchWishlist: new WatchWishlist(wishlists),
     renameWishlist: new RenameWishlist(wishlists),
     deleteWishlist: new DeleteWishlist(wishlists, wishes),

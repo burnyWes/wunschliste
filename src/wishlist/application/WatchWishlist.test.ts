@@ -1,15 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { wishlistIdOf } from '../domain/ids';
-import { Name } from '../domain/Name';
-import { requireValid } from '../domain/parsed';
-import { Wishlist } from '../domain/Wishlist';
+import type { Wishlist } from '../domain/Wishlist';
 import { InMemoryWishlistRepository } from './fakes/InMemoryWishlistRepository';
+import { wishlistNamed } from './fakes/wishlistNamed';
 import { WatchWishlist } from './WatchWishlist';
 
 describe('WatchWishlist', () => {
   it('reports the wishlist with the given id', async () => {
     const wishlists = new InMemoryWishlistRepository();
-    const birthday = Wishlist.create(wishlistIdOf('b'), requireValid(Name.parse('Geburtstag')));
+    const birthday = wishlistNamed('Geburtstag', 'b');
     await wishlists.save(birthday);
     let reported: Wishlist | undefined;
 

@@ -9,8 +9,8 @@ const dialog = (page: Page) => page.getByRole('dialog');
 
 const data: SeedData = {
   wishlists: [
-    { id: 'birthday', name: 'Geburtstag' },
-    { id: 'christmas', name: 'Weihnachten' },
+    { id: 'birthday', name: 'Geburtstag', ownerId: 'anna' },
+    { id: 'christmas', name: 'Weihnachten', ownerId: 'anna' },
   ],
   wishes: [
     {

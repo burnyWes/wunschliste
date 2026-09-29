@@ -58,7 +58,7 @@ for (const path of ['./', './#/einstellungen']) {
 
 for (const path of ['./#/liste/birthday', './#/liste/neu']) {
   test(`hides the main navigation on the sub page ${path}`, async ({ page }) => {
-    await seed({ wishlists: [{ id: 'birthday', name: 'Geburtstag' }] });
+    await seed({ wishlists: [{ id: 'birthday', name: 'Geburtstag', ownerId: 'anna' }] });
     await page.goto(path);
 
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

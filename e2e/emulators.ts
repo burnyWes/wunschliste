@@ -1,5 +1,5 @@
 import type { RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { collection, doc, getDocs, writeBatch, type Firestore } from 'firebase/firestore';
+import { collection, doc, getDocs, setDoc, writeBatch, type Firestore } from 'firebase/firestore';
 import { familyAccountUidFrom, readFamilyRules } from '../tests/familyAccount';
 import { startTestEnvironment, withoutRules } from '../tests/integration/testFirestore';
 
@@ -7,7 +7,7 @@ export const PROJECT_ID = 'demo-wunschliste';
 
 export type PersonRecord = { id: string; name: string };
 
-export type WishlistRecord = { id: string; name: string };
+export type WishlistRecord = { id: string; name: string; ownerId: string };
 
 export type WishRecord = {
   id: string;
@@ -50,6 +50,16 @@ export async function seed({ persons = [], wishlists = [], wishes = [] }: SeedDa
       batch.set(doc(firestore, 'wishes', id), wish);
     }
     await batch.commit();
+  });
+}
+
+export async function seedDocument(
+  collectionName: string,
+  id: string,
+  data: Record<string, unknown>,
+): Promise<void> {
+  await withoutRules(await emulatedFirestore(), async (firestore) => {
+    await setDoc(doc(firestore, collectionName, id), data);
   });
 }
 

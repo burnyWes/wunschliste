@@ -6,8 +6,17 @@ const WCAG_21_AA = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
 
 const twoWishlists: SeedData = {
   wishlists: [
-    { id: 'birthday', name: 'Geburtstag 2027' },
-    { id: 'christmas', name: 'Weihnachten' },
+    { id: 'birthday', name: 'Geburtstag 2027', ownerId: 'anna' },
+    { id: 'christmas', name: 'Weihnachten', ownerId: 'anna' },
+  ],
+};
+
+const wishlistsOfSeveralOwners: SeedData = {
+  persons: [{ id: 'ben', name: 'Ben' }],
+  wishlists: [
+    { id: 'birthday', name: 'Geburtstag 2027', ownerId: 'anna' },
+    { id: 'easter', name: 'Ostern', ownerId: 'ben' },
+    { id: 'camping', name: 'Zelten', ownerId: 'gone' },
   ],
 };
 
@@ -77,7 +86,18 @@ const pages: CheckedPage[] = [
     prepare: openSignOutDialog,
   },
   { name: 'overview', path: './', heading: 'Wunschlisten', data: twoWishlists },
-  { name: 'create wishlist', path: './#/liste/neu', heading: 'Wunschliste erstellen' },
+  {
+    name: 'grouped overview',
+    path: './',
+    heading: 'Wunschlisten',
+    data: wishlistsOfSeveralOwners,
+  },
+  {
+    name: 'create wishlist',
+    path: './#/liste/neu',
+    heading: 'Wunschliste erstellen',
+    data: wishlistsOfSeveralOwners,
+  },
   {
     name: 'wishlist',
     path: './#/liste/birthday',

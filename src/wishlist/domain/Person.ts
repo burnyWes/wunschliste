@@ -28,6 +28,14 @@ export function sortPersons(persons: readonly Person[]): Person[] {
   );
 }
 
+export function personsMeFirst(persons: readonly Person[], me: PersonId): Person[] {
+  const sorted = sortPersons(persons);
+  return [
+    ...sorted.filter((person) => person.id === me),
+    ...sorted.filter((person) => person.id !== me),
+  ];
+}
+
 export class PersonNotFound extends Error {
   constructor(readonly personId: PersonId) {
     super(`The person ${personId} does not exist.`);

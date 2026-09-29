@@ -588,7 +588,7 @@ E2E:
 - [x] `npm run lint` und `npm test` grün (Architektur, Unit, Integration und E2E inklusive aller bestehenden Specs)
 
 **Manuelle Verifikation**:
-- [ ] Auf dem iPhone mit VoiceOver nach dem Ausrollen der Regeln:
+- [x] Auf dem iPhone mit VoiceOver nach dem Ausrollen der Regeln:
   - „Wer bist du?“ erscheint nach dem Anmelden.
   - Person anlegen und wählen: Die Ansage „Du bist …“ kommt, der Fokus liegt auf
     „Wunschlisten“.
@@ -604,13 +604,13 @@ Listenseite nennt sie.
 **Aufgaben**:
 
 Domäne (test-getrieben):
-- [ ] `Wishlist.ts`: `ownerId: PersonId`
+- [x] `Wishlist.ts`: `ownerId: PersonId`
   - `create(id, name, ownerId)`, `restore(id, name, ownerId)`
   - `rename` behält `ownerId`
   - Tests anpassen, neuer Test: Umbenennen behält die Besitzerin
-- [ ] `Person.ts`: `personsMeFirst(persons, me)` → eigene Person zuerst, Rest wie
+- [x] `Person.ts`: `personsMeFirst(persons, me)` → eigene Person zuerst, Rest wie
   `sortPersons`. Mit Test.
-- [ ] `wishlistOverview.ts`:
+- [x] `wishlistOverview.ts`:
   ```ts
   export type WishlistGroup = {
     owner: Person | undefined;
@@ -630,20 +630,20 @@ Domäne (test-getrieben):
   - Listen innerhalb der Gruppe per `sortWishlists`
   - Listen ohne bekannte Besitzerin in einer Gruppe `owner: undefined` am Ende
   - keine Listen → `[]`
-- [ ] `WishlistRepository.ts`: `getOwnedBy(ownerId)` und
+- [x] `WishlistRepository.ts`: `getOwnedBy(ownerId)` und
   `watchOwnedBy(ownerId, onChange, onFailure)`. Der Fake bekommt beide Methoden.
 
 Anwendung (test-getrieben):
-- [ ] `CreateWishlist.execute(name, ownerId)`: wirft `PersonNotFound`, wenn es die
+- [x] `CreateWishlist.execute(name, ownerId)`: wirft `PersonNotFound`, wenn es die
   Person nicht gibt. Der Konstruktor bekommt `PersonRepository`.
-- [ ] `WatchWishlistOverview.execute(me, onChange, onFailure)`
+- [x] `WatchWishlistOverview.execute(me, onChange, onFailure)`
   - beobachtet Wunschlisten und Personen und meldet erst nach beiden
   - ein Fehler in einer der beiden Beobachtungen → `onFailure`
   - die Rückgabe beendet beide
-- [ ] `WatchPerson.execute(id, onChange, onFailure)` für „für Anna“ (über `watchAll` und
+- [x] `WatchPerson.execute(id, onChange, onFailure)` für „für Anna“ (über `watchAll` und
   die Suche nach der ID)
-- [ ] `WatchWishlists` samt Test entfernen
-- [ ] Auf die neuen Signaturen von `Wishlist.create`/`restore` und
+- [x] `WatchWishlists` samt Test entfernen
+- [x] Auf die neuen Signaturen von `Wishlist.create`/`restore` und
   `CreateWishlist` umstellen:
   - `src/wishlist/domain/Wishlist.test.ts`
   - `src/wishlist/application/CreateWishlist.test.ts` (Konstruktor mit
@@ -653,46 +653,46 @@ Anwendung (test-getrieben):
     `src` und `tests`
 
 Infrastruktur:
-- [ ] `wishlistDocument.ts`:
+- [x] `wishlistDocument.ts`:
   - `WishlistDocument = { name: string; ownerId: string }`
   - `ownerId` muss eine nicht leere Zeichenkette sein, sonst `undefined`
-- [ ] `FirestoreWishlistRepository.ts`: `getOwnedBy` (`getDocs` einer
+- [x] `FirestoreWishlistRepository.ts`: `getOwnedBy` (`getDocs` einer
   `where('ownerId', '==', id)`-Abfrage, Server zuerst, Entscheidung 12) und
   `watchOwnedBy` (`onSnapshot` derselben Abfrage)
-- [ ] `fakes/InMemoryWishlistRepository.ts`: `getOwnedBy`, `watchOwnedBy`
-- [ ] `createWishlistModule.ts`: `watchWishlistOverview` und `watchPerson` neu,
+- [x] `fakes/InMemoryWishlistRepository.ts`: `getOwnedBy`, `watchOwnedBy`
+- [x] `createWishlistModule.ts`: `watchWishlistOverview` und `watchPerson` neu,
   `watchWishlists` entfernen, `createWishlist` bekommt die Personen
-- [ ] `ui/personTexts.ts` mit Tests in `ui/personTexts.test.ts`:
+- [x] `ui/personTexts.ts` mit Tests in `ui/personTexts.test.ts`:
   - `ownerGroupHeading(group)` → „Anna (ich)“, „Ben“, „Unbekannt“
   - `ownerLine(owner, isMe)` → „für mich“ / „für Anna“
   - `ownerChoiceLabel(person, isMe)` → „Anna (ich)“ / „Ben“
   - `ownedByLabel(name)` → „Für: Anna“
-- [ ] `WishlistsPage.svelte`:
+- [x] `WishlistsPage.svelte`:
   - `watchWishlists` durch `watchWishlistOverview.execute(me.id, …)` ersetzen
   - je Gruppe ein `<section aria-labelledby>` mit h2 und `entry-list`
   - leerer Zustand unverändert
   - `me` aus `useCurrentProfile().me`
-- [ ] `CreateWishlistPage.svelte`:
+- [x] `CreateWishlistPage.svelte`:
   - `ChoiceGroup` mit Legende „Für“ und `name="wishlist-owner"` im Snippet `extra`
     von `NameForm`
   - Optionen aus `watchPersons` + `personsMeFirst`, vorausgewählt `me.id`
   - `createWishlist.execute(name, ownerId)`
-- [ ] `EditWishlistPage.svelte`: Absatz „Für: Anna“ vor dem Löschknopf. Bei unbekannter
+- [x] `EditWishlistPage.svelte`: Absatz „Für: Anna“ vor dem Löschknopf. Bei unbekannter
   Besitzerin entfällt der Absatz.
-- [ ] `WishlistPage.svelte`: unter dem `PageHeader` ein Absatz „für Anna“ bzw. „für
+- [x] `WishlistPage.svelte`: unter dem `PageHeader` ein Absatz „für Anna“ bzw. „für
   mich“ über `watchPerson`. Bei unbekannter Besitzerin entfällt die Zeile.
-- [ ] `README.md` „Daten“: Feld `ownerId` erwähnen
+- [x] `README.md` „Daten“: Feld `ownerId` erwähnen
 
 E2E:
-- [ ] `e2e/emulators.ts`: `WishlistRecord` bekommt `ownerId: string`. Alle Seeds bekommen
+- [x] `e2e/emulators.ts`: `WishlistRecord` bekommt `ownerId: string`. Alle Seeds bekommen
   `ownerId: 'anna'`, sonst werden die Listen unsichtbar. Die Typprüfung findet sie:
   - `access.spec.ts`, `accessibility.spec.ts`, `backLinks.spec.ts`
   - `editing.spec.ts`, `gifting.spec.ts`, `layout.spec.ts`
   - `navigation.spec.ts`, `offline.spec.ts`, `problems.spec.ts`
   - `wishes.spec.ts`
-- [ ] `tests/integration/FirestoreWishlistRepository.integration.test.ts`:
+- [x] `tests/integration/FirestoreWishlistRepository.integration.test.ts`:
   `wishlistNamed` mit `ownerId`
-- [ ] `e2e/wishlists.spec.ts`:
+- [x] `e2e/wishlists.spec.ts`:
   - „lists wishlists alphabetically“ → gruppiert: mit geseedeter Person Ben und Listen
     für Anna, Ben und die unbekannte `ownerId: 'gone'` prüft der Test die h2-Reihenfolge
     `['Anna (ich)', 'Ben', 'Unbekannt']` und die Einträge je Gruppe
@@ -701,18 +701,18 @@ E2E:
   - Vorauswahl „Anna (ich)“ ist `checked`
   - eigene Liste zeigt „für mich“
   - Die Bearbeiten-Seite zeigt „Für: Anna“ und hat keine Radiogruppe.
-- [ ] neuer Test: Ein Dokument ohne `ownerId` taucht nicht auf.
-- [ ] `e2e/accessibility.spec.ts`: gruppierte Übersicht und „Wunschliste erstellen“ mit
+- [x] neuer Test: Ein Dokument ohne `ownerId` taucht nicht auf.
+- [x] `e2e/accessibility.spec.ts`: gruppierte Übersicht und „Wunschliste erstellen“ mit
   Radiogruppe
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` grün
-- [ ] `tests/integration/FirestoreWishlistRepository.integration.test.ts` angepasst und
+- [x] `npm run test:unit` grün
+- [x] `tests/integration/FirestoreWishlistRepository.integration.test.ts` angepasst und
   grün:
   - `ownerId` wird gespeichert und gelesen
   - Dokument ohne `ownerId` bzw. mit leerer `ownerId` wird übersprungen
   - `getOwnedBy` und `watchOwnedBy` liefern nur die Listen der Person
-- [ ] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
+- [x] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
 
 **Manuelle Verifikation**:
 - [ ] Auf dem iPhone mit VoiceOver:
@@ -856,6 +856,9 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
 - Phase 1, E2E: `fixtures.ts` exportiert neben `signIn` auch `submitSignIn` (ohne
   Navigation, damit Deep-Links erhalten bleiben) und `chooseProfile`. Das Konto STRANGER
   landet im Zustand `failed`. Die Seite zeigt dort das h1 „Laden fehlgeschlagen“.
+- Phase 2: `WatchWishlistOverview` meldet über zwei Beobachtungen. Die Testhilfe
+  `wishlistNamed` (`application/fakes`) setzt standardmäßig die Besitzerin `anna`. Für
+  Dokumente ohne gültige Form gibt es in `e2e/emulators.ts` `seedDocument`.
 
 ## Verweise
 

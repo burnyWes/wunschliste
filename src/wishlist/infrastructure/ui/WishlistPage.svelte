@@ -4,11 +4,14 @@
   import PageHeader from '../../../shared/ui/PageHeader.svelte';
   import { Watched } from '../../../shared/ui/watched.svelte';
   import type { WishlistId } from '../../domain/ids';
+  import type { Person } from '../../domain/Person';
   import type { Wish } from '../../domain/Wish';
   import type { Wishlist } from '../../domain/Wishlist';
   import { wishesMatching, type WishFilter } from '../../domain/wishOrder';
+  import { useCurrentProfile } from './currentProfile.svelte';
   import LoadFailed from './LoadFailed.svelte';
   import NotFound from './NotFound.svelte';
+  import { ownerLine } from './personTexts';
   import { hashOf } from './wishlistAddresses';
   import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
@@ -22,11 +25,13 @@
     { value: 'fulfilled', label: 'Erfüllte Wünsche', emptyText: 'Noch keine erfüllten Wünsche.' },
   ];
 
-  const { watchWishlist, watchWishesOfWishlist } = useWishlistModule();
+  const { watchWishlist, watchWishesOfWishlist, watchPerson } = useWishlistModule();
+  const profile = useCurrentProfile();
 
   const wishlist = new Watched<Wishlist>();
   let wishes = $state.raw<readonly Wish[]>();
   let haveWishesFailed = $state(false);
+  let owner = $state.raw<Person>();
 
   $effect(() =>
     watchWishlist.execute(
@@ -42,6 +47,18 @@
       () => (haveWishesFailed = true),
     ),
   );
+
+  const ownerId = $derived(wishlist.value?.ownerId);
+
+  $effect(() => {
+    if (ownerId !== undefined) {
+      return watchPerson.execute(
+        ownerId,
+        (reported) => (owner = reported),
+        () => {},
+      );
+    }
+  });
 
   $effect(() => wishlistFilterMemory.remember(wishlistId, filter));
 
@@ -81,6 +98,10 @@
         </button>
       {/snippet}
     </PageHeader>
+
+    {#if owner}
+      <p class="owner">{ownerLine(owner, owner.id === profile.me.id)}</p>
+    {/if}
 
     <div class="button-row">
       {#each FILTERS as { value, label } (value)}
@@ -131,6 +152,11 @@
 {/if}
 
 <style>
+  .owner {
+    margin: -0.5rem 0 0;
+    overflow-wrap: anywhere;
+  }
+
   .wish-name {
     display: block;
     font-weight: 600;

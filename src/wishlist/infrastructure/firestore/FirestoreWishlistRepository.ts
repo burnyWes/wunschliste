@@ -2,13 +2,18 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDocs,
   onSnapshot,
+  query,
   setDoc,
+  where,
   type DocumentReference,
   type DocumentSnapshot,
   type Firestore,
+  type Query,
+  type QuerySnapshot,
 } from 'firebase/firestore';
-import type { WishlistId } from '../../domain/ids';
+import type { PersonId, WishlistId } from '../../domain/ids';
 import type { Unsubscribe } from '../../domain/Unsubscribe';
 import type { Wishlist } from '../../domain/Wishlist';
 import type { WishlistRepository } from '../../domain/WishlistRepository';
@@ -24,6 +29,10 @@ function wishlistIn(snapshot: DocumentSnapshot): Wishlist | undefined {
   return snapshot.exists() ? wishlistFromDocument(snapshot.id, snapshot.data()) : undefined;
 }
 
+function wishlistsIn(snapshot: QuerySnapshot): Wishlist[] {
+  return snapshot.docs.map(wishlistIn).filter((wishlist) => wishlist !== undefined);
+}
+
 export class FirestoreWishlistRepository implements WishlistRepository {
   readonly #firestore: Firestore;
   readonly #onProblem: ReportWishlistProblem;
@@ -36,8 +45,19 @@ export class FirestoreWishlistRepository implements WishlistRepository {
   watchAll(onChange: (wishlists: readonly Wishlist[]) => void, onFailure: () => void): Unsubscribe {
     return onSnapshot(
       collection(this.#firestore, WISHLISTS_COLLECTION),
-      (snapshot) =>
-        onChange(snapshot.docs.map(wishlistIn).filter((wishlist) => wishlist !== undefined)),
+      (snapshot) => onChange(wishlistsIn(snapshot)),
+      reportedFailure(onFailure, this.#onProblem),
+    );
+  }
+
+  watchOwnedBy(
+    ownerId: PersonId,
+    onChange: (wishlists: readonly Wishlist[]) => void,
+    onFailure: () => void,
+  ): Unsubscribe {
+    return onSnapshot(
+      this.#ownedBy(ownerId),
+      (snapshot) => onChange(wishlistsIn(snapshot)),
       reportedFailure(onFailure, this.#onProblem),
     );
   }
@@ -58,6 +78,10 @@ export class FirestoreWishlistRepository implements WishlistRepository {
     return wishlistIn(await cachedDocument(this.#reference(id)));
   }
 
+  async getOwnedBy(ownerId: PersonId): Promise<readonly Wishlist[]> {
+    return wishlistsIn(await getDocs(this.#ownedBy(ownerId)));
+  }
+
   async save(wishlist: Wishlist): Promise<void> {
     observedWrite(
       setDoc(this.#reference(wishlist.id), toWishlistDocument(wishlist)),
@@ -67,6 +91,13 @@ export class FirestoreWishlistRepository implements WishlistRepository {
 
   async delete(id: WishlistId): Promise<void> {
     observedWrite(deleteDoc(this.#reference(id)), this.#onProblem);
+  }
+
+  #ownedBy(ownerId: PersonId): Query {
+    return query(
+      collection(this.#firestore, WISHLISTS_COLLECTION),
+      where('ownerId', '==', ownerId),
+    );
   }
 
   #reference(id: WishlistId): DocumentReference {

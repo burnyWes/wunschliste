@@ -4,7 +4,7 @@ import { seed, storedWishes, type WishRecord } from './emulators';
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
 const field = (page: Page, name: string) => page.getByRole('textbox', { name, exact: true });
 
-const birthday = { id: 'birthday', name: 'Geburtstag' };
+const birthday = { id: 'birthday', name: 'Geburtstag', ownerId: 'anna' };
 
 async function chooseRating(page: Page, label: string): Promise<void> {
   await page.locator('label').filter({ hasText: label }).click();

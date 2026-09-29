@@ -1,7 +1,7 @@
 import type { RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { disableNetwork, doc, setDoc } from 'firebase/firestore';
+import { disableNetwork, doc, getDoc, setDoc } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { wishlistIdOf } from '../../src/wishlist/domain/ids';
+import { personIdOf, wishlistIdOf, type PersonId } from '../../src/wishlist/domain/ids';
 import { Name } from '../../src/wishlist/domain/Name';
 import { requireValid } from '../../src/wishlist/domain/parsed';
 import { Wishlist } from '../../src/wishlist/domain/Wishlist';
@@ -19,8 +19,11 @@ import {
   withoutRules,
 } from './testFirestore';
 
-function wishlistNamed(name: string, id = name): Wishlist {
-  return Wishlist.create(wishlistIdOf(id), requireValid(Name.parse(name)));
+const anna = personIdOf('anna');
+const ben = personIdOf('ben');
+
+function wishlistNamed(name: string, id = name, ownerId: PersonId = anna): Wishlist {
+  return Wishlist.create(wishlistIdOf(id), requireValid(Name.parse(name)), ownerId);
 }
 
 function namesOf(wishlists: readonly Wishlist[]): string[] {
@@ -46,17 +49,45 @@ function familyRepository(): FirestoreWishlistRepository {
 }
 
 describe('FirestoreWishlistRepository', () => {
-  it('shows a saved wishlist on another device', async () => {
-    const reports: (string | undefined)[] = [];
+  it('shows a saved wishlist with its owner on another device', async () => {
+    const reports: (Wishlist | undefined)[] = [];
     familyRepository().watch(
       wishlistIdOf('b'),
-      (wishlist) => reports.push(wishlist?.name.value),
+      (wishlist) => reports.push(wishlist),
       ignoreFailure,
     );
 
-    await familyRepository().save(wishlistNamed('Geburtstag', 'b'));
+    await familyRepository().save(wishlistNamed('Geburtstag', 'b', ben));
 
-    await eventually(() => expect(reports.at(-1)).toBe('Geburtstag'));
+    await eventually(() => {
+      expect(reports.at(-1)?.name.value).toBe('Geburtstag');
+      expect(reports.at(-1)?.ownerId).toBe('ben');
+    });
+  });
+
+  it('stores the name and the owner', async () => {
+    await familyRepository().save(wishlistNamed('Geburtstag', 'b', ben));
+
+    await eventually(async () => {
+      const stored = await withoutRules(environment, async (firestore) =>
+        (await getDoc(doc(firestore, WISHLISTS_COLLECTION, 'b'))).data(),
+      );
+      expect(stored).toEqual({ name: 'Geburtstag', ownerId: 'ben' });
+    });
+  });
+
+  it('gives and reports only the wishlists of one owner', async () => {
+    const repository = familyRepository();
+    const reports: string[][] = [];
+    repository.watchOwnedBy(ben, (wishlists) => reports.push(namesOf(wishlists)), ignoreFailure);
+    await eventually(() => expect(reports).toEqual([[]]));
+
+    await repository.save(wishlistNamed('Ostern', 'easter', ben));
+    await repository.save(wishlistNamed('Geburtstag', 'birthday', anna));
+
+    await eventually(() => expect(reports.at(-1)).toEqual(['Ostern']));
+    expect(namesOf(await familyRepository().getOwnedBy(ben))).toEqual(['Ostern']);
+    expect(reports.flat()).not.toContain('Geburtstag');
   });
 
   it('reports all wishlists at once and after each save and delete', async () => {
@@ -92,11 +123,19 @@ describe('FirestoreWishlistRepository', () => {
     expect(await familyRepository().get(wishlistIdOf('unknown'))).toBeUndefined();
   });
 
-  it('skips a document with an empty name and keeps the others', async () => {
+  it('skips documents without a valid name or owner and keeps the others', async () => {
     await withoutRules(environment, async (firestore) => {
-      await setDoc(doc(firestore, WISHLISTS_COLLECTION, 'a'), { name: '' });
-      await setDoc(doc(firestore, WISHLISTS_COLLECTION, 'b'), { name: 'Geburtstag' });
-      await setDoc(doc(firestore, WISHLISTS_COLLECTION, 'c'), { title: 'Ostern' });
+      const documents: Record<string, object> = {
+        a: { name: '', ownerId: 'anna' },
+        b: { name: 'Geburtstag', ownerId: 'anna' },
+        c: { title: 'Ostern', ownerId: 'anna' },
+        d: { name: 'Weihnachten' },
+        e: { name: 'Pfingsten', ownerId: '' },
+        f: { name: 'Nikolaus', ownerId: 7 },
+      };
+      for (const [id, data] of Object.entries(documents)) {
+        await setDoc(doc(firestore, WISHLISTS_COLLECTION, id), data);
+      }
     });
     const reports: string[][] = [];
 

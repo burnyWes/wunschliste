@@ -1,23 +1,24 @@
 import { compareIds } from './compareIds';
-import type { WishlistId } from './ids';
+import type { PersonId, WishlistId } from './ids';
 import type { Name } from './Name';
 
 export class Wishlist {
   private constructor(
     readonly id: WishlistId,
     readonly name: Name,
+    readonly ownerId: PersonId,
   ) {}
 
-  static create(id: WishlistId, name: Name): Wishlist {
-    return new Wishlist(id, name);
+  static create(id: WishlistId, name: Name, ownerId: PersonId): Wishlist {
+    return new Wishlist(id, name, ownerId);
   }
 
-  static restore(id: WishlistId, name: Name): Wishlist {
-    return new Wishlist(id, name);
+  static restore(id: WishlistId, name: Name, ownerId: PersonId): Wishlist {
+    return new Wishlist(id, name, ownerId);
   }
 
   rename(name: Name): Wishlist {
-    return new Wishlist(this.id, name);
+    return new Wishlist(this.id, name, this.ownerId);
   }
 }
 

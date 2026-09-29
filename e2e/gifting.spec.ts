@@ -10,7 +10,7 @@ const wishLink = (page: Page, name: string) =>
 
 test.beforeEach(async () => {
   await seed({
-    wishlists: [{ id: 'birthday', name: 'Geburtstag' }],
+    wishlists: [{ id: 'birthday', name: 'Geburtstag', ownerId: 'anna' }],
     wishes: [
       { id: 'helmet', wishlistId: 'birthday', name: 'Fahrradhelm', gifted: false },
       { id: 'book', wishlistId: 'birthday', name: 'Buch', gifted: false },

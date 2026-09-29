@@ -6,7 +6,7 @@ const pageHeading = (page: Page, name: string) => page.getByRole('heading', { le
 
 test.beforeEach(async () => {
   await seed({
-    wishlists: [{ id: 'birthday', name: 'Geburtstag' }],
+    wishlists: [{ id: 'birthday', name: 'Geburtstag', ownerId: 'anna' }],
     wishes: [
       { id: 'helmet', wishlistId: 'birthday', name: 'Fahrradhelm', gifted: false },
       { id: 'tent', wishlistId: 'birthday', name: 'Zelt', gifted: true },

@@ -145,6 +145,9 @@ gleichen sich live zwischen den Geräten ab. Jedes Gerät hält sie zusätzlich 
 (IndexedDB), damit die App ohne Netz bedienbar bleibt. Abmelden löscht diesen
 Zwischenspeicher.
 
+Jede Wunschliste gehört genau einer Person (Feld `ownerId`). Dokumente in `wishlists`
+ohne gültige `ownerId` werden ignoriert.
+
 Welche Person ein Gerät benutzt („Wer bist du?“), steht nur auf dem Gerät in
 `localStorage` unter `wunschliste.profile`. Abmelden entfernt es.
 

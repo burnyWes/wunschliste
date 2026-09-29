@@ -19,7 +19,7 @@ async function signedInDevice(browser: Browser, baseURL: string | undefined): Pr
 }
 
 test.beforeEach(async () => {
-  await seed({ wishlists: [{ id: 'birthday', name: 'Geburtstag' }] });
+  await seed({ wishlists: [{ id: 'birthday', name: 'Geburtstag', ownerId: 'anna' }] });
 });
 
 test('points out the missing connection and hides the notice once back online', async ({

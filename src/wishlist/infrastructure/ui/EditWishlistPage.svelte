@@ -6,6 +6,7 @@
   import { Watched } from '../../../shared/ui/watched.svelte';
   import type { WishlistId } from '../../domain/ids';
   import type { Name } from '../../domain/Name';
+  import type { Person } from '../../domain/Person';
   import type { Wish } from '../../domain/Wish';
   import type { Wishlist } from '../../domain/Wishlist';
   import LoadFailed from './LoadFailed.svelte';
@@ -14,6 +15,7 @@
   import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
   import NameForm from './NameForm.svelte';
+  import { ownedByLabel } from './personTexts';
   import {
     SAVED_ANNOUNCEMENT,
     wishlistDeletedAnnouncement,
@@ -22,11 +24,12 @@
 
   let { wishlistId }: { wishlistId: WishlistId } = $props();
 
-  const { watchWishlist, watchWishesOfWishlist, renameWishlist, deleteWishlist } =
+  const { watchWishlist, watchWishesOfWishlist, watchPerson, renameWishlist, deleteWishlist } =
     useWishlistModule();
 
   const wishlist = new Watched<Wishlist>();
   let wishes = $state.raw<readonly Wish[]>([]);
+  let owner = $state.raw<Person>();
   let haveWishesFailed = $state(false);
   let isDeleting = $state(false);
   let deletionDialog = $state<ConfirmDialog>();
@@ -45,6 +48,18 @@
       () => (haveWishesFailed = true),
     ),
   );
+
+  const ownerId = $derived(wishlist.value?.ownerId);
+
+  $effect(() => {
+    if (ownerId !== undefined) {
+      return watchPerson.execute(
+        ownerId,
+        (reported) => (owner = reported),
+        () => {},
+      );
+    }
+  });
 
   const wishlistHash = $derived(wishlistFilterMemory.hashOf(wishlistId));
 
@@ -73,6 +88,9 @@
     onsubmit={save}
   >
     {#snippet extra()}
+      {#if owner}
+        <p>{ownedByLabel(owner.name.value)}</p>
+      {/if}
       <div class="button-row">
         <button
           class="button"

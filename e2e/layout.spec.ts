@@ -30,7 +30,7 @@ test('keeps the action bar at the bottom of the viewport while scrolling tall co
 });
 
 test('centers the buttons in the action bar', async ({ page }) => {
-  await seed({ wishlists: [{ id: 'b', name: 'Geburtstag' }] });
+  await seed({ wishlists: [{ id: 'b', name: 'Geburtstag', ownerId: 'anna' }] });
   await page.goto('./#/liste/b/wunsch/neu');
 
   const offCenter = await actionBar(page).evaluate((bar) => {

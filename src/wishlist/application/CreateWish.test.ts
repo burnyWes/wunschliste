@@ -2,18 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { wishlistIdOf } from '../domain/ids';
 import { Name } from '../domain/Name';
 import { requireValid } from '../domain/parsed';
-import { Wishlist, WishlistNotFound } from '../domain/Wishlist';
+import { WishlistNotFound } from '../domain/Wishlist';
 import { CreateWish } from './CreateWish';
 import { InMemoryWishlistRepository } from './fakes/InMemoryWishlistRepository';
 import { InMemoryWishRepository } from './fakes/InMemoryWishRepository';
 import { SequentialIdGenerator } from './fakes/SequentialIdGenerator';
+import { wishlistNamed } from './fakes/wishlistNamed';
 
 const helmet = { name: requireValid(Name.parse('Fahrradhelm')) };
 
 async function setUp() {
   const wishlists = new InMemoryWishlistRepository();
   const wishes = new InMemoryWishRepository();
-  const birthday = Wishlist.create(wishlistIdOf('b'), requireValid(Name.parse('Geburtstag')));
+  const birthday = wishlistNamed('Geburtstag', 'b');
   await wishlists.save(birthday);
   const createWish = new CreateWish(wishlists, wishes, new SequentialIdGenerator());
   return { wishes, birthday, createWish };

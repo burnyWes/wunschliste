@@ -108,7 +108,7 @@ test.describe('after signing out', () => {
   }
 
   test('shows the data again after signing in anew', async ({ page }) => {
-    await seed({ wishlists: [{ id: 'birthday', name: 'Geburtstag' }] });
+    await seed({ wishlists: [{ id: 'birthday', name: 'Geburtstag', ownerId: 'anna' }] });
     await signIn(page);
     await expect(page.getByRole('main').getByRole('button', { name: 'Geburtstag' })).toBeVisible();
 

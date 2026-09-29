@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { personIdOf } from './ids';
 import { Name } from './Name';
 import { requireValid } from './parsed';
-import { Person, sortPersons } from './Person';
+import { Person, personsMeFirst, sortPersons } from './Person';
 
 function nameOf(raw: string): Name {
   return requireValid(Name.parse(raw));
@@ -49,5 +49,25 @@ describe('sortPersons', () => {
     const sorted = sortPersons([personNamed('Ben', 'b'), personNamed('Ben', 'a')]);
 
     expect(sorted.map((person) => person.id)).toEqual(['a', 'b']);
+  });
+});
+
+describe('personsMeFirst', () => {
+  it('puts me first and sorts the others by name', () => {
+    const ordered = personsMeFirst(
+      ['Oma', 'Ben', 'Anna'].map((name) => personNamed(name)),
+      personIdOf('Oma'),
+    );
+
+    expect(ordered.map((person) => person.name.value)).toEqual(['Oma', 'Anna', 'Ben']);
+  });
+
+  it('only sorts when I am not among the persons', () => {
+    const ordered = personsMeFirst(
+      ['Oma', 'Anna'].map((name) => personNamed(name)),
+      personIdOf('gone'),
+    );
+
+    expect(ordered.map((person) => person.name.value)).toEqual(['Anna', 'Oma']);
   });
 });

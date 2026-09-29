@@ -3,10 +3,10 @@ import { wishIdOf, wishlistIdOf, type WishlistId } from '../domain/ids';
 import { Name } from '../domain/Name';
 import { requireValid } from '../domain/parsed';
 import { Wish } from '../domain/Wish';
-import { Wishlist } from '../domain/Wishlist';
 import { DeleteWishlist } from './DeleteWishlist';
 import { InMemoryWishlistRepository } from './fakes/InMemoryWishlistRepository';
 import { InMemoryWishRepository } from './fakes/InMemoryWishRepository';
+import { wishlistNamed } from './fakes/wishlistNamed';
 
 const nameOf = (raw: string) => requireValid(Name.parse(raw));
 const birthday = wishlistIdOf('birthday');
@@ -20,8 +20,8 @@ describe('DeleteWishlist', () => {
   it('deletes the wishlist with its wishes and keeps the wishes of other wishlists', async () => {
     const wishlists = new InMemoryWishlistRepository();
     const wishes = new InMemoryWishRepository();
-    await wishlists.save(Wishlist.create(birthday, nameOf('Geburtstag')));
-    await wishlists.save(Wishlist.create(christmas, nameOf('Weihnachten')));
+    await wishlists.save(wishlistNamed('Geburtstag', birthday));
+    await wishlists.save(wishlistNamed('Weihnachten', christmas));
     await wishes.save(wish('helmet', birthday));
     await wishes.save(wish('book', birthday));
     await wishes.save(wish('sledge', christmas));
