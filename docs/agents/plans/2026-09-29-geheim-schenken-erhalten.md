@@ -5,7 +5,7 @@ branch: main
 story: WL-006
 topic: "Schenken und Erhalten, Geheim-Einträge und Löschen nur für die Besitzerin"
 tags: [plan, wishlist, domain, application, firestore, wish-page, wishlist-page, accessibility]
-status: ready
+status: done
 ---
 
 # PLAN: WL-006 — Schenken und Erhalten, Geheim-Einträge und Löschen nur für die Besitzerin
@@ -910,7 +910,7 @@ E2E:
 - [x] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
 
 **Manuelle Verifikation**:
-- [ ] Auf zwei iPhones mit VoiceOver:
+- [x] Auf zwei iPhones mit VoiceOver:
   - Anna löscht einen Wunsch, den Ben geschenkt hat. Bei Anna ist er weg, Ben hört auf der
     Detailseite „Anna hat diesen Wunsch entfernt.“ und kann endgültig löschen.
   - Anna löscht eine Liste mit einem geheimen Wunsch. Bei Anna ist sie weg, Ben sieht sie
