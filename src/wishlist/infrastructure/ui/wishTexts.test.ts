@@ -12,6 +12,9 @@ import {
   formatPrice,
   fulfilledNote,
   giverNote,
+  secretHint,
+  secretNote,
+  surpriseLine,
   LINK_PROBLEM_MESSAGES,
   NAME_FORM_PROBLEM_MESSAGES,
   NAME_PROBLEM_MESSAGES,
@@ -128,6 +131,22 @@ describe('wish state', () => {
 
   it('leaves out an unknown giver', () => {
     expect(fulfilledNote(undefined)).toBe('Erfüllt');
+  });
+
+  it('names the creator of a secret wish', () => {
+    expect(secretNote('Ben')).toBe('Geheim – von Ben');
+    expect(secretNote(undefined)).toBe('Geheim');
+  });
+
+  it('explains what the owner sees of a secret wish', () => {
+    expect(secretHint('Anna')).toBe('Anna sieht nur „Überraschung“.');
+  });
+
+  it.each([
+    [1, '1 Überraschung'],
+    [2, '2 Überraschungen'],
+  ])('counts %i surprises', (count, line) => {
+    expect(surpriseLine(count)).toBe(line);
   });
 });
 

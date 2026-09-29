@@ -33,14 +33,25 @@ function giverShownTo(wish: Wish, perspective: Perspective): PersonId | undefine
   return isGiftStillSecret ? undefined : wish.giverId;
 }
 
+function visibilityFor(wish: Wish, perspective: Perspective): WishVisibility {
+  if (wish.isSurpriseFor(perspective)) {
+    return 'surprise';
+  }
+  return wish.isHiddenFrom(perspective) ? 'hidden' : 'shown';
+}
+
+function secretCreatorShownTo(wish: Wish, perspective: Perspective): PersonId | undefined {
+  return wish.secret && !isOwner(perspective) ? wish.createdBy : undefined;
+}
+
 export function viewOfWish(wish: Wish, perspective: Perspective): WishView {
   const { primary, secondary } = allowedWishActions(wish, perspective);
   return {
     wish,
-    visibility: 'shown',
+    visibility: visibilityFor(wish, perspective),
     status: isFulfilledFor(wish, perspective) ? 'fulfilled' : 'open',
     giverId: giverShownTo(wish, perspective),
-    secretCreatorId: undefined,
+    secretCreatorId: secretCreatorShownTo(wish, perspective),
     removedByOwner: wish.removedByOwner,
     primaryAction: primary,
     secondaryAction: secondary,

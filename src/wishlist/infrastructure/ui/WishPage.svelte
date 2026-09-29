@@ -109,7 +109,7 @@
 
 {#if wish.status === 'failed' || wishlist.status === 'failed'}
   <LoadFailed />
-{:else if view}
+{:else if view?.visibility === 'shown'}
   {@const { name, link, description } = view.wish.details}
   {@const { primaryAction, secondaryAction } = view}
   <div class="page">
@@ -154,7 +154,7 @@
       {/if}
     </ActionBar>
   </div>
-{:else if wish.status === 'missing' || wishlist.status === 'missing'}
+{:else if wish.status === 'missing' || wishlist.status === 'missing' || view}
   <NotFound message="Diesen Wunsch gibt es nicht mehr." />
 {/if}
 

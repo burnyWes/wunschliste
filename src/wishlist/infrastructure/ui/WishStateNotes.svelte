@@ -2,7 +2,7 @@
   import type { PersonId } from '../../domain/ids';
   import type { Person } from '../../domain/Person';
   import type { WishView } from '../../domain/wishView';
-  import { fulfilledNote, giverNote } from './wishTexts';
+  import { fulfilledNote, giverNote, secretNote } from './wishTexts';
 
   let {
     view,
@@ -15,8 +15,15 @@
   }
 
   const giverName = $derived(nameOf(view.giverId));
+  const noteElement = $derived(variant === 'page' ? 'p' : 'span');
 </script>
 
+{#if view.secretCreatorId !== undefined}
+  <svelte:element this={noteElement} class="note">
+    <span aria-hidden="true">🤫</span>
+    {secretNote(nameOf(view.secretCreatorId))}
+  </svelte:element>
+{/if}
 {#if view.status === 'fulfilled'}
   {#if variant === 'page'}
     <p class="note note--strong">{fulfilledNote(giverName)}</p>

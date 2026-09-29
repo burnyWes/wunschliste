@@ -60,7 +60,7 @@ export function createWishlistModule({
     createWish: new CreateWish(wishlists, wishes, idGenerator),
     watchWishesOfWishlist: new WatchWishesOfWishlist(wishes),
     watchWish: new WatchWish(wishes),
-    editWish: new EditWish(wishes),
+    editWish: new EditWish(wishes, wishlists),
     deleteWish: new DeleteWish(wishes),
     changeWishState: new ChangeWishState(wishes, wishlists),
   };

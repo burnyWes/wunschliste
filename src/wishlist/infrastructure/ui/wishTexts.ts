@@ -104,6 +104,18 @@ export function giverNote(giverName: string): string {
   return `von ${giverName}`;
 }
 
+export function secretNote(creatorName?: string): string {
+  return creatorName === undefined ? 'Geheim' : `Geheim – von ${creatorName}`;
+}
+
+export function secretHint(ownerName: string): string {
+  return `${ownerName} sieht nur „Überraschung“.`;
+}
+
+export function surpriseLine(count: number): string {
+  return count === 1 ? '1 Überraschung' : `${count} Überraschungen`;
+}
+
 export function wishlistDeletedAnnouncement(name: string): string {
   return `Wunschliste „${name}“ gelöscht.`;
 }

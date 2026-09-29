@@ -1,5 +1,5 @@
 import type { PersonId, WishId, WishlistId } from './ids';
-import type { Perspective } from './Perspective';
+import { isOwner, type Perspective } from './Perspective';
 import { allowedWishActions, type WishAction } from './wishActions';
 import type { WishDetails } from './WishDetails';
 
@@ -18,6 +18,7 @@ export type NewWish = {
   id: WishId;
   wishlistId: WishlistId;
   details: WishDetails;
+  secret: boolean;
 };
 
 type WishChange = Partial<Pick<RestoredWish, 'giverId' | 'received'>>;
@@ -52,13 +53,16 @@ export class Wish {
     this.removedByOwner = state.removedByOwner;
   }
 
-  static create({ id, wishlistId, details }: NewWish, perspective: Perspective): Wish {
+  static create({ id, wishlistId, details, secret }: NewWish, perspective: Perspective): Wish {
+    if (secret && isOwner(perspective)) {
+      throw new OwnerCannotKeepSecrets(id);
+    }
     return new Wish({
       id,
       wishlistId,
       details,
       createdBy: perspective.me,
-      secret: false,
+      secret,
       giverId: undefined,
       received: false,
       removedByOwner: false,
@@ -69,8 +73,22 @@ export class Wish {
     return new Wish(state);
   }
 
-  edit(details: WishDetails): Wish {
-    return this.#changed({ details });
+  isSurpriseFor(perspective: Perspective): boolean {
+    return isOwner(perspective) && this.secret && !this.received;
+  }
+
+  isHiddenFrom(perspective: Perspective): boolean {
+    return this.isSurpriseFor(perspective);
+  }
+
+  edit(details: WishDetails, secret: boolean, perspective: Perspective): Wish {
+    if (this.isHiddenFrom(perspective)) {
+      throw new WishHiddenFromOwner(this.id);
+    }
+    if (secret && !this.secret) {
+      throw new WishCannotBecomeSecret(this.id);
+    }
+    return this.#changed({ details, secret });
   }
 
   perform(action: WishAction, perspective: Perspective): Wish {
@@ -110,5 +128,26 @@ export class WishActionNotAllowed extends Error {
   ) {
     super(`The action ${action} is not allowed on the wish ${wishId}.`);
     this.name = 'WishActionNotAllowed';
+  }
+}
+
+export class OwnerCannotKeepSecrets extends Error {
+  constructor(readonly wishId: WishId) {
+    super(`The wish ${wishId} cannot be kept secret in the own wishlist.`);
+    this.name = 'OwnerCannotKeepSecrets';
+  }
+}
+
+export class WishCannotBecomeSecret extends Error {
+  constructor(readonly wishId: WishId) {
+    super(`The wish ${wishId} was visible and cannot become secret.`);
+    this.name = 'WishCannotBecomeSecret';
+  }
+}
+
+export class WishHiddenFromOwner extends Error {
+  constructor(readonly wishId: WishId) {
+    super(`The wish ${wishId} is hidden from the owner.`);
+    this.name = 'WishHiddenFromOwner';
   }
 }

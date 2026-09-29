@@ -74,6 +74,31 @@ const giftsInWishlistOfBen: SeedData = {
   ],
 };
 
+const secretWishes: SeedData = {
+  persons: [{ id: 'ben', name: 'Ben' }],
+  wishlists: [
+    { id: 'easter', name: 'Ostern', ownerId: 'ben' },
+    { id: 'birthday', name: 'Geburtstag 2027', ownerId: 'anna' },
+  ],
+  wishes: [
+    wishRecord({
+      id: 'tickets',
+      wishlistId: 'easter',
+      name: 'Konzertkarten',
+      secret: true,
+      giverId: 'anna',
+    }),
+    wishRecord({ id: 'book', wishlistId: 'birthday', name: 'Buch' }),
+    wishRecord({
+      id: 'cake',
+      wishlistId: 'birthday',
+      name: 'Torte',
+      createdBy: 'ben',
+      secret: true,
+    }),
+  ],
+};
+
 async function submitInvalidWish(page: Page): Promise<void> {
   await page.getByRole('textbox', { name: 'Preis in Euro' }).fill('abc');
   await page.getByRole('button', { name: 'Speichern' }).click();
@@ -186,6 +211,24 @@ const pages: CheckedPage[] = [
     path: './#/wunsch/lamp',
     heading: 'Lampe',
     data: giftsInWishlistOfBen,
+  },
+  {
+    name: 'secret wish gifted by me',
+    path: './#/wunsch/tickets',
+    heading: 'Konzertkarten',
+    data: secretWishes,
+  },
+  {
+    name: 'wishlist with surprise',
+    path: './#/liste/birthday',
+    heading: 'Geburtstag 2027',
+    data: secretWishes,
+  },
+  {
+    name: 'create secret wish',
+    path: './#/liste/easter/wunsch/neu',
+    heading: 'Wunsch erstellen',
+    data: secretWishes,
   },
   {
     name: 'create wish with problems',

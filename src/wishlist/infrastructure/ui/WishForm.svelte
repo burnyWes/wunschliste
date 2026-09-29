@@ -2,6 +2,7 @@
   import { Save, X } from '@lucide/svelte';
   import { onMount, tick, untrack, type Snippet } from 'svelte';
   import ActionBar from '../../../shared/ui/ActionBar.svelte';
+  import CheckOption from '../../../shared/ui/CheckOption.svelte';
   import ChoiceGroup from '../../../shared/ui/ChoiceGroup.svelte';
   import { navigateTo } from '../../../shared/ui/navigation';
   import { takePageFocusRequest } from '../../../shared/ui/pageFocus';
@@ -24,11 +25,14 @@
 
   type RatingChoice = Rating | 'none';
 
+  type SecretChoice = { initial: boolean; hint: string };
+
   let {
     heading,
     initialInput,
     cancelTarget,
     focusesName = false,
+    secret,
     onsubmit,
     extra,
   }: {
@@ -36,7 +40,8 @@
     initialInput?: WishDetailsInput;
     cancelTarget: string;
     focusesName?: boolean;
-    onsubmit: (details: WishDetails) => Promise<void>;
+    secret?: SecretChoice;
+    onsubmit: (details: WishDetails, secret: boolean) => Promise<void>;
     extra?: Snippet;
   } = $props();
 
@@ -60,6 +65,7 @@
   let description = $state(start.description);
   let price = $state(start.price);
   let ratingChoice = $state<RatingChoice>(start.rating ?? 'none');
+  let isSecret = $state(untrack(() => secret?.initial) ?? false);
   let problems = $state<WishDetailsProblems>({});
 
   let nameField: TextField;
@@ -97,7 +103,7 @@
       return;
     }
     problems = {};
-    await onsubmit(parsed.details);
+    await onsubmit(parsed.details, secret !== undefined && isSecret);
   }
 </script>
 
@@ -147,6 +153,14 @@
     selected={ratingChoice}
     onselect={(choice) => (ratingChoice = choice)}
   />
+  {#if secret}
+    <CheckOption
+      id="wish-secret"
+      label="Geheim"
+      bind:checked={isSecret}
+      description={secret.hint}
+    />
+  {/if}
   {@render extra?.()}
   <ActionBar>
     <button class="button" type="submit"><Save aria-hidden="true" size="1.25em" /> Speichern</button

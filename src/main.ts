@@ -3,6 +3,7 @@ import App from './app/App.svelte';
 import './app/theme/colorSchemes.css';
 import './app/global.css';
 import './shared/ui/buttons.css';
+import './shared/ui/checkOption.css';
 import './shared/ui/entryList.css';
 
 function requireAppRoot(): HTMLElement {

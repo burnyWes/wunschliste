@@ -81,6 +81,47 @@ describe('viewOfWish', () => {
   });
 });
 
+describe('viewOfWish for secret wishes', () => {
+  const secret = annasWish('Konzert', { secret: true, createdBy: ben });
+
+  it('shows the owner only a surprise', () => {
+    const view = viewOfWish(secret, asAnna);
+
+    expect(view.visibility).toBe('surprise');
+    expect(view.secretCreatorId).toBeUndefined();
+    expect(view.primaryAction).toBeUndefined();
+  });
+
+  it('names the creator to everyone else', () => {
+    expect(viewOfWish(secret, asOma)).toMatchObject({
+      visibility: 'shown',
+      status: 'open',
+      secretCreatorId: ben,
+      primaryAction: 'gift',
+    });
+  });
+
+  it('shows the owner the handed over wish as fulfilled by the giver without action', () => {
+    const handedOver = annasWish('Konzert', {
+      secret: true,
+      createdBy: ben,
+      giverId: ben,
+      received: true,
+    });
+
+    expect(viewOfWish(handedOver, asAnna)).toEqual({
+      wish: handedOver,
+      visibility: 'shown',
+      status: 'fulfilled',
+      giverId: ben,
+      secretCreatorId: undefined,
+      removedByOwner: false,
+      primaryAction: undefined,
+      secondaryAction: undefined,
+    });
+  });
+});
+
 describe('viewOfWishes', () => {
   const wishes = [
     annasWish('D', { giverId: ben }),
@@ -99,6 +140,22 @@ describe('viewOfWishes', () => {
 
   it('keeps a gifted wish open for the owner', () => {
     expect(namesOf(viewOfWishes(wishes, asAnna, 'open').entries)).toEqual(['A', 'C', 'D']);
+  });
+
+  it('counts the surprises of the owner apart from the open wishes', () => {
+    const withSecrets = [
+      ...wishes,
+      annasWish('E', { secret: true, createdBy: ben }),
+      annasWish('F', { secret: true, createdBy: ben, giverId: ben }),
+    ];
+
+    const open = viewOfWishes(withSecrets, asAnna, 'open');
+
+    expect(namesOf(open.entries)).toEqual(['A', 'C', 'D']);
+    expect(open.surpriseCount).toBe(2);
+    expect(viewOfWishes(withSecrets, asAnna, 'fulfilled').surpriseCount).toBe(0);
+    expect(namesOf(viewOfWishes(withSecrets, asAnna, 'fulfilled').entries)).toEqual(['B']);
+    expect(viewOfWishes(withSecrets, asOma, 'open').surpriseCount).toBe(0);
   });
 
   it('counts no surprises without secret wishes', () => {

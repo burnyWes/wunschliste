@@ -591,7 +591,7 @@ E2E:
 - [x] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
 
 **Manuelle Verifikation**:
-- [ ] Auf zwei iPhones mit VoiceOver, als Anna und als Ben:
+- [x] Auf zwei iPhones mit VoiceOver, als Anna und als Ben:
   - Ben schenkt in Annas Liste: Anna sieht weiter [Erhalten] und keinen Hinweis.
   - Anna tippt [Erhalten]: Ansage, Fokus auf [Erhalten zurücknehmen], „Erfüllt – von Ben“
     wird vorgelesen.
@@ -606,19 +606,19 @@ nur eine Überraschungszeile. Der Schenkende meldet die Übergabe.
 **Aufgaben**:
 
 Domäne (test-getrieben):
-- [ ] `Wish.create({ id, wishlistId, details, secret }, p)`: `secret && isOwner(p)` wirft
+- [x] `Wish.create({ id, wishlistId, details, secret }, p)`: `secret && isOwner(p)` wirft
   `OwnerCannotKeepSecrets`. Tests: geheim in fremder Liste, verboten in der eigenen.
-- [ ] `Wish.ts`:
+- [x] `Wish.ts`:
   - `wish.isSurpriseFor(p)` gilt für die Besitzerin bei geheimen, nicht erhaltenen
     Wünschen.
   - `wish.isHiddenFrom(p)` ist in Phase 2 gleich `isSurpriseFor(p)`, Phase 3 erweitert es.
   - Tests
-- [ ] `Wish.edit(details, secret, p)`:
+- [x] `Wish.edit(details, secret, p)`:
   - Gilt `isHiddenFrom(p)`, wirft die Methode `WishHiddenFromOwner`.
   - `secret` darf nur gleich bleiben oder von `true` auf `false` wechseln, sonst wirft sie
     `WishCannotBecomeSecret`.
   - Tests: abwählen, nicht nachträglich geheim, Besitzerin kann Geheimes nicht bearbeiten
-- [ ] `wishView.ts`:
+- [x] `wishView.ts`:
   - `visibility: 'surprise'` für die Besitzerin bei geheimen, nicht erhaltenen Wünschen
   - `secretCreatorId` für andere bei geheimen Wünschen
   - `viewOfWishes` zählt Überraschungen nur beim Filter `open` in `surpriseCount` und
@@ -627,18 +627,18 @@ Domäne (test-getrieben):
     - Überraschung für Anna, Klartext für Oma
     - nach der Übergabe erfüllt für Anna mit `giverId` und ohne Aktion
     - `surpriseCount` bei `fulfilled` ist 0
-- [ ] `Wish.perform`: Die Tests für `handOver`, `undoHandOver` und `takeBackGift` bei
+- [x] `Wish.perform`: Die Tests für `handOver`, `undoHandOver` und `takeBackGift` bei
   geheimen Wünschen bestätigen die Regeltabelle (schon in `allowedWishActions`
   enthalten).
 
 Anwendung (test-getrieben):
-- [ ] `CreateWish.execute(wishlistId, details, secret, me)`, Test für geheim
-- [ ] `EditWish.execute(wishId, details, secret, me)` lädt die Liste für die Perspektive.
+- [x] `CreateWish.execute(wishlistId, details, secret, me)`, Test für geheim
+- [x] `EditWish.execute(wishId, details, secret, me)` lädt die Liste für die Perspektive.
   Der Konstruktor bekommt dafür `WishlistRepository`. Dazu Tests.
-- [ ] `createWishlistModule.ts`: `new EditWish(wishes, wishlists)`
+- [x] `createWishlistModule.ts`: `new EditWish(wishes, wishlists)`
 
 Infrastruktur:
-- [ ] `src/shared/ui/CheckOption.svelte` (neu):
+- [x] `src/shared/ui/CheckOption.svelte` (neu):
   - eine einzelne Checkbox mit Label links und Haken rechts
   - Optik wie `ChoiceGroup` (nur linke und untere Linie, großer Haken in der Hakenfarbe
     des Farbschemas)
@@ -646,7 +646,7 @@ Infrastruktur:
   - `ChoiceGroup` selbst ist eine Radiogruppe und passt deshalb nicht.
   - Die gemeinsame Haken-Optik wird bei Bedarf in eine CSS-Datei neben `entryList.css`
     ausgelagert.
-- [ ] `ui/WishForm.svelte`:
+- [x] `ui/WishForm.svelte`:
   - optionale Prop `secret?: { initial: boolean; hint: string }`
   - Ist sie gesetzt, erscheint nach „Wie sehr gewünscht?“ `CheckOption` mit „Geheim“.
     Sonst gibt es keine Checkbox, und `onsubmit` bekommt `false`.
@@ -656,31 +656,31 @@ Infrastruktur:
     Bearbeiten nur für geheime Wünsche herein) und `Wish.edit` ab.
   - Der Hinweistext `hint` hängt per `aria-describedby` an der Checkbox, etwa „Anna sieht
     nur ‚Überraschung‘.“.
-- [ ] `ui/CreateWishPage.svelte`:
+- [x] `ui/CreateWishPage.svelte`:
   - `secret` nur, wenn `wishlist.ownerId !== me.id`, und dann mit `initial: true`
   - Der Hinweistext nennt den Namen der Besitzerin (`watchPerson`).
-- [ ] `ui/EditWishPage.svelte`:
+- [x] `ui/EditWishPage.svelte`:
   - lädt die Liste für die Perspektive
   - `secret` nur, wenn `wish.secret` gilt
   - `view.visibility !== 'shown'` → `NotFound` „Diesen Wunsch gibt es nicht mehr.“
-- [ ] `ui/WishPage.svelte`: `view.visibility !== 'shown'` → `NotFound`. Der Knopf
+- [x] `ui/WishPage.svelte`: `view.visibility !== 'shown'` → `NotFound`. Der Knopf
   `secondaryAction` erscheint im Inhalt.
-- [ ] `ui/WishStateNotes.svelte`: „🤫 Geheim – von Ben“ bzw. „🤫 Geheim“, in Eintrag und
+- [x] `ui/WishStateNotes.svelte`: „🤫 Geheim – von Ben“ bzw. „🤫 Geheim“, in Eintrag und
   Seite vor dem Erfüllt-Vermerk
-- [ ] `ui/WishlistPage.svelte`:
+- [x] `ui/WishlistPage.svelte`:
   - Bei `surpriseCount > 0` steht am Ende der `entry-list` ein `<li class="surprise">`
     ohne Knopf mit `surpriseLine(count)`.
   - Die Liste erscheint auch, wenn `entries` leer ist.
   - Der Leer-Satz erscheint nur bei `entries.length === 0 && surpriseCount === 0`.
   - [+ Wunsch erstellen] bleibt bei leeren `entries` sichtbar.
-- [ ] `ui/wishTexts.ts` mit Tests:
+- [x] `ui/wishTexts.ts` mit Tests:
   - `surpriseLine(count)` → „1 Überraschung“ / „2 Überraschungen“ (Emoji separat,
     `aria-hidden`)
   - `secretNote(creatorName?)` → „Geheim – von Ben“ / „Geheim“
   - `secretHint(ownerName)` → „Anna sieht nur ‚Überraschung‘.“
 
 E2E:
-- [ ] neu `e2e/secrets.spec.ts`:
+- [x] neu `e2e/secrets.spec.ts`:
   - Seeds: Ben, Liste `birthday` von Ben, Liste `mine` von Anna
   - Anna legt in Bens Liste an: „Geheim“ ist angehakt. Nach dem Speichern zeigt die
     Detailseite „🤫 Geheim – von Anna“, und `storedWishes()` hat `secret: true` und
@@ -699,15 +699,15 @@ E2E:
     Ben“, kein Zustandsknopf
   - Bearbeiten eines geheimen Wunsches: Häkchen abwählen und speichern → `secret: false`.
     Bearbeiten eines normalen Wunsches: kein Häkchen.
-- [ ] `e2e/accessibility.spec.ts`: „Wunsch erstellen“ mit Häkchen, Liste mit
+- [x] `e2e/accessibility.spec.ts`: „Wunsch erstellen“ mit Häkchen, Liste mit
   Überraschungszeile, Detailseite des Schenkenden eines geheimen Wunsches, jeweils in
   allen drei Farbschemata
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` grün
-- [ ] `tests/integration/FirestoreWishRepository.integration.test.ts`: `secret: true`
+- [x] `npm run test:unit` grün
+- [x] `tests/integration/FirestoreWishRepository.integration.test.ts`: `secret: true`
   wird gespeichert und gelesen
-- [ ] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
+- [x] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
 
 **Manuelle Verifikation**:
 - [ ] Auf zwei iPhones mit VoiceOver:
@@ -928,6 +928,10 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
 - Phase 1, `WishPage`: Der Erfüllt-Vermerk steht wie in den Skizzen unter der Überschrift
   und vor Bewertung und Preis. Fehlt die Liste eines Wunsches, erscheint jetzt ebenfalls
   „Diesen Wunsch gibt es nicht mehr.“ statt einer leeren Seite.
+- Phase 2: Die Haken-Optik von `ChoiceGroup` steht jetzt global in
+  `src/shared/ui/checkOption.css` (`.check-option`, `.check-option__box`) und wird von
+  `ChoiceGroup` und `CheckOption` geteilt. Der Hinweis unter „Geheim“ steht als Absatz unter
+  der Checkbox und ist per `aria-describedby` verknüpft.
 
 ## Verweise
 

@@ -18,7 +18,7 @@
   import { useWishlistModule } from './wishlistModuleContext';
   import WishStateNotes from './WishStateNotes.svelte';
   import WishSummary from './WishSummary.svelte';
-  import { LOAD_FAILED_MESSAGE } from './wishTexts';
+  import { LOAD_FAILED_MESSAGE, surpriseLine } from './wishTexts';
 
   let { wishlistId, filter }: { wishlistId: WishlistId; filter: WishFilter } = $props();
 
@@ -73,10 +73,10 @@
   $effect(() => wishlistFilterMemory.remember(wishlistId, filter));
 
   const createWishHash = $derived(hashOf({ page: 'createWish', wishlistId }));
-  const shownWishes = $derived(
+  const wishesView = $derived(
     wishes &&
       wishlist.value &&
-      viewOfWishes(wishes, perspectiveOf(wishlist.value, profile.me.id), filter).entries,
+      viewOfWishes(wishes, perspectiveOf(wishlist.value, profile.me.id), filter),
   );
   const emptyText = $derived(FILTERS.find(({ value }) => value === filter)?.emptyText);
 
@@ -133,34 +133,43 @@
 
     {#if haveWishesFailed}
       <p>{LOAD_FAILED_MESSAGE}</p>
-    {:else if shownWishes?.length === 0}
-      <p>{emptyText}</p>
-      {#if filter === 'open'}
+    {:else if wishesView}
+      {@const { entries, surpriseCount } = wishesView}
+      {#if entries.length === 0 && surpriseCount === 0}
+        <p>{emptyText}</p>
+      {:else}
+        <ul class="entry-list">
+          {#each entries as view (view.wish.id)}
+            {@const { wish } = view}
+            <li>
+              <button
+                type="button"
+                onclick={() => navigateTo(hashOf({ page: 'wish', wishId: wish.id }))}
+              >
+                <span>
+                  <span class="wish-name">{wish.details.name.value}</span>
+                  <WishSummary details={wish.details} />
+                  <WishStateNotes {view} {persons} variant="entry" />
+                </span>
+                <ChevronRight aria-hidden="true" size="1.25em" />
+              </button>
+            </li>
+          {/each}
+          {#if surpriseCount > 0}
+            <li class="surprise">
+              <span aria-hidden="true">🎁</span>
+              {surpriseLine(surpriseCount)}
+            </li>
+          {/if}
+        </ul>
+      {/if}
+      {#if entries.length === 0 && filter === 'open'}
         <div class="button-row">
           <button type="button" class="button" onclick={() => navigateTo(createWishHash)}>
             <Plus aria-hidden="true" size="1.25em" /> Wunsch erstellen
           </button>
         </div>
       {/if}
-    {:else if shownWishes}
-      <ul class="entry-list">
-        {#each shownWishes as view (view.wish.id)}
-          {@const { wish } = view}
-          <li>
-            <button
-              type="button"
-              onclick={() => navigateTo(hashOf({ page: 'wish', wishId: wish.id }))}
-            >
-              <span>
-                <span class="wish-name">{wish.details.name.value}</span>
-                <WishSummary details={wish.details} />
-                <WishStateNotes {view} {persons} variant="entry" />
-              </span>
-              <ChevronRight aria-hidden="true" size="1.25em" />
-            </button>
-          </li>
-        {/each}
-      </ul>
     {/if}
   </div>
 {:else if wishlist.status === 'missing'}
@@ -171,6 +180,10 @@
   .owner {
     margin: -0.5rem 0 0;
     overflow-wrap: anywhere;
+  }
+
+  .surprise {
+    padding: 0.75rem 0;
   }
 
   .wish-name {

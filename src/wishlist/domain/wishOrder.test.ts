@@ -12,6 +12,7 @@ function wish(name: string, rating?: Rating, id = name): Wish {
       id: wishIdOf(id),
       wishlistId: wishlistIdOf('l'),
       details: { name: requireValid(Name.parse(name)), rating },
+      secret: false,
     },
     { me: personIdOf('anna'), ownerId: personIdOf('anna') },
   );

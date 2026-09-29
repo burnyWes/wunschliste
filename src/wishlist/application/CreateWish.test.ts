@@ -25,7 +25,7 @@ describe('CreateWish', () => {
   it('saves an open wish on the wishlist and returns its id', async () => {
     const { wishes, birthday, createWish } = await setUp();
 
-    const id = await createWish.execute(birthday.id, helmet, ben);
+    const id = await createWish.execute(birthday.id, helmet, false, ben);
 
     const saved = await wishes.get(id);
     expect(id).toBe('id-1');
@@ -33,12 +33,21 @@ describe('CreateWish', () => {
     expect(saved?.details).toBe(helmet);
     expect(saved?.giverId).toBeUndefined();
     expect(saved?.received).toBe(false);
+    expect(saved?.secret).toBe(false);
+  });
+
+  it('keeps the wish secret in the wishlist of someone else', async () => {
+    const { wishes, birthday, createWish } = await setUp();
+
+    const id = await createWish.execute(birthday.id, helmet, true, ben);
+
+    expect((await wishes.get(id))?.secret).toBe(true);
   });
 
   it('remembers me as the creator', async () => {
     const { wishes, birthday, createWish } = await setUp();
 
-    const id = await createWish.execute(birthday.id, helmet, ben);
+    const id = await createWish.execute(birthday.id, helmet, false, ben);
 
     expect((await wishes.get(id))?.createdBy).toBe(ben);
   });
@@ -46,7 +55,7 @@ describe('CreateWish', () => {
   it('refuses an unknown wishlist', async () => {
     const { createWish } = await setUp();
 
-    await expect(createWish.execute(wishlistIdOf('unknown'), helmet, ben)).rejects.toThrow(
+    await expect(createWish.execute(wishlistIdOf('unknown'), helmet, false, ben)).rejects.toThrow(
       WishlistNotFound,
     );
   });

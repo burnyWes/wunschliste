@@ -36,7 +36,7 @@ function wishOf(input: WishDetailsInput, wishlistId: WishlistId, id: string): Wi
     throw new Error(`Invalid test wish ${input.name}`);
   }
   return Wish.create(
-    { id: wishIdOf(id), wishlistId, details: parsed.details },
+    { id: wishIdOf(id), wishlistId, details: parsed.details, secret: false },
     { me: anna, ownerId: anna },
   );
 }
@@ -116,6 +116,27 @@ describe('FirestoreWishRepository', () => {
     await eventually(() => {
       expect(restored?.giverId).toBe(ben);
       expect(restored?.received).toBe(true);
+    });
+  });
+
+  it('restores a secret wish', async () => {
+    const secret = Wish.create(
+      {
+        id: wishIdOf('Konzert'),
+        wishlistId: birthday,
+        details: { name: wishNamed('Konzert').details.name },
+        secret: true,
+      },
+      { me: ben, ownerId: anna },
+    );
+    let restored: Wish | undefined;
+    familyRepository().watch(wishIdOf('Konzert'), (wish) => (restored = wish), ignoreFailure);
+
+    await familyRepository().save(secret);
+
+    await eventually(() => {
+      expect(restored?.secret).toBe(true);
+      expect(restored?.createdBy).toBe(ben);
     });
   });
 

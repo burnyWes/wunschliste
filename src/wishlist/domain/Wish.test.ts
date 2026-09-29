@@ -4,7 +4,14 @@ import { Name } from './Name';
 import { requireValid } from './parsed';
 import type { Perspective } from './Perspective';
 import { Price } from './Price';
-import { Wish, WishActionNotAllowed, type RestoredWish } from './Wish';
+import {
+  OwnerCannotKeepSecrets,
+  Wish,
+  WishActionNotAllowed,
+  WishCannotBecomeSecret,
+  WishHiddenFromOwner,
+  type RestoredWish,
+} from './Wish';
 
 const helmet = { name: requireValid(Name.parse('Fahrradhelm')) };
 
@@ -33,7 +40,7 @@ function annasWish(state: Partial<RestoredWish> = {}): Wish {
 describe('Wish', () => {
   it('is created open and not secret by me', () => {
     const wish = Wish.create(
-      { id: wishIdOf('w'), wishlistId: wishlistIdOf('l'), details: helmet },
+      { id: wishIdOf('w'), wishlistId: wishlistIdOf('l'), details: helmet, secret: false },
       asBen,
     );
 
@@ -44,11 +51,29 @@ describe('Wish', () => {
     expect(wish.removedByOwner).toBe(false);
   });
 
+  it('is created secret in the wishlist of someone else', () => {
+    const wish = Wish.create(
+      { id: wishIdOf('w'), wishlistId: wishlistIdOf('l'), details: helmet, secret: true },
+      asBen,
+    );
+
+    expect(wish.secret).toBe(true);
+  });
+
+  it('cannot be created secret in my own wishlist', () => {
+    expect(() =>
+      Wish.create(
+        { id: wishIdOf('w'), wishlistId: wishlistIdOf('l'), details: helmet, secret: true },
+        asAnna,
+      ),
+    ).toThrow(OwnerCannotKeepSecrets);
+  });
+
   it('is edited into a new wish that keeps everything but the details', () => {
     const wish = annasWish({ giverId: ben, received: true });
     const editedDetails = { ...helmet, price: requireValid(Price.ofCents(4999)) };
 
-    const edited = wish.edit(editedDetails);
+    const edited = wish.edit(editedDetails, false, asAnna);
 
     expect(edited.details).toBe(editedDetails);
     expect(edited.id).toBe('w');
@@ -57,6 +82,53 @@ describe('Wish', () => {
     expect(edited.giverId).toBe(ben);
     expect(edited.received).toBe(true);
     expect(wish.details).toBe(helmet);
+  });
+
+  describe('edit of the secret', () => {
+    const secret = annasWish({ secret: true, createdBy: ben });
+
+    it('lets the secret be revealed', () => {
+      expect(secret.edit(helmet, false, asBen).secret).toBe(false);
+    });
+
+    it('keeps a secret', () => {
+      expect(secret.edit(helmet, true, asOma).secret).toBe(true);
+    });
+
+    it('never turns a normal wish into a secret', () => {
+      expect(() => annasWish().edit(helmet, true, asBen)).toThrow(WishCannotBecomeSecret);
+    });
+
+    it('keeps the owner from editing a secret she cannot see', () => {
+      expect(() => secret.edit(helmet, true, asAnna)).toThrow(WishHiddenFromOwner);
+    });
+
+    it('lets the owner edit a secret wish once it has been handed over', () => {
+      const handedOver = annasWish({ secret: true, createdBy: ben, giverId: ben, received: true });
+
+      expect(handedOver.edit(helmet, true, asAnna).details).toBe(helmet);
+    });
+  });
+
+  describe('visibility', () => {
+    it('is a surprise for the owner while secret and not received', () => {
+      const secret = annasWish({ secret: true, createdBy: ben });
+
+      expect(secret.isSurpriseFor(asAnna)).toBe(true);
+      expect(secret.isHiddenFrom(asAnna)).toBe(true);
+      expect(secret.isSurpriseFor(asOma)).toBe(false);
+      expect(secret.isHiddenFrom(asOma)).toBe(false);
+    });
+
+    it('is no surprise once received', () => {
+      const handedOver = annasWish({ secret: true, createdBy: ben, giverId: ben, received: true });
+
+      expect(handedOver.isSurpriseFor(asAnna)).toBe(false);
+    });
+
+    it('is no surprise when not secret', () => {
+      expect(annasWish({ giverId: ben }).isSurpriseFor(asAnna)).toBe(false);
+    });
   });
 
   describe('perform', () => {
