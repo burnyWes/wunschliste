@@ -23,6 +23,7 @@
   import WishStateNotes from './WishStateNotes.svelte';
   import WishSummary from './WishSummary.svelte';
   import {
+    BRAND_PREFIX,
     FINAL_DELETION_LABEL,
     WISH_ACTION_ANNOUNCEMENTS,
     WISH_ACTION_LABELS,
@@ -131,7 +132,7 @@
 {#if wish.status === 'failed' || wishlist.status === 'failed'}
   <LoadFailed />
 {:else if view?.visibility === 'shown'}
-  {@const { name, link, description } = view.wish.details}
+  {@const { name, brand, link, description, rating, price } = view.wish.details}
   {@const { primaryAction, secondaryAction } = view}
   <div class="page">
     <PageHeader heading={name.value} back={backToWishlist} />
@@ -160,7 +161,12 @@
       />
     {/if}
     <WishStateNotes {view} {persons} {ownerName} variant="page" />
-    <p><WishSummary details={view.wish.details} /></p>
+    {#if brand}
+      <p class="brand"><span class="visually-hidden">{BRAND_PREFIX}</span>{brand.value}</p>
+    {/if}
+    {#if rating || price}
+      <p><WishSummary details={view.wish.details} includesBrand={false} /></p>
+    {/if}
     {#if secondaryAction}
       <div class="button-row">
         <button class="button" type="button" onclick={() => perform(secondaryAction)}>
@@ -206,6 +212,10 @@
 <style>
   .warning {
     font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  .brand {
     overflow-wrap: anywhere;
   }
 

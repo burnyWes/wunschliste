@@ -21,6 +21,7 @@ test('creates a wish with every field and shows its details', async ({ page }) =
   await expect(pageHeading(page, 'Wunsch erstellen')).toBeVisible();
   await expect(field(page, 'Name')).toBeFocused();
   await field(page, 'Name').fill('Fahrradhelm');
+  await field(page, 'Marke / Hersteller').fill('Uvex');
   await field(page, 'Link').fill('amazon.de/helm');
   await field(page, 'Beschreibung').fill('Größe M,\ngern in Dunkelblau.');
   await field(page, 'Preis in Euro').fill('49,99');
@@ -28,7 +29,10 @@ test('creates a wish with every field and shows its details', async ({ page }) =
   await page.getByRole('button', { name: 'Speichern' }).click();
 
   await expect(pageHeading(page, 'Fahrradhelm')).toBeFocused();
+  await expect(page.locator('p.brand')).toHaveText('Marke: Uvex');
+  await expect(page.locator('p.brand')).toBeVisible();
   await expect(page.getByText(/★★★\s*unbedingt\s*·\s*49,99\s€/)).toBeVisible();
+  await expect(page.getByRole('main')).not.toContainText('Uvex ·');
   await expect(page.getByText('gern in Dunkelblau.')).toBeVisible();
   const offer = page.getByRole('link', { name: 'Zum Angebot auf amazon.de' });
   await expect(offer).toHaveAttribute('href', 'https://amazon.de/helm');
@@ -37,6 +41,39 @@ test('creates a wish with every field and shows its details', async ({ page }) =
   await page.getByRole('button', { name: 'Zurück zu Geburtstag' }).click();
 
   await expect(pageHeading(page, 'Geburtstag')).toBeVisible();
+  const entry = page.getByRole('button', { name: /^Fahrradhelm/ });
+  await expect(entry).toContainText(/Uvex\s*·\s*★★★\s*unbedingt\s*·\s*49,99\s€/);
+  await expect(entry).toHaveAccessibleName(/^Fahrradhelm Marke: Uvex unbedingt 49,99\s€$/);
+});
+
+test('points out a brand that is too long at the focused field', async ({ page }) => {
+  await page.goto('./#/liste/birthday/wunsch/neu');
+
+  await field(page, 'Name').fill('Fahrradhelm');
+  await field(page, 'Marke / Hersteller').fill('a'.repeat(101));
+  await page.getByRole('button', { name: 'Speichern' }).click();
+
+  await expect(page.getByText('Die Marke darf höchstens 100 Zeichen lang sein.')).toBeVisible();
+  await expect(field(page, 'Marke / Hersteller')).toBeFocused();
+  expect(await storedWishes()).toEqual([]);
+});
+
+test('fills in the brand when editing and removes it when emptied', async ({ page }) => {
+  await seed({
+    wishes: [
+      wishRecord({ id: 'helmet', wishlistId: 'birthday', name: 'Fahrradhelm', brand: 'Uvex' }),
+    ],
+  });
+  await page.goto('./#/wunsch/helmet/bearbeiten');
+
+  await expect(field(page, 'Marke / Hersteller')).toHaveValue('Uvex');
+  await field(page, 'Marke / Hersteller').fill('');
+  await page.getByRole('button', { name: 'Speichern' }).click();
+
+  await expect(pageHeading(page, 'Fahrradhelm')).toBeVisible();
+  await expect(page.locator('p.brand')).toHaveCount(0);
+  await expect.poll(async () => (await storedWishes())[0]?.brand).toBeUndefined();
+  expect((await storedWishes())[0]?.name).toBe('Fahrradhelm');
 });
 
 test('shows neither offer link nor summary for a wish with only a name', async ({ page }) => {

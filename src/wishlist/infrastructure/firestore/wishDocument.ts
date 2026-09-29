@@ -1,3 +1,4 @@
+import { Brand } from '../../domain/Brand';
 import { Description } from '../../domain/Description';
 import { personIdOf, wishIdOf, wishlistIdOf } from '../../domain/ids';
 import { Name } from '../../domain/Name';
@@ -12,6 +13,7 @@ import { isObject } from './isObject';
 export type WishDocument = {
   wishlistId: string;
   name: string;
+  brand?: string;
   link?: string;
   description?: string;
   priceInCents?: number;
@@ -36,6 +38,7 @@ function isWishDocument(candidate: unknown): candidate is WishDocument {
     isObject(candidate) &&
     typeof candidate.wishlistId === 'string' &&
     typeof candidate.name === 'string' &&
+    isOptional(candidate.brand, 'string') &&
     isOptional(candidate.link, 'string') &&
     isOptional(candidate.description, 'string') &&
     isOptional(candidate.priceInCents, 'number') &&
@@ -50,15 +53,17 @@ function isWishDocument(candidate: unknown): candidate is WishDocument {
 
 function detailsOf(document: WishDocument): WishDetails | undefined {
   const name = Name.parse(document.name);
+  const brand = Brand.parse(document.brand ?? '');
   const link = WishLink.parse(document.link ?? '');
   const description = Description.parse(document.description ?? '');
   const price =
     document.priceInCents === undefined ? valid(undefined) : Price.ofCents(document.priceInCents);
-  if (!name.ok || !link.ok || !description.ok || !price.ok) {
+  if (!name.ok || !brand.ok || !link.ok || !description.ok || !price.ok) {
     return undefined;
   }
   return {
     name: name.value,
+    brand: brand.value,
     link: link.value,
     description: description.value,
     price: price.value,
@@ -71,6 +76,7 @@ export function toWishDocument(wish: Wish): WishDocument {
   return {
     wishlistId,
     name: details.name.value,
+    ...(details.brand && { brand: details.brand.value }),
     ...(details.link && { link: details.link.href }),
     ...(details.description && { description: details.description.value }),
     ...(details.price && { priceInCents: details.price.cents }),

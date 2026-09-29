@@ -24,6 +24,7 @@ const anna = personIdOf('anna');
 const ben = personIdOf('ben');
 
 const ONLY_A_NAME: Omit<WishDetailsInput, 'name'> = {
+  brand: '',
   link: '',
   description: '',
   price: '',
@@ -76,6 +77,7 @@ describe('FirestoreWishRepository', () => {
     const helmet = wishOf(
       {
         name: 'Fahrradhelm',
+        brand: 'Uvex',
         link: 'amazon.de/helm',
         description: 'Größe M',
         price: '49,99',
@@ -92,6 +94,7 @@ describe('FirestoreWishRepository', () => {
     await eventually(() => {
       expect(restored?.wishlistId).toBe(birthday);
       expect(restored?.details.name.value).toBe('Fahrradhelm');
+      expect(restored?.details.brand?.value).toBe('Uvex');
       expect(restored?.details.link?.href).toBe('https://amazon.de/helm');
       expect(restored?.details.description?.value).toBe('Größe M');
       expect(restored?.details.price?.cents).toBe(4999);
@@ -263,6 +266,8 @@ describe('FirestoreWishRepository', () => {
         link: { ...valid, link: 'javascript:alert(1)' },
         rating: { ...valid, rating: 'sehr' },
         name: { ...valid, name: ' ' },
+        brand: { ...valid, brand: 'a'.repeat(101) },
+        brandType: { ...valid, brand: 5 },
         legacy: { wishlistId: 'birthday', name: 'Helm', gifted: true },
         createdBy: { ...valid, createdBy: '' },
         giverId: { ...valid, giverId: '' },

@@ -1,18 +1,31 @@
 <script lang="ts">
   import type { WishDetails } from '../../domain/WishDetails';
-  import { formatPrice, ratingLabel, ratingStars } from './wishTexts';
+  import { BRAND_PREFIX, formatPrice, ratingLabel, ratingStars } from './wishTexts';
 
-  let { details }: { details: WishDetails } = $props();
+  let { details, includesBrand = true }: { details: WishDetails; includesBrand?: boolean } =
+    $props();
+
+  const brand = $derived(includesBrand ? details.brand : undefined);
 </script>
 
-{#if details.rating || details.price}
+{#snippet separator()}
+  <span aria-hidden="true">·</span>
+{/snippet}
+
+{#if brand || details.rating || details.price}
   <span class="summary">
+    {#if brand}
+      <span class="visually-hidden">{BRAND_PREFIX}</span>{brand.value}
+    {/if}
+    {#if brand && (details.rating || details.price)}
+      {@render separator()}
+    {/if}
     {#if details.rating}
       <span aria-hidden="true">{ratingStars(details.rating)}</span>
       {ratingLabel(details.rating)}
     {/if}
     {#if details.rating && details.price}
-      <span aria-hidden="true">·</span>
+      {@render separator()}
     {/if}
     {#if details.price}
       {formatPrice(details.price)}
@@ -23,5 +36,6 @@
 <style>
   .summary {
     display: block;
+    overflow-wrap: anywhere;
   }
 </style>

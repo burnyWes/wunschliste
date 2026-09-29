@@ -275,39 +275,39 @@ Neues optionales Feld von der Domäne bis zur Anzeige. Dazu „geschenkt von …
 Listeneintrag, damit die Marke ohne „von“ nicht mit dem Schenkenden verwechselt wird.
 
 **Aufgaben**:
-- [ ] **Test zuerst** `src/wishlist/domain/Brand.test.ts`, nach dem Vorbild von
+- [x] **Test zuerst** `src/wishlist/domain/Brand.test.ts`, nach dem Vorbild von
   `Name.test.ts`: trimmt Leerraum; `''` und `'   '` ergeben `valid(undefined)`; 100 Zeichen
   sind erlaubt; 101 ergeben `{ ok: false, problem: 'tooLong' }`; Emoji zählen einfach.
-- [ ] `src/wishlist/domain/Brand.ts`: Wertetyp nach dem Muster von `Description`
+- [x] `src/wishlist/domain/Brand.ts`: Wertetyp nach dem Muster von `Description`
   (`static parse(raw): Parsed<Brand | undefined, BrandProblem>`,
   `MAXIMUM_CHARACTERS = 100`).
-- [ ] **Test zuerst** `src/wishlist/domain/WishDetails.test.ts`: `parseWishDetails`
+- [x] **Test zuerst** `src/wishlist/domain/WishDetails.test.ts`: `parseWishDetails`
   übernimmt eine gültige Marke, lässt eine leere weg und meldet eine zu lange als
   `problems.brand = 'tooLong'` neben anderen Problemen.
-- [ ] `src/wishlist/domain/WishDetails.ts`: `brand?: Brand` in `WishDetails`,
+- [x] `src/wishlist/domain/WishDetails.ts`: `brand?: Brand` in `WishDetails`,
   `brand: string` in `WishDetailsInput`, `brand?: BrandProblem` in `WishDetailsProblems`,
   `parseWishDetails` entsprechend erweitern.
-- [ ] Alle Stellen mit `WishDetailsInput`-Literalen um `brand: ''` ergänzen (Compiler
+- [x] Alle Stellen mit `WishDetailsInput`-Literalen um `brand: ''` ergänzen (Compiler
   zeigt sie): u. a. `WishForm.svelte` (`EMPTY_INPUT`),
   `tests/integration/FirestoreWishRepository.integration.test.ts` (`ONLY_A_NAME`) und
   vorhandene Unit-Tests.
-- [ ] `src/wishlist/infrastructure/firestore/wishDocument.ts`: `brand?: string` in
+- [x] `src/wishlist/infrastructure/firestore/wishDocument.ts`: `brand?: string` in
   `WishDocument`, `isOptional(candidate.brand, 'string')` in `isWishDocument`,
   `Brand.parse(document.brand ?? '')` in `detailsOf` (ungültig → `undefined`),
   `...(details.brand && { brand: details.brand.value })` in `toWishDocument`.
-- [ ] `tests/integration/FirestoreWishRepository.integration.test.ts`: Ein Wunsch mit Marke
+- [x] `tests/integration/FirestoreWishRepository.integration.test.ts`: Ein Wunsch mit Marke
   wird mit `brand` gespeichert und wieder gelesen. Ein Dokument ohne `brand` (mit
   `withoutField`) bleibt lesbar und hat keine Marke.
-- [ ] `src/wishlist/infrastructure/ui/wishTexts.ts`:
+- [x] `src/wishlist/infrastructure/ui/wishTexts.ts`:
   - `BRAND_PROBLEM_MESSAGES: Record<BrandProblem, string> = { tooLong: 'Die Marke darf
     höchstens 100 Zeichen lang sein.' }`
   - `wishDetailsInputOf`: `brand: details.brand?.value ?? ''`
   - `giverNote(giverName)` → `` `geschenkt von ${giverName}` ``
-  - Konstante `BRAND_PREFIX = 'Marke:'` für den unsichtbaren Vorsatz
-- [ ] `src/wishlist/infrastructure/ui/wishTexts.test.ts`: Erwartungen für `giverNote`
+  - Konstante `BRAND_PREFIX = 'Marke: '` (mit Leerzeichen, weil Svelte Leerraum am Ende eines Elements entfernt) für den unsichtbaren Vorsatz
+- [x] `src/wishlist/infrastructure/ui/wishTexts.test.ts`: Erwartungen für `giverNote`
   („geschenkt von Ben“), `wishDetailsInputOf` (Rundreise mit Marke) und die neue Meldung
   anpassen bzw. ergänzen.
-- [ ] `src/wishlist/infrastructure/ui/WishForm.svelte`: Feld direkt unter „Name“:
+- [x] `src/wishlist/infrastructure/ui/WishForm.svelte`: Feld direkt unter „Name“:
   ```svelte
   <TextField bind:this={brandField} id="wish-brand" label="Marke / Hersteller"
     bind:value={brand} problem={problems.brand && BRAND_PROBLEM_MESSAGES[problems.brand]}
@@ -315,40 +315,40 @@ Listeneintrag, damit die Marke ohne „von“ nicht mit dem Schenkenden verwechs
   ```
   `let brand = $state(start.brand)`, Übergabe an `parseWishDetails`, und `firstFieldWith`
   prüft `found.brand` direkt nach `found.name`.
-- [ ] `src/wishlist/infrastructure/ui/WishSummary.svelte`: Prop `includesBrand = true`.
+- [x] `src/wishlist/infrastructure/ui/WishSummary.svelte`: Prop `includesBrand = true`.
   Die Teile Marke, Bewertung und Preis werden in dieser Reihenfolge mit
   `<span aria-hidden="true">·</span>` verbunden. Die Marke wird als
   `<span class="visually-hidden">{BRAND_PREFIX} </span>{brand.value}` ausgegeben. Die
   Zusammenfassung erscheint nur, wenn mindestens ein Teil vorhanden ist.
-- [ ] `src/wishlist/infrastructure/ui/WishPage.svelte`: Direkt nach `PageHeader` und den
+- [x] `src/wishlist/infrastructure/ui/WishPage.svelte`: Direkt nach `PageHeader` und den
   Hinweisen, vor der Zusammenfassung, bei vorhandener Marke
   `<p class="brand"><span class="visually-hidden">{BRAND_PREFIX} </span>{brand.value}</p>`
   (mit `overflow-wrap: anywhere`). Die Zusammenfassung mit
   `<WishSummary details={…} includesBrand={false} />` ausgeben. Den leeren `<p>` um
   `WishSummary` vermeiden, wenn weder Bewertung noch Preis vorliegen: den Absatz nur
   rendern, wenn `details.rating || details.price`.
-- [ ] `e2e/emulators.ts`: `brand?: string` in `WishRecord`.
-- [ ] `e2e/wishes.spec.ts`: Im Test „creates a wish with every field …“ das Feld
+- [x] `e2e/emulators.ts`: `brand?: string` in `WishRecord`.
+- [x] `e2e/wishes.spec.ts`: Im Test „creates a wish with every field …“ das Feld
   „Marke / Hersteller“ mit „Uvex“ füllen. Die Detailseite zeigt „Uvex“ als eigenen
   Absatz, der zugängliche Text enthält „Marke: Uvex“. Nach „Zurück zu Geburtstag“ enthält
   der Listeneintrag „Uvex · ★★★ unbedingt · 49,99 €“. Neuer Test: eine Marke mit 101
   Zeichen zeigt die Meldung und fokussiert das Feld. Neuer Test: Beim Bearbeiten ist die
   Marke vorbelegt, und geleert wird sie entfernt (`storedWishes()` hat kein `brand`).
-- [ ] `e2e/gifting.spec.ts:68` und `:130`: Erwartung „von Anna“/„von Ben“ im Listeneintrag
+- [x] `e2e/gifting.spec.ts:68` und `:130`: Erwartung „von Anna“/„von Ben“ im Listeneintrag
   auf „geschenkt von Anna“/„geschenkt von Ben“ ändern.
-- [ ] `docs/agents/research/2026-09-28-wunschliste-konzept.md`: In der Tabelle
+- [x] `docs/agents/research/2026-09-28-wunschliste-konzept.md`: In der Tabelle
   „Wünsche“ eine Zeile „Marke / Hersteller | nein | Text, höchstens 100 Zeichen; Anzeige
   ohne „von“, VoiceOver „Marke: …““ ergänzen. In „Schenken und Erhalten“ ergänzen, dass
   der Listeneintrag „geschenkt von Ben“ zeigt.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` läuft durch, einschließlich `Brand.test.ts`,
+- [x] `npm run test:unit` läuft durch, einschließlich `Brand.test.ts`,
   `WishDetails.test.ts` und `wishTexts.test.ts`.
-- [ ] `npm run test:integration` läuft durch (Marke speichern und lesen, Dokument ohne
+- [x] `npm run test:integration` läuft durch (Marke speichern und lesen, Dokument ohne
   `brand`).
-- [ ] `npm run test:e2e` läuft durch (`wishes.spec.ts`, `gifting.spec.ts`,
+- [x] `npm run test:e2e` läuft durch (`wishes.spec.ts`, `gifting.spec.ts`,
   `accessibility.spec.ts`).
-- [ ] `npm run lint` und `npm test` laufen durch.
+- [x] `npm run lint` und `npm test` laufen durch.
 
 **Manuelle Verifikation**:
 - [ ] Auf dem iPhone mit VoiceOver: Ein Wunsch mit Marke wird in der Liste als

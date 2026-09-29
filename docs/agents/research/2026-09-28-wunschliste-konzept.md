@@ -57,6 +57,7 @@ dem Nutzer abgestimmt. Dieses Dokument ist die Quelle der Wahrheit für die Plan
 | Feld | Pflicht | Form |
 |---|---|---|
 | Name | ja | Text |
+| Marke / Hersteller | nein | Text, höchstens 100 Zeichen; Anzeige ohne „von“ (Liste: „Uvex · ★★★ unbedingt“), VoiceOver „Marke: Uvex“ (WL-007) |
 | Link | nein | URL; ohne `http(s)://` wird `https://` vorangestellt; öffnet in Safari |
 | Beschreibung | nein | mehrzeiliger Freitext ohne Formatierung |
 | Preis | nein | Eurobetrag, Kommaeingabe, Zifferntastatur |
@@ -107,6 +108,8 @@ dem Nutzer abgestimmt. Dieses Dokument ist die Quelle der Wahrheit für die Plan
     heißt der Wunsch danach nur „Erfüllt“.
   - „Schenken zurücknehmen“ gibt es nur für den Schenkenden und nur vor dem Erhalten.
   - Nach dem Erhalten sieht auch die Besitzerin „Erfüllt – von Ben“.
+- Ergänzung aus WL-007: Im Listeneintrag steht der Schenkende als „geschenkt von Ben“,
+  damit er nicht mit der Marke verwechselt wird.
 
 ```
  Ben schaut Annas Wunsch an              Anna schaut ihren Wunsch an

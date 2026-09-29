@@ -65,7 +65,7 @@ test('gifts a wish and moves it to the fulfilled wishes', async ({ page }) => {
 
   await expect(page).toHaveURL(/#\/liste\/birthday\/erfuellt$/);
   await expect(wishLink(page, 'Fahrradhelm')).toBeVisible();
-  await expect(wishLink(page, 'Fahrradhelm')).toContainText('von Anna');
+  await expect(wishLink(page, 'Fahrradhelm')).toContainText('geschenkt von Anna');
   await expect(filterButton(page, 'Erfüllt')).toBeFocused();
   await expect(filterButton(page, 'Erfüllt')).toHaveAttribute('aria-pressed', 'true');
   await expect(pageHeading(page, 'Geburtstag')).not.toBeFocused();
@@ -127,7 +127,7 @@ test('lets the owner receive a gifted wish without revealing the giver before', 
   await expect(page.getByText('Erfüllt – von Ben', { exact: true })).toBeVisible();
 
   await page.goto('./#/liste/anniversary/erfuellt');
-  await expect(wishLink(page, 'Uhr')).toContainText('von Ben');
+  await expect(wishLink(page, 'Uhr')).toContainText('geschenkt von Ben');
 
   await wishLink(page, 'Uhr').click();
   await page.getByRole('button', { name: 'Erhalten zurücknehmen' }).click();

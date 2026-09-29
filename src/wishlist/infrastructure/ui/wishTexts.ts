@@ -1,3 +1,4 @@
+import type { BrandProblem } from '../../domain/Brand';
 import type { DescriptionProblem } from '../../domain/Description';
 import type { NameProblem } from '../../domain/Name';
 import type { Price, PriceProblem } from '../../domain/Price';
@@ -17,6 +18,12 @@ export const NAME_FORM_PROBLEM_MESSAGES: Record<NameFormProblem, string> = {
   ...NAME_PROBLEM_MESSAGES,
   taken: 'Diesen Namen gibt es schon.',
 };
+
+export const BRAND_PROBLEM_MESSAGES: Record<BrandProblem, string> = {
+  tooLong: 'Die Marke darf höchstens 100 Zeichen lang sein.',
+};
+
+export const BRAND_PREFIX = 'Marke: ';
 
 export const LINK_PROBLEM_MESSAGES: Record<WishLinkProblem, string> = {
   invalid: 'Das ist keine gültige Webadresse.',
@@ -101,7 +108,7 @@ export function fulfilledNote(giverName?: string): string {
 }
 
 export function giverNote(giverName: string): string {
-  return `von ${giverName}`;
+  return `geschenkt von ${giverName}`;
 }
 
 export function secretNote(creatorName?: string): string {
@@ -145,6 +152,7 @@ function priceInputOf(price: Price): string {
 export function wishDetailsInputOf(details: WishDetails): WishDetailsInput {
   return {
     name: details.name.value,
+    brand: details.brand?.value ?? '',
     link: details.link?.href ?? '',
     description: details.description?.value ?? '',
     price: details.price ? priceInputOf(details.price) : '',

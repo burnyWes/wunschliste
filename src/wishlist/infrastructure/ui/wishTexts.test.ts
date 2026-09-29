@@ -3,6 +3,8 @@ import { requireValid } from '../../domain/parsed';
 import { parseWishDetails } from '../../domain/WishDetails';
 import { Price } from '../../domain/Price';
 import {
+  BRAND_PREFIX,
+  BRAND_PROBLEM_MESSAGES,
   DESCRIPTION_PROBLEM_MESSAGES,
   SAVED_ANNOUNCEMENT,
   WISH_CREATED_ANNOUNCEMENT,
@@ -62,6 +64,9 @@ describe('problem messages', () => {
     expect(NAME_FORM_PROBLEM_MESSAGES).toEqual({
       ...NAME_PROBLEM_MESSAGES,
       taken: 'Diesen Namen gibt es schon.',
+    });
+    expect(BRAND_PROBLEM_MESSAGES).toEqual({
+      tooLong: 'Die Marke darf höchstens 100 Zeichen lang sein.',
     });
     expect(LINK_PROBLEM_MESSAGES).toEqual({ invalid: 'Das ist keine gültige Webadresse.' });
     expect(DESCRIPTION_PROBLEM_MESSAGES).toEqual({
@@ -130,7 +135,7 @@ describe('wish state', () => {
 
   it('names the giver of a fulfilled wish', () => {
     expect(fulfilledNote('Ben')).toBe('Erfüllt – von Ben');
-    expect(giverNote('Ben')).toBe('von Ben');
+    expect(giverNote('Ben')).toBe('geschenkt von Ben');
   });
 
   it('leaves out an unknown giver', () => {
@@ -178,12 +183,13 @@ describe('wishDetailsInputOf', () => {
   it.each([
     {
       name: 'Fahrradhelm',
+      brand: 'Uvex',
       link: 'https://amazon.de/helm',
       description: 'Größe M',
       price: '49,99',
       rating: 'essential' as const,
     },
-    { name: 'Buch', link: '', description: '', price: '12,00', rating: undefined },
+    { name: 'Buch', brand: '', link: '', description: '', price: '12,00', rating: undefined },
   ])('fills the form so that saving it unchanged keeps $name', (input) => {
     const parsed = parseWishDetails(input);
     if (!parsed.ok) {
@@ -191,5 +197,11 @@ describe('wishDetailsInputOf', () => {
     }
 
     expect(wishDetailsInputOf(parsed.details)).toEqual(input);
+  });
+});
+
+describe('brand', () => {
+  it('names the brand for screen readers', () => {
+    expect(BRAND_PREFIX).toBe('Marke: ');
   });
 });

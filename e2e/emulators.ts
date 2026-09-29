@@ -18,6 +18,7 @@ export type WishRecord = {
   id: string;
   wishlistId: string;
   name: string;
+  brand?: string;
   link?: string;
   description?: string;
   priceInCents?: number;

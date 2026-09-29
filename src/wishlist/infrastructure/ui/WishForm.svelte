@@ -16,6 +16,7 @@
     type WishDetailsProblems,
   } from '../../domain/WishDetails';
   import {
+    BRAND_PROBLEM_MESSAGES,
     DESCRIPTION_PROBLEM_MESSAGES,
     LINK_PROBLEM_MESSAGES,
     NAME_PROBLEM_MESSAGES,
@@ -52,6 +53,7 @@
 
   const EMPTY_INPUT: WishDetailsInput = {
     name: '',
+    brand: '',
     link: '',
     description: '',
     price: '',
@@ -61,6 +63,7 @@
   const start = untrack(() => initialInput) ?? EMPTY_INPUT;
 
   let name = $state(start.name);
+  let brand = $state(start.brand);
   let link = $state(start.link);
   let description = $state(start.description);
   let price = $state(start.price);
@@ -69,6 +72,7 @@
   let problems = $state<WishDetailsProblems>({});
 
   let nameField: TextField;
+  let brandField: TextField;
   let linkField: TextField;
   let descriptionField: TextField;
   let priceField: TextField;
@@ -81,6 +85,7 @@
 
   function firstFieldWith(found: WishDetailsProblems): TextField | undefined {
     if (found.name) return nameField;
+    if (found.brand) return brandField;
     if (found.link) return linkField;
     if (found.description) return descriptionField;
     if (found.price) return priceField;
@@ -91,6 +96,7 @@
     event.preventDefault();
     const parsed = parseWishDetails({
       name,
+      brand,
       link,
       description,
       price,
@@ -116,6 +122,15 @@
     bind:value={name}
     problem={problems.name && NAME_PROBLEM_MESSAGES[problems.name]}
     autocapitalize="sentences"
+    autocomplete="off"
+  />
+  <TextField
+    bind:this={brandField}
+    id="wish-brand"
+    label="Marke / Hersteller"
+    bind:value={brand}
+    problem={problems.brand && BRAND_PROBLEM_MESSAGES[problems.brand]}
+    autocapitalize="words"
     autocomplete="off"
   />
   <TextField
