@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { personIdOf } from './ids';
+import { personIdOf, wishlistIdOf } from './ids';
 import { Name } from './Name';
 import { requireValid } from './parsed';
 import { Person } from './Person';
-import { ensureNameIsFree, PersonNameTaken } from './personRules';
+import {
+  ensureNameIsFree,
+  ensurePersonIsDeletable,
+  PersonNameTaken,
+  PersonOwnsWishlists,
+} from './personRules';
+import { Wishlist } from './Wishlist';
 
 function nameOf(raw: string): Name {
   return requireValid(Name.parse(raw));
@@ -32,5 +38,22 @@ describe('ensureNameIsFree', () => {
 
   it('rejects the name of another person when renaming', () => {
     expect(() => ensureNameIsFree(nameOf('Anna'), persons, ben.id)).toThrow(PersonNameTaken);
+  });
+});
+
+describe('ensurePersonIsDeletable', () => {
+  it('accepts a person without wishlists', () => {
+    expect(() => ensurePersonIsDeletable(ben.id, [])).not.toThrow();
+  });
+
+  it('rejects a person who still owns wishlists and counts them', () => {
+    const owned = ['Ostern', 'Weihnachten'].map((name) =>
+      Wishlist.create(wishlistIdOf(name), nameOf(name), ben.id),
+    );
+
+    expect(() => ensurePersonIsDeletable(ben.id, owned)).toThrow(
+      expect.objectContaining({ name: 'PersonOwnsWishlists', wishlistCount: 2 }),
+    );
+    expect(() => ensurePersonIsDeletable(ben.id, owned)).toThrow(PersonOwnsWishlists);
   });
 });

@@ -5,10 +5,13 @@ import { requireValid } from '../../domain/parsed';
 import { Person } from '../../domain/Person';
 import {
   ownedByLabel,
+  ownedWishlistsHint,
   ownerChoiceLabel,
   ownerGroupHeading,
   ownerLine,
   PERSON_CREATED_ANNOUNCEMENT,
+  personDeletedAnnouncement,
+  personDeletionMessage,
   profileChosenAnnouncement,
 } from './personTexts';
 
@@ -21,6 +24,23 @@ describe('announcements', () => {
 
   it('reports a created person', () => {
     expect(PERSON_CREATED_ANNOUNCEMENT).toBe('Person erstellt.');
+  });
+
+  it('names the deleted person', () => {
+    expect(personDeletedAnnouncement('Oma')).toBe('Person „Oma“ gelöscht.');
+  });
+});
+
+describe('deleting a person', () => {
+  it('names the person in the confirmation', () => {
+    expect(personDeletionMessage('Oma')).toBe('„Oma“ wird gelöscht.');
+  });
+
+  it.each([
+    [1, 'Oma gehören noch 1 Wunschliste. Sie kann erst gelöscht werden, wenn sie keine mehr hat.'],
+    [2, 'Oma gehören noch 2 Wunschlisten. Sie kann erst gelöscht werden, wenn sie keine mehr hat.'],
+  ])('explains why a person with %i wishlists stays', (count, hint) => {
+    expect(ownedWishlistsHint('Oma', count)).toBe(hint);
   });
 });
 

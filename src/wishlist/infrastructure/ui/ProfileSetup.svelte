@@ -13,6 +13,8 @@
 
   let step = $state<Step>('choose');
 
+  requestPageFocus();
+
   function show(nextStep: Step): void {
     requestPageFocus();
     step = nextStep;

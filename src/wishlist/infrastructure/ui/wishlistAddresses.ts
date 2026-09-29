@@ -1,4 +1,11 @@
-import { wishIdOf, wishlistIdOf, type WishId, type WishlistId } from '../../domain/ids';
+import {
+  personIdOf,
+  wishIdOf,
+  wishlistIdOf,
+  type PersonId,
+  type WishId,
+  type WishlistId,
+} from '../../domain/ids';
 import type { WishFilter } from '../../domain/wishOrder';
 
 export type WishlistAddress =
@@ -8,7 +15,10 @@ export type WishlistAddress =
   | { page: 'editWishlist'; wishlistId: WishlistId }
   | { page: 'createWish'; wishlistId: WishlistId }
   | { page: 'wish'; wishId: WishId }
-  | { page: 'editWish'; wishId: WishId };
+  | { page: 'editWish'; wishId: WishId }
+  | { page: 'chooseProfile' }
+  | { page: 'createPerson' }
+  | { page: 'editPerson'; personId: PersonId };
 
 type AddressPattern = {
   pattern: RegExp;
@@ -44,6 +54,12 @@ const addressPatterns: readonly AddressPattern[] = [
     pattern: new RegExp(`^#/wunsch/${ID}/bearbeiten$`),
     toAddress: (id) => ({ page: 'editWish', wishId: wishIdOf(id) }),
   },
+  { pattern: /^#\/wer-bist-du$/, toAddress: () => ({ page: 'chooseProfile' }) },
+  { pattern: /^#\/person\/neu$/, toAddress: () => ({ page: 'createPerson' }) },
+  {
+    pattern: new RegExp(`^#/person/${ID}/bearbeiten$`),
+    toAddress: (id) => ({ page: 'editPerson', personId: personIdOf(id) }),
+  },
 ];
 
 export function parseWishlistAddress(hash: string): WishlistAddress | undefined {
@@ -74,5 +90,11 @@ export function hashOf(address: WishlistAddress): string {
       return `#/wunsch/${address.wishId}`;
     case 'editWish':
       return `#/wunsch/${address.wishId}/bearbeiten`;
+    case 'chooseProfile':
+      return '#/wer-bist-du';
+    case 'createPerson':
+      return '#/person/neu';
+    case 'editPerson':
+      return `#/person/${address.personId}/bearbeiten`;
   }
 }

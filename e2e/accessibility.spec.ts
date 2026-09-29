@@ -56,6 +56,11 @@ async function openDeletionDialog(page: Page): Promise<void> {
   await expect(page.getByRole('dialog')).toBeVisible();
 }
 
+async function openPersonDeletionDialog(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Person löschen' }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+}
+
 async function openSignOutDialog(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Abmelden' }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
@@ -78,7 +83,31 @@ type CheckedPage = {
 
 const pages: CheckedPage[] = [
   { name: 'empty overview', path: './', heading: 'Wunschlisten' },
-  { name: 'settings', path: './#/einstellungen', heading: 'Einstellungen' },
+  {
+    name: 'settings with persons',
+    path: './#/einstellungen',
+    heading: 'Einstellungen',
+    data: wishlistsOfSeveralOwners,
+  },
+  {
+    name: 'profile choice from the settings',
+    path: './#/wer-bist-du',
+    heading: 'Wer bist du?',
+    data: wishlistsOfSeveralOwners,
+  },
+  {
+    name: 'edit person with deletion dialog',
+    path: './#/person/ben/bearbeiten',
+    heading: 'Person bearbeiten',
+    data: { persons: [{ id: 'ben', name: 'Ben' }] },
+    prepare: openPersonDeletionDialog,
+  },
+  {
+    name: 'edit person who owns wishlists',
+    path: './#/person/ben/bearbeiten',
+    heading: 'Person bearbeiten',
+    data: wishlistsOfSeveralOwners,
+  },
   {
     name: 'settings with sign-out dialog',
     path: './#/einstellungen',

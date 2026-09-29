@@ -22,7 +22,7 @@
   import MainNavigation from './layout/MainNavigation.svelte';
   import { problemText } from './problemTexts';
   import { CurrentRoute } from './router/currentRoute.svelte';
-  import { mainPageOf, pageKeyOf } from './router/routes';
+  import { hashFor, mainPageOf, pageKeyOf } from './router/routes';
   import SettingsPage from './settings/SettingsPage.svelte';
 
   const access = useFamilyAccess();
@@ -85,7 +85,10 @@
         {#if currentRoute.route.page === 'settings'}
           <SettingsPage />
         {:else}
-          <WishlistPages address={currentRoute.route} />
+          <WishlistPages
+            address={currentRoute.route}
+            settingsHash={hashFor({ page: 'settings' })}
+          />
         {/if}
       {/key}
     {:else if profile.state.status === 'missing'}

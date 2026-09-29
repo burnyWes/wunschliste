@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { wishlistIdOf } from '../../wishlist/domain/ids';
+import { personIdOf, wishlistIdOf } from '../../wishlist/domain/ids';
 import { hashFor, mainPageOf, pageKeyOf, resolveRoute, type MainPage, type Route } from './routes';
 
 const birthday = wishlistIdOf('birthday');
@@ -51,6 +51,9 @@ describe('mainPageOf', () => {
     [{ page: 'settings' }, 'settings'],
     [{ page: 'createWishlist' }, undefined],
     [{ page: 'wishlist', wishlistId: birthday, filter: 'open' }, undefined],
+    [{ page: 'chooseProfile' }, undefined],
+    [{ page: 'createPerson' }, undefined],
+    [{ page: 'editPerson', personId: personIdOf('ben') }, undefined],
   ])('gives %j the main page %s', (route, mainPage) => {
     expect(mainPageOf(route)).toBe(mainPage);
   });

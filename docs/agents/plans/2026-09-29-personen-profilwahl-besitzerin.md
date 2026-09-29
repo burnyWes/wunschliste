@@ -715,7 +715,7 @@ E2E:
 - [x] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
 
 **Manuelle Verifikation**:
-- [ ] Auf dem iPhone mit VoiceOver:
+- [x] Auf dem iPhone mit VoiceOver:
   - Im Rotor „Überschriften“ springt man in der Übersicht von Person zu Person.
   - Die Radiogruppe „Für“ wird als solche angesagt, mit „Anna (ich), ausgewählt“.
   - Auf der Listenseite wird „für mich“ vorgelesen.
@@ -730,33 +730,33 @@ geschützt löschen.
 **Aufgaben**:
 
 Domäne (test-getrieben):
-- [ ] `personRules.ts`: `ensurePersonIsDeletable(personId, ownedWishlists)` wirft
+- [x] `personRules.ts`: `ensurePersonIsDeletable(personId, ownedWishlists)` wirft
   `PersonOwnsWishlists` (mit `wishlistCount`), sobald die Liste nicht leer ist. Mit
   Test.
 
 Anwendung (test-getrieben):
-- [ ] `RenamePerson.execute(id, name)`:
+- [x] `RenamePerson.execute(id, name)`:
   - `get` → `PersonNotFound`
   - `getAll` → `ensureNameIsFree(name, persons, id)`
   - `save(person.rename(name))`
   - Tests: umbenennen, vergebener Name, gleicher Name in anderer Schreibweise bei
     derselben Person
-- [ ] `DeletePerson.execute(id)`: `wishlists.getOwnedBy(id)` →
+- [x] `DeletePerson.execute(id)`: `wishlists.getOwnedBy(id)` →
   `ensurePersonIsDeletable` → `persons.delete(id)`. Tests: löscht ohne Listen, lehnt mit
   Listen ab und lässt die Person bestehen.
-- [ ] `WatchWishlistsOwnedBy.execute(ownerId, onChange, onFailure)`
+- [x] `WatchWishlistsOwnedBy.execute(ownerId, onChange, onFailure)`
 - „Person bearbeiten“ beobachtet die Person über `WatchPerson` aus Phase 2. Ein
   zusätzlicher Use Case ist nicht nötig.
 
 Infrastruktur:
-- [ ] `createWishlistModule.ts`: `renamePerson`, `deletePerson`, `watchWishlistsOwnedBy`
-- [ ] `wishlistAddresses.ts`:
+- [x] `createWishlistModule.ts`: `renamePerson`, `deletePerson`, `watchWishlistsOwnedBy`
+- [x] `wishlistAddresses.ts`:
   - `{ page: 'chooseProfile' }` ↔ `#/wer-bist-du`
   - `{ page: 'createPerson' }` ↔ `#/person/neu`
   - `{ page: 'editPerson'; personId }` ↔ `#/person/<id>/bearbeiten`
   - Tests in `wishlistAddresses.test.ts` und `src/app/router/routes.test.ts`, damit
     `mainPageOf` für die drei Seiten `undefined` liefert
-- [ ] `WishlistPages.svelte`: Die drei neuen Adressen bekommen eigene `{:else if}`-Zweige
+- [x] `WishlistPages.svelte`: Die drei neuen Adressen bekommen eigene `{:else if}`-Zweige
   **vor** dem abschließenden `{:else}` (`EditWishPage`), sonst schlägt die Typprüfung
   bei `address.wishId` fehl. Neuer Prop `settingsHash: string`. `wishlist` darf `app`
   nicht importieren, deshalb reicht `SignedInApp` `hashFor({ page: 'settings' })` hinein.
@@ -769,7 +769,7 @@ Infrastruktur:
   - `EditPersonPage`
   - Die „Wer bist du?“-Liste markiert die aktuelle Person nicht extra. Ein Tipp auf
     sie wählt sie erneut und führt zurück zu den Einstellungen.
-- [ ] `ui/EditPersonPage.svelte`:
+- [x] `ui/EditPersonPage.svelte`:
   - Überschrift „Person bearbeiten“, `back` → Einstellungen
   - `NameForm` mit `initialName` und `fieldId="person-name"`
   - Speichern: `renamePerson`, danach Einstellungen und „Gespeichert.“
@@ -790,26 +790,26 @@ Infrastruktur:
     Fokus auf „Wer bist du?“ landet. Die Ansage bleibt `Person „Anna“ gelöscht.`, der
     Hash zeigt auf die Einstellungen. Nach der neuen Wahl erscheinen die Einstellungen.
   - Unbekannte ID → `NotFound` „Diese Person gibt es nicht mehr.“
-- [ ] `ui/PersonSettings.svelte`:
+- [x] `ui/PersonSettings.svelte`:
   - `<section aria-labelledby>` „Ich“ mit „Ich bin Anna“ und dem Knopf [⇄ Wechseln]
     (Lucide `ArrowLeftRight`)
   - `<section>` „Personen“ mit h2 und icon-only [+] (`aria-label="Person erstellen"`),
     Eintragsliste aus `watchPersons` → `editPerson`
   - Stil wie `FamilyAccessSettings` (h2 1.25em)
-- [ ] `src/app/settings/SettingsPage.svelte`: `<PersonSettings />` zwischen
+- [x] `src/app/settings/SettingsPage.svelte`: `<PersonSettings />` zwischen
   `ColorSchemeSettings` und `FamilyAccessSettings`. `PersonSettings` führt nur zu
   Adressen aus `wishlistAddresses.ts` und braucht keinen Einstellungs-Hash.
-- [ ] `src/app/SignedInApp.svelte`: `<WishlistPages address={…} settingsHash={hashFor({ page: 'settings' })} />`
-- [ ] `ui/personTexts.ts`:
+- [x] `src/app/SignedInApp.svelte`: `<WishlistPages address={…} settingsHash={hashFor({ page: 'settings' })} />`
+- [x] `ui/personTexts.ts`:
   - `ownedWishlistsHint(name, count)` → „Oma gehören noch 1 Wunschliste. Sie kann erst
     gelöscht werden, wenn sie keine mehr hat.“ bzw. „… 2 Wunschlisten. …“. Mit Test in
     `personTexts.test.ts`.
   - `personDeletionMessage`, `personDeletedAnnouncement`
-- [ ] `README.md`: kurz in „Daten“ oder im Konzeptverweis ergänzen, dass Personen in den
+- [x] `README.md`: kurz in „Daten“ oder im Konzeptverweis ergänzen, dass Personen in den
   Einstellungen verwaltet werden
 
 E2E:
-- [ ] neu `e2e/persons.spec.ts`:
+- [x] neu `e2e/persons.spec.ts`:
   - Einstellungen zeigen „Ich bin Anna“.
   - „Wechseln“ → `#/wer-bist-du` mit „Zurück zu Einstellungen“ → Ben wählen → zurück in
     den Einstellungen, „Ich bin Ben“, Ansage „Du bist Ben.“
@@ -823,13 +823,13 @@ E2E:
   - eigene Person wird in einem zweiten Tab gelöscht → der erste Tab zeigt „Wer bist
     du?“
   - `#/person/gibtsnicht/bearbeiten` → „Diese Person gibt es nicht mehr.“
-- [ ] `e2e/accessibility.spec.ts`: Einstellungen mit Personen, „Person bearbeiten“ mit
+- [x] `e2e/accessibility.spec.ts`: Einstellungen mit Personen, „Person bearbeiten“ mit
   Löschdialog und mit Hinweissatz, `#/wer-bist-du` mit Zurück-Knopf
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` grün, mit den neuen Tests für Domäne, Anwendung, Adressen und
+- [x] `npm run test:unit` grün, mit den neuen Tests für Domäne, Anwendung, Adressen und
   Texte
-- [ ] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
+- [x] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
 
 **Manuelle Verifikation**:
 - [ ] Auf dem iPhone mit VoiceOver:
@@ -859,6 +859,13 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
 - Phase 2: `WatchWishlistOverview` meldet über zwei Beobachtungen. Die Testhilfe
   `wishlistNamed` (`application/fakes`) setzt standardmäßig die Besitzerin `anna`. Für
   Dokumente ohne gültige Form gibt es in `e2e/emulators.ts` `seedDocument`.
+- Phase 3, Fokus nach dem Löschen der eigenen Person: Der Plan sah vor, dass
+  `EditPersonPage` vor dem Löschen `requestPageFocus()` aufruft. Das ist ein Wettlauf. Das
+  Löschen wartet nicht auf den Server, und `navigateTo(settingsHash)` kann vor dem
+  Schnappschuss ankommen. Dann nimmt die Einstellungsseite die Anforderung ab, und das
+  Tor erscheint ohne Fokus. Stattdessen fordert `ProfileSetup` beim Erscheinen immer
+  selbst den Fokus an. Das Tor ist stets ein Kontextwechsel (Anmelden, eigene Person
+  gelöscht, Profil in einem anderen Tab vergessen).
 
 ## Verweise
 
