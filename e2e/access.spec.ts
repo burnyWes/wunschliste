@@ -1,5 +1,5 @@
 import { FAMILY, seed } from './emulators';
-import { expect, signIn, test, type Page } from './fixtures';
+import { chooseProfile, expect, signIn, test, type Page } from './fixtures';
 
 test.use({ signedIn: false });
 
@@ -61,6 +61,7 @@ test('shows the requested page after signing in and stays signed in', async ({ p
   await page.goto('./#/einstellungen');
 
   await submitSignIn(page, FAMILY.email, FAMILY.password);
+  await chooseProfile(page, 'Anna');
 
   await expect(pageHeading(page, 'Einstellungen')).toBeFocused();
   await expect(page).toHaveURL(/#\/einstellungen$/);

@@ -9,6 +9,8 @@ import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 import { familyAccountUidFrom, readFamilyRules } from '../familyAccount';
 import { asModularFirestore, startTestEnvironment } from './testFirestore';
 
+const FAMILY_PATHS = ['wishlists/a', 'wishes/b', 'persons/c'];
+
 let environment: RulesTestEnvironment;
 
 beforeAll(async () => {
@@ -44,19 +46,19 @@ async function writeFails(context: RulesTestContext, path: string): Promise<void
 }
 
 describe('firestore rules', () => {
-  it.each(['wishlists/a', 'wishes/b'])('let the family account read and write %s', async (path) => {
+  it.each(FAMILY_PATHS)('let the family account read and write %s', async (path) => {
     await writeSucceeds(familyAccount(), path);
     await readSucceeds(familyAccount(), path);
   });
 
-  it.each(['wishlists/a', 'wishes/b'])('keep another account out of %s', async (path) => {
+  it.each(FAMILY_PATHS)('keep another account out of %s', async (path) => {
     const stranger = environment.authenticatedContext('stranger');
 
     await writeFails(stranger, path);
     await readFails(stranger, path);
   });
 
-  it.each(['wishlists/a', 'wishes/b'])('keep visitors without sign-in out of %s', async (path) => {
+  it.each(FAMILY_PATHS)('keep visitors without sign-in out of %s', async (path) => {
     const visitor = environment.unauthenticatedContext();
 
     await writeFails(visitor, path);

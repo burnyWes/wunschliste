@@ -2,11 +2,20 @@
   import { terminate } from 'firebase/firestore';
   import { tick } from 'svelte';
   import OfflineNotice from '../shared/ui/OfflineNotice.svelte';
+  import PageHeader from '../shared/ui/PageHeader.svelte';
   import ProblemNotice from '../shared/ui/ProblemNotice.svelte';
   import { clearProblems, reportProblem } from '../shared/ui/reportedProblems.svelte';
   import { createWishlistModule } from '../wishlist/infrastructure/createWishlistModule';
+  import { LocalStorageProfileStore } from '../wishlist/infrastructure/profile/LocalStorageProfileStore';
+  import {
+    CurrentProfile,
+    provideCurrentProfile,
+  } from '../wishlist/infrastructure/ui/currentProfile.svelte';
+  import ProfileSetup from '../wishlist/infrastructure/ui/ProfileSetup.svelte';
   import WishlistPages from '../wishlist/infrastructure/ui/WishlistPages.svelte';
   import { provideWishlistModule } from '../wishlist/infrastructure/ui/wishlistModuleContext';
+  import { LOAD_FAILED_MESSAGE } from '../wishlist/infrastructure/ui/wishTexts';
+  import FamilyAccessSettings from './access/FamilyAccessSettings.svelte';
   import { useFamilyAccess } from './access/familyAccessContext';
   import { forgetFamilyDatabase, openFamilyDatabase } from './firebase/firebaseApp';
   import AppFrame from './layout/AppFrame.svelte';
@@ -19,13 +28,18 @@
   const access = useFamilyAccess();
   const firestore = openFamilyDatabase();
 
-  provideWishlistModule(
+  const wishlistModule = provideWishlistModule(
     createWishlistModule({
       firestore,
       idGenerator: { next: () => crypto.randomUUID() },
+      profileStore: new LocalStorageProfileStore(() => localStorage),
       onProblem: (problem) => reportProblem(problemText(problem)),
     }),
   );
+
+  const profile = provideCurrentProfile(new CurrentProfile(wishlistModule.watchCurrentPerson));
+
+  $effect(() => profile.follow());
 
   let isLeaving = $state(false);
 
@@ -33,6 +47,7 @@
     isLeaving = true;
     await tick();
     await terminate(firestore);
+    wishlistModule.forgetProfile.execute();
   }
 
   $effect(() =>
@@ -59,18 +74,28 @@
 {:else}
   <AppFrame>
     {#snippet header()}
-      {#if mainPage}
+      {#if mainPage && profile.state.status === 'chosen'}
         <MainNavigation active={mainPage} />
       {/if}
       <OfflineNotice />
       <ProblemNotice />
     {/snippet}
-    {#key pageKeyOf(currentRoute.route)}
-      {#if currentRoute.route.page === 'settings'}
-        <SettingsPage />
-      {:else}
-        <WishlistPages address={currentRoute.route} />
-      {/if}
-    {/key}
+    {#if profile.state.status === 'chosen'}
+      {#key pageKeyOf(currentRoute.route)}
+        {#if currentRoute.route.page === 'settings'}
+          <SettingsPage />
+        {:else}
+          <WishlistPages address={currentRoute.route} />
+        {/if}
+      {/key}
+    {:else if profile.state.status === 'missing'}
+      <ProfileSetup />
+    {:else if profile.state.status === 'failed'}
+      <div class="page">
+        <PageHeader heading="Laden fehlgeschlagen" />
+        <p>{LOAD_FAILED_MESSAGE}</p>
+        <FamilyAccessSettings />
+      </div>
+    {/if}
   </AppFrame>
 {/if}

@@ -5,7 +5,7 @@
   import type { Name } from '../../domain/Name';
   import { hashOf } from './wishlistAddresses';
   import { useWishlistModule } from './wishlistModuleContext';
-  import WishlistNameForm from './WishlistNameForm.svelte';
+  import NameForm from './NameForm.svelte';
   import { WISHLIST_CREATED_ANNOUNCEMENT } from './wishTexts';
 
   const { createWishlist } = useWishlistModule();
@@ -17,7 +17,7 @@
   }
 </script>
 
-<WishlistNameForm heading="Wunschliste erstellen" focusesName onsubmit={create}>
+<NameForm heading="Wunschliste erstellen" fieldId="wishlist-name" focusesName onsubmit={create}>
   {#snippet actions()}
     <button class="button" type="submit"><Plus aria-hidden="true" size="1.25em" /> Erstellen</button
     >
@@ -25,4 +25,4 @@
       <X aria-hidden="true" size="1.25em" /> Abbrechen
     </button>
   {/snippet}
-</WishlistNameForm>
+</NameForm>

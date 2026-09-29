@@ -10,5 +10,8 @@ service cloud.firestore {
     match /wishes/{wishId} {
       allow read, write: if isFamilyAccount();
     }
+    match /persons/{personId} {
+      allow read, write: if isFamilyAccount();
+    }
   }
 }

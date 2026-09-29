@@ -79,6 +79,17 @@ Geschützt wird über `firestore.rules`: Lesen und Schreiben darf nur die UID de
 Familienkontos. Die UID ist kein Geheimnis
 (<https://firebase.google.com/docs/projects/api-keys>).
 
+### Umstieg auf Personen (WL-005)
+
+Der Code ab WL-005 liest die Sammlung `persons`. Ohne passende Regel landet jedes Gerät
+nach dem Anmelden bei „Die Daten konnten nicht geladen werden.“ Deshalb in dieser
+Reihenfolge:
+
+1. `npx firebase deploy --only firestore:rules`
+2. **erst dann** auf `main` pushen
+3. In der Firebase-Konsole die alten Dokumente in `wishlists` und `wishes` löschen. Sie
+   haben keine Besitzerin und werden nicht mehr angezeigt.
+
 ## App-Icon neu erzeugen
 
 Quelle ist `public/icon.svg` (Lucide-Icon „gift“, ISC-Lizenz, <https://lucide.dev/icons/gift>).
@@ -129,10 +140,13 @@ das durch, `tests/architecture.test.ts` sichert die Regel selbst ab.
 
 ## Daten
 
-Die Daten liegen in Firestore in den Sammlungen `wishlists` und `wishes` und gleichen sich
-live zwischen den Geräten ab. Jedes Gerät hält sie zusätzlich in einem Offline-Zwischenspeicher
+Die Daten liegen in Firestore in den Sammlungen `persons`, `wishlists` und `wishes` und
+gleichen sich live zwischen den Geräten ab. Jedes Gerät hält sie zusätzlich in einem Offline-Zwischenspeicher
 (IndexedDB), damit die App ohne Netz bedienbar bleibt. Abmelden löscht diesen
 Zwischenspeicher.
+
+Welche Person ein Gerät benutzt („Wer bist du?“), steht nur auf dem Gerät in
+`localStorage` unter `wunschliste.profile`. Abmelden entfernt es.
 
 Die lokalen Daten aus Schritt 2 (`wunschliste.wishlists`, `wunschliste.wishes` in
 `localStorage`) werden nicht übernommen und beim Start entfernt. Das gewählte Farbschema

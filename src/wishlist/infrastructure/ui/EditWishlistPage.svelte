@@ -13,7 +13,7 @@
   import { hashOf } from './wishlistAddresses';
   import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
-  import WishlistNameForm from './WishlistNameForm.svelte';
+  import NameForm from './NameForm.svelte';
   import {
     SAVED_ANNOUNCEMENT,
     wishlistDeletedAnnouncement,
@@ -66,8 +66,9 @@
 {#if wishlist.status === 'failed' || haveWishesFailed}
   <LoadFailed />
 {:else if wishlist.value}
-  <WishlistNameForm
+  <NameForm
     heading="Wunschliste bearbeiten"
+    fieldId="wishlist-name"
     initialName={wishlist.value.name.value}
     onsubmit={save}
   >
@@ -97,7 +98,7 @@
         <X aria-hidden="true" size="1.25em" /> Abbrechen
       </button>
     {/snippet}
-  </WishlistNameForm>
+  </NameForm>
 {:else if wishlist.status === 'missing' && !isDeleting}
   <NotFound message="Diese Wunschliste gibt es nicht mehr." />
 {/if}

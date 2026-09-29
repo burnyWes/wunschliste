@@ -5,6 +5,8 @@ import { startTestEnvironment, withoutRules } from '../tests/integration/testFir
 
 export const PROJECT_ID = 'demo-wunschliste';
 
+export type PersonRecord = { id: string; name: string };
+
 export type WishlistRecord = { id: string; name: string };
 
 export type WishRecord = {
@@ -18,7 +20,11 @@ export type WishRecord = {
   gifted: boolean;
 };
 
-export type SeedData = { wishlists?: WishlistRecord[]; wishes?: WishRecord[] };
+export type SeedData = {
+  persons?: PersonRecord[];
+  wishlists?: WishlistRecord[];
+  wishes?: WishRecord[];
+};
 
 let testEnvironment: Promise<RulesTestEnvironment> | undefined;
 
@@ -31,9 +37,12 @@ export async function resetFirestore(): Promise<void> {
   await (await emulatedFirestore()).clearFirestore();
 }
 
-export async function seed({ wishlists = [], wishes = [] }: SeedData): Promise<void> {
+export async function seed({ persons = [], wishlists = [], wishes = [] }: SeedData): Promise<void> {
   await withoutRules(await emulatedFirestore(), async (firestore) => {
     const batch = writeBatch(firestore);
+    for (const { id, ...person } of persons) {
+      batch.set(doc(firestore, 'persons', id), person);
+    }
     for (const { id, ...wishlist } of wishlists) {
       batch.set(doc(firestore, 'wishlists', id), wishlist);
     }
@@ -49,6 +58,10 @@ async function storedRecords<T>(collectionName: string): Promise<T[]> {
     const snapshot = await getDocs(collection(firestore, collectionName));
     return snapshot.docs.map((stored) => ({ id: stored.id, ...stored.data() }) as T);
   });
+}
+
+export function storedPersons(): Promise<PersonRecord[]> {
+  return storedRecords<PersonRecord>('persons');
 }
 
 export function storedWishlists(): Promise<WishlistRecord[]> {

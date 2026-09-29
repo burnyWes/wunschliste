@@ -390,17 +390,17 @@ Abmelden vergisst das Profil.
 **Aufgaben**:
 
 Domäne (test-getrieben):
-- [ ] `ids.ts`: `PersonId` (Brand) und `personIdOf`
-- [ ] `Person.ts` mit `Person.create(id, name)`, `Person.restore(id, name)`,
+- [x] `ids.ts`: `PersonId` (Brand) und `personIdOf`
+- [x] `Person.ts` mit `Person.create(id, name)`, `Person.restore(id, name)`,
   `rename(name)`, `sortPersons` (Name `de`, dann `compareIds`) und `PersonNotFound`.
   Dazu `Person.test.ts`.
-- [ ] `personRules.ts`: `ensureNameIsFree(name, persons, renamedPersonId?)`
+- [x] `personRules.ts`: `ensureNameIsFree(name, persons, renamedPersonId?)`
   - wirft `PersonNameTaken` bei gleichem Namen, ohne Rücksicht auf Groß- und
     Kleinschreibung (`localeCompare(a, b, 'de', { sensitivity: 'accent' }) === 0`)
   - ignoriert die umbenannte Person selbst
   - Tests: „Ben“ gegen „ben“, Umbenennen in den eigenen Namen erlaubt, „Bén“ ist ein
     anderer Name
-- [ ] `PersonRepository.ts`:
+- [x] `PersonRepository.ts`:
   ```ts
   export interface PersonRepository {
     watchAll(onChange: (persons: readonly Person[]) => void, onFailure: () => void): Unsubscribe;
@@ -410,7 +410,7 @@ Domäne (test-getrieben):
     delete(id: PersonId): Promise<void>;
   }
   ```
-- [ ] `ProfileStore.ts`:
+- [x] `ProfileStore.ts`:
   ```ts
   export interface ProfileStore {
     current(): PersonId | undefined;
@@ -421,15 +421,15 @@ Domäne (test-getrieben):
   ```
 
 Anwendung (test-getrieben, mit Fakes):
-- [ ] `fakes/InMemoryPersonRepository.ts` (auf `ObservableMap`, mit `failWatchers`) und
+- [x] `fakes/InMemoryPersonRepository.ts` (auf `ObservableMap`, mit `failWatchers`) und
   `fakes/InMemoryProfileStore.ts`
-- [ ] `CreatePerson.execute(name): Promise<PersonId>`: `getAll` → `ensureNameIsFree` →
+- [x] `CreatePerson.execute(name): Promise<PersonId>`: `getAll` → `ensureNameIsFree` →
   `save`. Tests: legt an, lehnt einen vergebenen Namen ab.
-- [ ] `WatchPersons.execute(onChange, onFailure)` meldet sortiert.
-- [ ] `ChooseProfile.execute(id)`: `get`, wirft `PersonNotFound`, sonst
+- [x] `WatchPersons.execute(onChange, onFailure)` meldet sortiert.
+- [x] `ChooseProfile.execute(id)`: `get`, wirft `PersonNotFound`, sonst
   `profileStore.choose(id)`.
-- [ ] `ForgetProfile.execute()` ruft `profileStore.forget()`.
-- [ ] `WatchCurrentPerson.execute(onChange, onFailure)` verbindet `profileStore.watch`
+- [x] `ForgetProfile.execute()` ruft `profileStore.forget()`.
+- [x] `WatchCurrentPerson.execute(onChange, onFailure)` verbindet `profileStore.watch`
   und `persons.watchAll`. Gemeldet wird erst, wenn die Personen einmal geliefert haben:
   die Person zur gespeicherten ID, sonst `undefined`. Tests:
   - kein Profil → `undefined`
@@ -440,9 +440,9 @@ Anwendung (test-getrieben, mit Fakes):
   - Abmelden beendet beide Beobachtungen
 
 Infrastruktur:
-- [ ] `firestore/personDocument.ts`: `PersonDocument = { name: string }`,
+- [x] `firestore/personDocument.ts`: `PersonDocument = { name: string }`,
   `toPersonDocument`, `personFromDocument` (ungültig → `undefined`)
-- [ ] `firestore/FirestorePersonRepository.ts` nach dem Muster von
+- [x] `firestore/FirestorePersonRepository.ts` nach dem Muster von
   `FirestoreWishlistRepository`:
   - `watchAll` über `onSnapshot`. Ein leerer Snapshot mit `metadata.fromCache` wird
     nicht gemeldet (Entscheidung 13).
@@ -450,7 +450,7 @@ Infrastruktur:
     beobachteten Liste stammt und damit im Cache liegt.
   - `getAll` über `getDocs` (Server zuerst, Entscheidung 12)
   - `save` und `delete` über `observedWrite`
-- [ ] `profile/LocalStorageProfileStore.ts`:
+- [x] `profile/LocalStorageProfileStore.ts`:
   - Der Konstruktor bekommt den Getter
     `storage: () => Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>` und optional
     ein `EventTarget` für `storage`-Ereignisse (Standard `window`).
@@ -460,40 +460,40 @@ Infrastruktur:
   - Speicherfehler werden wie in `colorSchemeStorage.ts` abgefangen, einschließlich des
     Getter-Aufrufs, mit Warum-Kommentar und MDN-Link. Ohne Speicher gilt das Profil nur
     für die laufende Sitzung. Der Adapter merkt es sich dann im Speicher des Objekts.
-- [ ] `createWishlistModule.ts`: neuer Parameter `profileStore: ProfileStore`. Neu im
+- [x] `createWishlistModule.ts`: neuer Parameter `profileStore: ProfileStore`. Neu im
   Modul: `createPerson`, `watchPersons`, `chooseProfile`, `forgetProfile`,
   `watchCurrentPerson`.
-- [ ] `firestore.rules`: `match /persons/{personId} { allow read, write: if isFamilyAccount(); }`
-- [ ] `ui/currentProfile.svelte.ts`:
+- [x] `firestore.rules`: `match /persons/{personId} { allow read, write: if isFamilyAccount(); }`
+- [x] `ui/currentProfile.svelte.ts`:
   - `CurrentProfile` mit `state` als diskriminierter Union (Entscheidung 6) und dem
     Getter `me: Person`, der außerhalb von `chosen` wirft
   - `follow()` gibt `Unsubscribe` zurück.
   - `provideCurrentProfile` / `useCurrentProfile` über `createContext`
-- [ ] `ui/personTexts.ts`:
+- [x] `ui/personTexts.ts`:
   - `PERSON_NAME_PROBLEM_MESSAGES` mit `missing`, `tooLong` und `taken: 'Diesen Namen gibt es schon.'`
   - `profileChosenAnnouncement(name)` → `Du bist ${name}.`
   - `PERSON_CREATED_ANNOUNCEMENT = 'Person erstellt.'`
-- [ ] `ui/WishlistNameForm.svelte` → `ui/NameForm.svelte` (Entscheidung 14):
+- [x] `ui/WishlistNameForm.svelte` → `ui/NameForm.svelte` (Entscheidung 14):
   - neue Props `fieldId` und `problemMessages: Record<NameProblem | 'taken', string>`
   - `onsubmit(name): Promise<'taken' | void>`. Bei `'taken'` erscheint die Meldung, und
     der Fokus springt ins Feld.
   - Solange `onsubmit` läuft, wird ein weiteres Absenden ignoriert.
   - `CreateWishlistPage` und `EditWishlistPage` umstellen (`fieldId="wishlist-name"`,
     Meldungen aus `NAME_PROBLEM_MESSAGES` ergänzt um `taken`, das dort nie eintritt)
-- [ ] `ui/personTexts.test.ts`: Texte mit Zahlen oder Namen, beginnend mit
+- [x] `ui/personTexts.test.ts`: Texte mit Zahlen oder Namen, beginnend mit
   `profileChosenAnnouncement`
-- [ ] `ui/ChooseProfilePage.svelte`:
+- [x] `ui/ChooseProfilePage.svelte`:
   - h1 „Wer bist du?“, optional `back`
   - Eintragsliste der Personen (`entry-list`, `ChevronRight`)
   - leer: „Noch keine Personen.“
   - Knopf [+ Neue Person] über den Rückruf `oncreate`
   - Tipp → Prop `onchoose(person: Person)`. Die Seite ruft den Use Case nicht selbst
     auf, damit der Aufrufer den Fokus vorher anfordern kann.
-- [ ] `ui/CreatePersonPage.svelte` mit den Props `oncreated(id: PersonId, name: Name)` und
+- [x] `ui/CreatePersonPage.svelte` mit den Props `oncreated(id: PersonId, name: Name)` und
   `oncancel`, Überschrift „Person erstellen“, Knöpfe [+ Erstellen] und [✕ Abbrechen] in
   der `ActionBar`, Namensfeld fokussiert. `PersonNameTaken` wird zu `'taken'` für
   `NameForm`.
-- [ ] `ui/ProfileSetup.svelte`:
+- [x] `ui/ProfileSetup.svelte`:
   - interner Zustand `'choose' | 'create'`, bei jedem Wechsel `requestPageFocus()`
   - Wahl bzw. nach dem Erstellen, in genau dieser Reihenfolge:
     1. `requestPageFocus()`
@@ -502,7 +502,7 @@ Infrastruktur:
     
     `CurrentProfile` wechselt dann synchron auf `chosen`. Die ursprüngliche Seite
     erscheint und nimmt die Fokusanforderung ab.
-- [ ] `SignedInApp.svelte`:
+- [x] `SignedInApp.svelte`:
   - `profileStore: new LocalStorageProfileStore(() => localStorage)` übergeben
   - `CurrentProfile` bereitstellen und `$effect(() => profile.follow())`
   - Verzweigung wie im Zielbild. `MainNavigation` erscheint nur bei `chosen`,
@@ -511,7 +511,7 @@ Infrastruktur:
     Abmelden möglich bleibt
   - `before` in `access.onSignOut` ruft nach `closePagesAndDatabase()`
     `forgetProfile.execute()` auf.
-- [ ] `README.md`:
+- [x] `README.md`:
   - „Firebase einrichten“ bzw. neuer Unterabschnitt „Umstieg auf Personen (WL-005)“:
     Zuerst `npx firebase deploy --only firestore:rules`, **erst dann** auf `main`
     pushen (Entscheidung 15). Danach die alten Dokumente in `wishlists` und `wishes`
@@ -519,11 +519,11 @@ Infrastruktur:
   - „Daten“: Sammlung `persons` und `localStorage`-Schlüssel `wunschliste.profile`
 
 E2E:
-- [ ] `e2e/emulators.ts`:
+- [x] `e2e/emulators.ts`:
   - `PersonRecord = { id: string; name: string }`
   - `SeedData.persons`, `seed` schreibt `persons`
   - `storedPersons()`
-- [ ] `e2e/fixtures.ts`:
+- [x] `e2e/fixtures.ts`:
   - Option `profile: 'Anna' | null`, Standard `'Anna'` (Entscheidung 11)
   - `freshEmulators` seedet `{ id: 'anna', name: 'Anna' }`, wenn `profile` nicht `null`
     ist
@@ -532,7 +532,7 @@ E2E:
     `null` auf „Wer bist du?“
   - Tests, die weitere Personen brauchen, seeden sie zusätzlich (etwa Ben). `anna`
     kommt immer aus der Fixture.
-- [ ] Bestehende Specs an das Tor anpassen:
+- [x] Bestehende Specs an das Tor anpassen:
   - `e2e/access.spec.ts:60-72`: nutzt `submitSignIn` und erwartet sofort das h1
     „Einstellungen“. Neu: nach dem Anmelden erscheint das Tor, dann Anna wählen, dann
     liegt der Fokus auf „Einstellungen“. Die übrigen Fälle mit `signedIn: false` geben
@@ -546,7 +546,7 @@ E2E:
     Übersicht wird der Zustand `failed` mit Offline-Hinweis geprüft.
   - `e2e/sync.spec.ts`, `e2e/offline.spec.ts` und weitere Fundstellen von
     `signIn(`/`submitSignIn(` (`grep -n "signIn(" e2e`)
-- [ ] neu `e2e/profile.spec.ts`:
+- [x] neu `e2e/profile.spec.ts`:
   - ohne Personen: leerer Zustand, [+ Neue Person] → „Person erstellen“ mit fokussiertem
     Feld; Erstellen → ursprüngliche Seite, Ansage „Du bist Lea.“, Fokus auf h1, keine
     Navigation vor der Wahl
@@ -562,12 +562,12 @@ E2E:
     erst ab Phase 3 über die Oberfläche. Hier wird es über
     `localStorage.removeItem('wunschliste.profile')` im zweiten Tab geprüft: Der erste
     Tab zeigt „Wer bist du?“.
-- [ ] `e2e/accessibility.spec.ts`: „Wer bist du?“ leer und gefüllt, „Person erstellen“
+- [x] `e2e/accessibility.spec.ts`: „Wer bist du?“ leer und gefüllt, „Person erstellen“
   mit Fehler, jeweils in allen drei Farbschemata
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` grün, mit den neuen Tests für Domäne und Anwendung
-- [ ] Neuer `tests/integration/FirestorePersonRepository.integration.test.ts` grün:
+- [x] `npm run test:unit` grün, mit den neuen Tests für Domäne und Anwendung
+- [x] Neuer `tests/integration/FirestorePersonRepository.integration.test.ts` grün:
   - Sync auf ein zweites Gerät
   - `watchAll` nach Speichern und Löschen
   - `getAll` liefert auf einem frischen Gerät (leerer Cache) die Personen vom Server
@@ -575,17 +575,17 @@ E2E:
   - Speichern ohne Warten auf den Server
   - Fehler ohne Berechtigung
   - Ein leerer Cache-Snapshot wird nicht als leere Liste gemeldet
-- [ ] `tests/integration/firestoreRules.integration.test.ts`: `persons/c` in allen drei
+- [x] `tests/integration/firestoreRules.integration.test.ts`: `persons/c` in allen drei
   `it.each`
-- [ ] Neuer `src/wishlist/infrastructure/profile/LocalStorageProfileStore.test.ts` grün,
+- [x] Neuer `src/wishlist/infrastructure/profile/LocalStorageProfileStore.test.ts` grün,
   mit Map-basiertem Speicher und eigenem `EventTarget`:
   - `choose` → `current`
   - `forget`
   - Beobachter werden benachrichtigt, auch bei einem `storage`-Ereignis für den
     Schlüssel, bei anderen Schlüsseln nicht
   - Ein werfender Getter oder Speicher lässt die App mit Sitzungsprofil weiterlaufen.
-- [ ] `npm run test:integration` grün (Adapter- und Regeltests)
-- [ ] `npm run lint` und `npm test` grün (Architektur, Unit, Integration und E2E inklusive aller bestehenden Specs)
+- [x] `npm run test:integration` grün (Adapter- und Regeltests)
+- [x] `npm run lint` und `npm test` grün (Architektur, Unit, Integration und E2E inklusive aller bestehenden Specs)
 
 **Manuelle Verifikation**:
 - [ ] Auf dem iPhone mit VoiceOver nach dem Ausrollen der Regeln:
@@ -841,6 +841,21 @@ E2E:
 ## Notizen zur Umsetzung
 
 Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalten.
+
+- Phase 1, Entscheidung 13: `FirestorePersonRepository.watchAll` beobachtet mit
+  `includeMetadataChanges: true`. Ohne das meldet Firestore keinen neuen Snapshot, wenn
+  der Server eine leere Sammlung nur bestätigt (reine Metadatenänderung `fromCache` →
+  `false`). Nach dem verworfenen leeren Cache-Snapshot bliebe die App sonst dauerhaft in
+  `loading`, etwa nach einem Neuladen, bevor die erste Person angelegt ist. Der
+  Integrationstest „reports an empty cache once the server confirmed it“ sichert das ab.
+- Phase 1, Entscheidung 14: `NameForm` hat keine Prop `problemMessages`. Wunschlisten und
+  Personen brauchen dieselben Meldungen, deshalb nutzt das Formular
+  `NAME_FORM_PROBLEM_MESSAGES` (`wishTexts.ts`, `NameProblem` plus `taken`). Dafür hat es
+  eine optionale Prop `back` für „Person bearbeiten“. `personTexts.ts` enthält in Phase 1
+  nur die Ansagen.
+- Phase 1, E2E: `fixtures.ts` exportiert neben `signIn` auch `submitSignIn` (ohne
+  Navigation, damit Deep-Links erhalten bleiben) und `chooseProfile`. Das Konto STRANGER
+  landet im Zustand `failed`. Die Seite zeigt dort das h1 „Laden fehlgeschlagen“.
 
 ## Verweise
 

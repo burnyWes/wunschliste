@@ -11,6 +11,7 @@ import {
   WISHLIST_CREATED_ANNOUNCEMENT,
   formatPrice,
   LINK_PROBLEM_MESSAGES,
+  NAME_FORM_PROBLEM_MESSAGES,
   NAME_PROBLEM_MESSAGES,
   PRICE_PROBLEM_MESSAGES,
   ratingLabel,
@@ -48,6 +49,10 @@ describe('problem messages', () => {
     expect(NAME_PROBLEM_MESSAGES).toEqual({
       missing: 'Bitte einen Namen eingeben.',
       tooLong: 'Der Name darf höchstens 100 Zeichen lang sein.',
+    });
+    expect(NAME_FORM_PROBLEM_MESSAGES).toEqual({
+      ...NAME_PROBLEM_MESSAGES,
+      taken: 'Diesen Namen gibt es schon.',
     });
     expect(LINK_PROBLEM_MESSAGES).toEqual({ invalid: 'Das ist keine gültige Webadresse.' });
     expect(DESCRIPTION_PROBLEM_MESSAGES).toEqual({

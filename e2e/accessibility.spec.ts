@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { createAccount, FAMILY, seed, STRANGER, type SeedData } from './emulators';
-import { expect, signIn, test, type Page } from './fixtures';
+import { expect, submitSignIn, test, type Page } from './fixtures';
 
 const WCAG_21_AA = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
 
@@ -195,6 +195,46 @@ function checkAccessibility(checkedPages: readonly CheckedPage[]): void {
 
 checkAccessibility(pages);
 
+async function submitTakenPersonName(page: Page): Promise<void> {
+  await page.getByRole('textbox', { name: 'Name' }).fill('Anna');
+  await page.getByRole('button', { name: 'Erstellen' }).click();
+  await expect(page.getByText('Diesen Namen gibt es schon.')).toBeVisible();
+}
+
+async function openCreatePerson(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Neue Person' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Person erstellen' })).toBeVisible();
+  await submitTakenPersonName(page);
+}
+
+const profileChoicePages: CheckedPage[] = [
+  { name: 'empty profile choice', path: './', heading: 'Wer bist du?' },
+  {
+    name: 'profile choice',
+    path: './',
+    heading: 'Wer bist du?',
+    data: {
+      persons: [
+        { id: 'anna', name: 'Anna' },
+        { id: 'ben', name: 'Ben' },
+      ],
+    },
+  },
+  {
+    name: 'create person with problem',
+    path: './',
+    heading: 'Wer bist du?',
+    data: { persons: [{ id: 'anna', name: 'Anna' }] },
+    prepare: openCreatePerson,
+  },
+];
+
+test.describe('before choosing a profile', () => {
+  test.use({ profile: null });
+
+  checkAccessibility(profileChoicePages);
+});
+
 test.describe('signed out', () => {
   test.use({ signedIn: false });
 
@@ -213,15 +253,10 @@ async function goOfflineWithProblems(page: Page): Promise<void> {
 
 const strangerPages: CheckedPage[] = [
   {
-    name: 'overview offline with problems',
+    name: 'load failed offline with problems',
     path: './',
-    heading: 'Wunschlisten',
-    prepare: goOfflineWithProblems,
-  },
-  {
-    name: 'load failed',
-    path: './#/liste/birthday',
     heading: 'Laden fehlgeschlagen',
+    prepare: goOfflineWithProblems,
   },
 ];
 
@@ -236,10 +271,9 @@ test.describe('as an account without access', () => {
         await page.addInitScript((scheme) => {
           localStorage.setItem('wunschliste.colorScheme', scheme);
         }, colorScheme);
-        await seed(twoWishlists);
         await createAccount(STRANGER);
-        await signIn(page, STRANGER);
         await page.goto(path);
+        await submitSignIn(page, STRANGER);
         await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
         await prepare?.(page);
 

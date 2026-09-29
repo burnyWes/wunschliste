@@ -10,6 +10,13 @@ export const NAME_PROBLEM_MESSAGES: Record<NameProblem, string> = {
   tooLong: 'Der Name darf höchstens 100 Zeichen lang sein.',
 };
 
+export type NameFormProblem = NameProblem | 'taken';
+
+export const NAME_FORM_PROBLEM_MESSAGES: Record<NameFormProblem, string> = {
+  ...NAME_PROBLEM_MESSAGES,
+  taken: 'Diesen Namen gibt es schon.',
+};
+
 export const LINK_PROBLEM_MESSAGES: Record<WishLinkProblem, string> = {
   invalid: 'Das ist keine gültige Webadresse.',
 };
