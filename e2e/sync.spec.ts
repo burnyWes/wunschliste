@@ -1,7 +1,12 @@
 import { devices, type Browser } from '@playwright/test';
+import { seed } from './emulators';
 import { expect, signIn, test, type Page } from './fixtures';
 
 test.use({ signedIn: false });
+
+test.beforeEach(async () => {
+  await seed({ persons: [{ id: 'ben', name: 'Ben' }] });
+});
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
 const mainButton = (page: Page, name: string | RegExp) =>
@@ -23,6 +28,7 @@ test('shows the changes of one device on another without reloading', async ({
 
   await deviceA.getByRole('button', { name: 'Wunschliste erstellen' }).first().click();
   await deviceA.getByRole('textbox', { name: 'Name' }).fill('Geburtstag 2027');
+  await deviceA.locator('label').filter({ hasText: 'Ben' }).click();
   await deviceA.getByRole('button', { name: 'Erstellen' }).click();
   await expect(pageHeading(deviceA, 'Geburtstag 2027')).toBeVisible();
 

@@ -10,12 +10,14 @@
   import { hashOf } from './wishlistAddresses';
   import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
+  import { useCurrentProfile } from './currentProfile.svelte';
   import WishForm from './WishForm.svelte';
   import { WISH_CREATED_ANNOUNCEMENT } from './wishTexts';
 
   let { wishlistId }: { wishlistId: WishlistId } = $props();
 
   const { watchWishlist, createWish } = useWishlistModule();
+  const profile = useCurrentProfile();
 
   const wishlist = new Watched<Wishlist>();
 
@@ -28,7 +30,7 @@
   );
 
   async function create(details: WishDetails): Promise<void> {
-    const wishId = await createWish.execute(wishlistId, details);
+    const wishId = await createWish.execute(wishlistId, details, profile.me.id);
     navigateTo(hashOf({ page: 'wish', wishId }));
     announce(WISH_CREATED_ANNOUNCEMENT);
   }

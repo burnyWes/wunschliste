@@ -1,4 +1,5 @@
 import type { Firestore } from 'firebase/firestore';
+import { ChangeWishState } from '../application/ChangeWishState';
 import { ChooseProfile } from '../application/ChooseProfile';
 import { CreatePerson } from '../application/CreatePerson';
 import { CreateWish } from '../application/CreateWish';
@@ -8,10 +9,8 @@ import { DeleteWish } from '../application/DeleteWish';
 import { DeleteWishlist } from '../application/DeleteWishlist';
 import { EditWish } from '../application/EditWish';
 import { ForgetProfile } from '../application/ForgetProfile';
-import { GiftWish } from '../application/GiftWish';
 import { RenamePerson } from '../application/RenamePerson';
 import { RenameWishlist } from '../application/RenameWishlist';
-import { TakeBackGift } from '../application/TakeBackGift';
 import { WatchCurrentPerson } from '../application/WatchCurrentPerson';
 import { WatchPerson } from '../application/WatchPerson';
 import { WatchPersons } from '../application/WatchPersons';
@@ -63,8 +62,7 @@ export function createWishlistModule({
     watchWish: new WatchWish(wishes),
     editWish: new EditWish(wishes),
     deleteWish: new DeleteWish(wishes),
-    giftWish: new GiftWish(wishes),
-    takeBackGift: new TakeBackGift(wishes),
+    changeWishState: new ChangeWishState(wishes, wishlists),
   };
 }
 

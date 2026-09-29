@@ -1,19 +1,44 @@
 import { expect, test, type Page } from './fixtures';
 import { expectAnnouncement } from './announcement';
-import { seed } from './emulators';
+import { seed, wishRecord } from './emulators';
 import { historyLength } from './history';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
 const filterButton = (page: Page, name: string) => page.getByRole('button', { name, exact: true });
 const wishLink = (page: Page, name: string) =>
   page.getByRole('main').getByRole('button', { name: new RegExp(`^${name}`) });
+const actionBarButtons = (page: Page) => page.locator('.action-bar').getByRole('button');
 
 test.beforeEach(async () => {
   await seed({
-    wishlists: [{ id: 'birthday', name: 'Geburtstag', ownerId: 'anna' }],
+    persons: [
+      { id: 'ben', name: 'Ben' },
+      { id: 'oma', name: 'Oma' },
+    ],
+    wishlists: [
+      { id: 'birthday', name: 'Geburtstag', ownerId: 'ben' },
+      { id: 'anniversary', name: 'Jubiläum', ownerId: 'anna' },
+    ],
     wishes: [
-      { id: 'helmet', wishlistId: 'birthday', name: 'Fahrradhelm', gifted: false },
-      { id: 'book', wishlistId: 'birthday', name: 'Buch', gifted: false },
+      wishRecord({ id: 'helmet', wishlistId: 'birthday', name: 'Fahrradhelm', createdBy: 'ben' }),
+      wishRecord({ id: 'book', wishlistId: 'birthday', name: 'Buch', createdBy: 'ben' }),
+      wishRecord({
+        id: 'lamp',
+        wishlistId: 'birthday',
+        name: 'Lampe',
+        createdBy: 'ben',
+        giverId: 'oma',
+      }),
+      wishRecord({
+        id: 'kite',
+        wishlistId: 'birthday',
+        name: 'Drachen',
+        createdBy: 'ben',
+        giverId: 'anna',
+        received: true,
+      }),
+      wishRecord({ id: 'watch', wishlistId: 'anniversary', name: 'Uhr', giverId: 'ben' }),
+      wishRecord({ id: 'scarf', wishlistId: 'anniversary', name: 'Schal' }),
     ],
   });
 });
@@ -26,9 +51,9 @@ test('gifts a wish and moves it to the fulfilled wishes', async ({ page }) => {
   await page.getByRole('button', { name: 'Schenken', exact: true }).focus();
   await page.keyboard.press('Enter');
 
-  await expectAnnouncement(page, 'Als erfüllt markiert.');
+  await expectAnnouncement(page, 'Als geschenkt markiert.');
   await expect(page.getByRole('button', { name: 'Schenken zurücknehmen' })).toBeFocused();
-  await expect(page.getByText('Erfüllt', { exact: true })).toBeVisible();
+  await expect(page.getByText('Erfüllt – von Anna', { exact: true })).toBeVisible();
 
   await page.getByRole('button', { name: 'Zurück zu Geburtstag' }).click();
 
@@ -40,6 +65,7 @@ test('gifts a wish and moves it to the fulfilled wishes', async ({ page }) => {
 
   await expect(page).toHaveURL(/#\/liste\/birthday\/erfuellt$/);
   await expect(wishLink(page, 'Fahrradhelm')).toBeVisible();
+  await expect(wishLink(page, 'Fahrradhelm')).toContainText('von Anna');
   await expect(filterButton(page, 'Erfüllte Wünsche')).toBeFocused();
   await expect(filterButton(page, 'Erfüllte Wünsche')).toHaveAttribute('aria-pressed', 'true');
   await expect(pageHeading(page, 'Geburtstag')).not.toBeFocused();
@@ -71,15 +97,62 @@ test('takes a gift back so the wish is open again', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Schenken zurücknehmen' }).click();
 
-  await expectAnnouncement(page, 'Wieder offen.');
-  await expect(page.getByText('Erfüllt', { exact: true })).toHaveCount(0);
+  await expectAnnouncement(page, 'Schenken zurückgenommen.');
+  await expect(page.getByRole('button', { name: 'Schenken', exact: true })).toBeFocused();
+  await expect(page.getByText(/^Erfüllt/)).toHaveCount(0);
 
   await page.goto('./#/liste/birthday');
   await expect(wishLink(page, 'Fahrradhelm')).toBeVisible();
 });
 
+test('shows the gift of someone else without a state button', async ({ page }) => {
+  await page.goto('./#/wunsch/lamp');
+
+  await expect(page.getByText('Erfüllt – von Oma', { exact: true })).toBeVisible();
+  await expect(actionBarButtons(page)).toHaveText(['Bearbeiten']);
+});
+
+test('lets the owner receive a gifted wish without revealing the giver before', async ({
+  page,
+}) => {
+  await page.goto('./#/liste/anniversary');
+  await expect(wishLink(page, 'Uhr')).toHaveText('Uhr');
+  await wishLink(page, 'Uhr').click();
+  await expect(page.getByText(/^Erfüllt/)).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Erhalten', exact: true }).click();
+
+  await expectAnnouncement(page, 'Als erhalten markiert.');
+  await expect(page.getByRole('button', { name: 'Erhalten zurücknehmen' })).toBeFocused();
+  await expect(page.getByText('Erfüllt – von Ben', { exact: true })).toBeVisible();
+
+  await page.goto('./#/liste/anniversary/erfuellt');
+  await expect(wishLink(page, 'Uhr')).toContainText('von Ben');
+
+  await wishLink(page, 'Uhr').click();
+  await page.getByRole('button', { name: 'Erhalten zurücknehmen' }).click();
+
+  await expectAnnouncement(page, 'Wieder offen.');
+  await expect(page.getByRole('button', { name: 'Erhalten', exact: true })).toBeFocused();
+});
+
+test('lets the owner receive a wish nobody gifted', async ({ page }) => {
+  await page.goto('./#/wunsch/scarf');
+
+  await page.getByRole('button', { name: 'Erhalten', exact: true }).click();
+
+  await expect(page.getByText('Erfüllt', { exact: true })).toBeVisible();
+});
+
+test('keeps a received gift from being taken back', async ({ page }) => {
+  await page.goto('./#/wunsch/kite');
+
+  await expect(page.getByText('Erfüllt – von Anna', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Schenken zurücknehmen' })).toHaveCount(0);
+});
+
 test('shows the empty fulfilled wishes without a create button', async ({ page }) => {
-  await page.goto('./#/liste/birthday/erfuellt');
+  await page.goto('./#/liste/anniversary/erfuellt');
 
   await expect(page.getByText('Noch keine erfüllten Wünsche.')).toBeVisible();
   await expect(

@@ -17,8 +17,20 @@ export type WishRecord = {
   description?: string;
   priceInCents?: number;
   rating?: 'essential' | 'wanted' | 'nice';
-  gifted: boolean;
+  createdBy: string;
+  secret: boolean;
+  giverId?: string;
+  received: boolean;
+  removedByOwner: boolean;
 };
+
+type WishRecordDefaults = 'createdBy' | 'secret' | 'received' | 'removedByOwner';
+
+export function wishRecord(
+  fields: Omit<WishRecord, WishRecordDefaults> & Partial<Pick<WishRecord, WishRecordDefaults>>,
+): WishRecord {
+  return { createdBy: 'anna', secret: false, received: false, removedByOwner: false, ...fields };
+}
 
 export type SeedData = {
   persons?: PersonRecord[];

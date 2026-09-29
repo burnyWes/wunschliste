@@ -6,7 +6,7 @@ import {
   type WishId,
   type WishlistId,
 } from '../../domain/ids';
-import type { WishFilter } from '../../domain/wishOrder';
+import type { WishFilter } from '../../domain/wishView';
 
 export type WishlistAddress =
   | { page: 'wishlists' }

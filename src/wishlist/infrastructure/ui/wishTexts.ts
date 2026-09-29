@@ -2,6 +2,7 @@ import type { DescriptionProblem } from '../../domain/Description';
 import type { NameProblem } from '../../domain/Name';
 import type { Price, PriceProblem } from '../../domain/Price';
 import type { Rating } from '../../domain/Rating';
+import type { WishAction } from '../../domain/wishActions';
 import type { WishDetails, WishDetailsInput } from '../../domain/WishDetails';
 import type { WishLinkProblem } from '../../domain/WishLink';
 
@@ -77,9 +78,31 @@ export const WISH_CREATED_ANNOUNCEMENT = 'Wunsch erstellt.';
 
 export const SAVED_ANNOUNCEMENT = 'Gespeichert.';
 
-export const WISH_GIFTED_ANNOUNCEMENT = 'Als erfüllt markiert.';
+export const WISH_ACTION_LABELS: Record<WishAction, string> = {
+  gift: 'Schenken',
+  takeBackGift: 'Schenken zurücknehmen',
+  receive: 'Erhalten',
+  undoReceive: 'Erhalten zurücknehmen',
+  handOver: 'Übergeben',
+  undoHandOver: 'Übergabe zurücknehmen',
+};
 
-export const GIFT_TAKEN_BACK_ANNOUNCEMENT = 'Wieder offen.';
+export const WISH_ACTION_ANNOUNCEMENTS: Record<WishAction, string> = {
+  gift: 'Als geschenkt markiert.',
+  takeBackGift: 'Schenken zurückgenommen.',
+  receive: 'Als erhalten markiert.',
+  undoReceive: 'Wieder offen.',
+  handOver: 'Übergabe vermerkt.',
+  undoHandOver: 'Übergabe zurückgenommen.',
+};
+
+export function fulfilledNote(giverName?: string): string {
+  return giverName === undefined ? 'Erfüllt' : `Erfüllt – von ${giverName}`;
+}
+
+export function giverNote(giverName: string): string {
+  return `von ${giverName}`;
+}
 
 export function wishlistDeletedAnnouncement(name: string): string {
   return `Wunschliste „${name}“ gelöscht.`;

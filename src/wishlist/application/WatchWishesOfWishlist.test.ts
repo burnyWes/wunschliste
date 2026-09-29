@@ -1,17 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { wishIdOf, wishlistIdOf, type WishlistId } from '../domain/ids';
+import { wishlistIdOf, type WishlistId } from '../domain/ids';
 import { Name } from '../domain/Name';
 import { requireValid } from '../domain/parsed';
 import type { Rating } from '../domain/Rating';
-import { Wish } from '../domain/Wish';
+import type { Wish } from '../domain/Wish';
 import { InMemoryWishRepository } from './fakes/InMemoryWishRepository';
+import { wishNamed } from './fakes/wishNamed';
 import { WatchWishesOfWishlist } from './WatchWishesOfWishlist';
 
 const birthday = wishlistIdOf('birthday');
 const christmas = wishlistIdOf('christmas');
 
 function wish(name: string, wishlistId: WishlistId, rating?: Rating): Wish {
-  return Wish.create(wishIdOf(name), wishlistId, { name: requireValid(Name.parse(name)), rating });
+  return wishNamed(name, { wishlistId, details: { name: requireValid(Name.parse(name)), rating } });
 }
 
 describe('WatchWishesOfWishlist', () => {

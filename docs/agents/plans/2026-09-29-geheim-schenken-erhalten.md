@@ -405,13 +405,13 @@ Blickwinkel.
 **Aufgaben**:
 
 Domäne (test-getrieben):
-- [ ] `Perspective.ts`:
+- [x] `Perspective.ts`:
   ```ts
   export type Perspective = { readonly me: PersonId; readonly ownerId: PersonId };
   export function perspectiveOf(wishlist: Wishlist, me: PersonId): Perspective;
   export function isOwner(perspective: Perspective): boolean;
   ```
-- [ ] `Wish.ts`:
+- [x] `Wish.ts`:
   ```ts
   export type RestoredWish = {
     id: WishId; wishlistId: WishlistId; details: WishDetails;
@@ -434,10 +434,10 @@ Domäne (test-getrieben):
   - Tests: jede Aktion aus der Regeltabelle erlaubt und verboten, darunter „Besitzerin
     kann nicht schenken“, „Oma kann Bens Geschenk nicht zurücknehmen“, „Ben kann nach dem
     Erhalten nicht zurücknehmen“ und „Erhalten ohne Schenkenden“.
-- [ ] `wishActions.ts`: `WishAction` und
+- [x] `wishActions.ts`: `WishAction` und
   `allowedWishActions(wish, p): { primary?: WishAction; secondary?: WishAction }` nach
   der Regeltabelle. Die Zeilen für geheime Wünsche sind schon enthalten und getestet.
-- [ ] `wishView.ts`:
+- [x] `wishView.ts`:
   ```ts
   export type WishView = {
     wish: Wish;
@@ -466,21 +466,21 @@ Domäne (test-getrieben):
     - Anna hat erhalten: Sie sieht `giverId`.
     - Anna erhält ohne Schenkenden: erfüllt ohne `giverId`.
     - Filter und Sortierung
-- [ ] `WishRepository.ts`: unverändert in Phase 1
+- [x] `WishRepository.ts`: unverändert in Phase 1
 
 Anwendung (test-getrieben):
-- [ ] `fakes/wishNamed.ts`: `wishNamed(name, overrides?)` liefert einen per `Wish.restore`
+- [x] `fakes/wishNamed.ts`: `wishNamed(name, overrides?)` liefert einen per `Wish.restore`
   gebauten Wunsch. Standard: Liste `birthday`, `createdBy` `anna`, nicht geheim, offen.
-- [ ] `ChangeWishState.execute(wishId, me, action)`:
+- [x] `ChangeWishState.execute(wishId, me, action)`:
   - `wishes.get` → `WishNotFound`
   - `wishlists.get(wish.wishlistId)` → `WishlistNotFound`
   - `save(wish.perform(action, perspectiveOf(wishlist, me)))`
   - Tests: schenkt, Besitzerin erhält, verbotene Aktion wirft und speichert nichts,
     unbekannter Wunsch, unbekannte Liste
-- [ ] `GiftWish.ts`, `TakeBackGift.ts` samt Tests entfernen
-- [ ] `CreateWish.execute(wishlistId, details, me)` erzeugt mit `perspectiveOf(wishlist, me)`.
+- [x] `GiftWish.ts`, `TakeBackGift.ts` samt Tests entfernen
+- [x] `CreateWish.execute(wishlistId, details, me)` erzeugt mit `perspectiveOf(wishlist, me)`.
   Test: `createdBy` ist `me`.
-- [ ] Alle Fundstellen umstellen, gefunden über
+- [x] Alle Fundstellen umstellen, gefunden über
   `grep -rn "gifted\|wishesMatching\|Wish.create(\|Wish.restore(\|WISH_GIFTED\|GIFT_TAKEN_BACK\|giftWish\|takeBackGift\|WishFilter" src tests`:
   - `Wish.test.ts`, `EditWish.test.ts`, `WatchWish.test.ts`,
     `WatchWishesOfWishlist.test.ts`, `DeleteWish.test.ts`, `DeleteWishlist.test.ts`,
@@ -491,7 +491,7 @@ Anwendung (test-getrieben):
   - Die Typprüfung (`npm run lint`) meldet übersehene Stellen.
 
 Infrastruktur:
-- [ ] `firestore/wishDocument.ts`:
+- [x] `firestore/wishDocument.ts`:
   ```ts
   export type WishDocument = {
     wishlistId: string; name: string; link?: string; description?: string;
@@ -506,9 +506,9 @@ Infrastruktur:
     - `secret`, `received` und `removedByOwner` sind Booleans.
   - Sonst liefert die Funktion `undefined` (Entscheidung 9). `gifted` wird weder gelesen
     noch geschrieben.
-- [ ] `createWishlistModule.ts`: `changeWishState: new ChangeWishState(wishes, wishlists)`,
+- [x] `createWishlistModule.ts`: `changeWishState: new ChangeWishState(wishes, wishlists)`,
   `giftWish` und `takeBackGift` entfernen
-- [ ] `ui/wishTexts.ts` mit Tests in `wishTexts.test.ts`:
+- [x] `ui/wishTexts.ts` mit Tests in `wishTexts.test.ts`:
   - `WISH_ACTION_LABELS: Record<WishAction, string>`: Schenken, Schenken zurücknehmen,
     Erhalten, Erhalten zurücknehmen, Übergeben, Übergabe zurücknehmen
   - `WISH_ACTION_ANNOUNCEMENTS: Record<WishAction, string>` (Ansagen wie in den
@@ -516,13 +516,13 @@ Infrastruktur:
     entfallen.
   - `fulfilledNote(giverName?)` → „Erfüllt – von Ben“ / „Erfüllt“
   - `giverNote(giverName)` → „von Ben“ (für Einträge der Liste)
-- [ ] `ui/WishStateNotes.svelte` (neu):
+- [x] `ui/WishStateNotes.svelte` (neu):
   - Props `view: WishView`, `persons: readonly Person[]`, `variant: 'entry' | 'page'`
   - zeigt die Vermerke. In Phase 1 ist das nur „Erfüllt – von …“ bzw. im Eintrag
     „von …“, und nur bei `status === 'fulfilled'`.
   - Namen über die ID in `persons`, bei unbekannter ID ohne „von …“
   - Emojis `aria-hidden`
-- [ ] `ui/WishPage.svelte`:
+- [x] `ui/WishPage.svelte`:
   - `me` aus `useCurrentProfile()`, `view = $derived(viewOfWish(wish, perspectiveOf(wishlist, me.id)))`
   - Personen über `watchPersons` für die Vermerke
   - `ActionBar`: [✏ Bearbeiten] und, falls `view.primaryAction`, der Zustandsknopf mit
@@ -534,15 +534,15 @@ Infrastruktur:
     - Fokus auf den Zustandsknopf, falls vorhanden, sonst auf [✏ Bearbeiten]
     - Beide Knöpfe werden über `bind:this` gehalten.
   - Der Absatz „Erfüllt“ entfällt, stattdessen `<WishStateNotes variant="page">`.
-- [ ] `ui/WishlistPage.svelte`:
+- [x] `ui/WishlistPage.svelte`:
   - `me`, `perspectiveOf(wishlist, me.id)` und
     `viewOfWishes(wishes, perspective, filter).entries` statt `wishesMatching`
   - Im Eintrag unter `WishSummary` steht `<WishStateNotes variant="entry">`.
   - Personen über `watchPersons`
-- [ ] `ui/CreateWishPage.svelte`: `createWish.execute(wishlistId, details, me.id)`
+- [x] `ui/CreateWishPage.svelte`: `createWish.execute(wishlistId, details, me.id)`
 
 E2E:
-- [ ] `e2e/emulators.ts`: `WishRecord` bekommt `createdBy: string`, `secret: boolean`,
+- [x] `e2e/emulators.ts`: `WishRecord` bekommt `createdBy: string`, `secret: boolean`,
   `giverId?: string`, `received: boolean` und `removedByOwner: boolean`. `gifted` entfällt.
   Hilfsfunktion `wishRecord(fields)` mit den Standardwerten `createdBy: 'anna'`,
   `secret: false`, `received: false` und `removedByOwner: false`. Alle Seeds nutzen sie,
@@ -551,7 +551,7 @@ E2E:
   - `gifting.spec.ts`, `wishes.spec.ts`
   - weitere laut `grep -rn "gifted" e2e`
   - Das bisherige `gifted: true` wird zu `received: true`.
-- [ ] `e2e/gifting.spec.ts` neu fassen:
+- [x] `e2e/gifting.spec.ts` neu fassen:
   - Seeds: Personen Ben und Oma, Liste `birthday` von Ben, Liste `anniversary` von Anna.
     Die Fixture wählt Anna.
   - Anna schenkt in Bens Liste:
@@ -573,22 +573,22 @@ E2E:
   - In Bens Liste ein von Anna geschenkter und von Ben erhaltener Wunsch: Anna hat kein
     [Schenken zurücknehmen].
   - leerer Zustand „Noch keine erfüllten Wünsche.“ bleibt
-- [ ] `e2e/offline.spec.ts:57` und `e2e/sync.spec.ts:39` klicken heute als Besitzerin Anna
+- [x] `e2e/offline.spec.ts:57` und `e2e/sync.spec.ts:39` klicken heute als Besitzerin Anna
   auf [Schenken]. Sie bekommen eine Liste von Ben (Person Ben seeden, `ownerId: 'ben'`),
   damit Anna dort schenken kann. Die geprüften Ansagen und Texte werden an die neuen
   angepasst.
-- [ ] `e2e/accessibility.spec.ts`: Detailseite als Besitzerin mit [Erhalten], als
+- [x] `e2e/accessibility.spec.ts`: Detailseite als Besitzerin mit [Erhalten], als
   Schenkende mit Vermerk, als Dritte ohne Zustandsknopf
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test:unit` grün, mit den Regeltests für `allowedWishActions`, `Wish.perform`,
+- [x] `npm run test:unit` grün, mit den Regeltests für `allowedWishActions`, `Wish.perform`,
   `viewOfWish(es)` und `ChangeWishState`
-- [ ] `tests/integration/FirestoreWishRepository.integration.test.ts` angepasst und grün:
+- [x] `tests/integration/FirestoreWishRepository.integration.test.ts` angepasst und grün:
   - neues Format wird geschrieben und gelesen (`createdBy`, `giverId`, `received`)
   - ein Dokument im alten Format (`gifted`, ohne `createdBy`) wird übersprungen
   - `it.each` der ungültigen Dokumente um `createdBy: ''`, `giverId: ''`,
     `received: 'ja'`, `secret` fehlt und `removedByOwner` fehlt ergänzt
-- [ ] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
+- [x] `npm run lint` und `npm test` grün (Architektur, Unit, Integration, E2E)
 
 **Manuelle Verifikation**:
 - [ ] Auf zwei iPhones mit VoiceOver, als Anna und als Ben:
@@ -919,6 +919,15 @@ E2E:
 ## Notizen zur Umsetzung
 
 Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalten.
+
+- Phase 1, `WishPage`: Der Fokus nach einer Zustandsänderung wird gesetzt, sobald die
+  Beobachtung die neue View meldet (`$effect` auf `view`), nicht nach einem festen `tick()`.
+  Grund: Die Firestore-Meldung des lokalen Schreibens kann nach dem Ende des Use Cases
+  kommen, und beim Wechsel von [↶ Schenken zurücknehmen] im Inhalt zu [🎁 Schenken]
+  verschwindet der geklickte Knopf.
+- Phase 1, `WishPage`: Der Erfüllt-Vermerk steht wie in den Skizzen unter der Überschrift
+  und vor Bewertung und Preis. Fehlt die Liste eines Wunsches, erscheint jetzt ebenfalls
+  „Diesen Wunsch gibt es nicht mehr.“ statt einer leeren Seite.
 
 ## Verweise
 

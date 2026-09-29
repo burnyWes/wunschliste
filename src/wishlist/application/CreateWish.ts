@@ -1,4 +1,11 @@
-import { wishIdOf, type IdGenerator, type WishId, type WishlistId } from '../domain/ids';
+import {
+  wishIdOf,
+  type IdGenerator,
+  type PersonId,
+  type WishId,
+  type WishlistId,
+} from '../domain/ids';
+import { perspectiveOf } from '../domain/Perspective';
 import { Wish } from '../domain/Wish';
 import type { WishDetails } from '../domain/WishDetails';
 import { WishlistNotFound } from '../domain/Wishlist';
@@ -12,11 +19,15 @@ export class CreateWish {
     private readonly ids: IdGenerator,
   ) {}
 
-  async execute(wishlistId: WishlistId, details: WishDetails): Promise<WishId> {
-    if ((await this.wishlists.get(wishlistId)) === undefined) {
+  async execute(wishlistId: WishlistId, details: WishDetails, me: PersonId): Promise<WishId> {
+    const wishlist = await this.wishlists.get(wishlistId);
+    if (wishlist === undefined) {
       throw new WishlistNotFound(wishlistId);
     }
-    const wish = Wish.create(wishIdOf(this.ids.next()), wishlistId, details);
+    const wish = Wish.create(
+      { id: wishIdOf(this.ids.next()), wishlistId, details },
+      perspectiveOf(wishlist, me),
+    );
     await this.wishes.save(wish);
     return wish.id;
   }

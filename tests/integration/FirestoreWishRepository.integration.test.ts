@@ -1,7 +1,7 @@
 import type { RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { disableNetwork, doc, getDoc, setDoc } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { wishIdOf, wishlistIdOf, type WishlistId } from '../../src/wishlist/domain/ids';
+import { personIdOf, wishIdOf, wishlistIdOf, type WishlistId } from '../../src/wishlist/domain/ids';
 import { Wish } from '../../src/wishlist/domain/Wish';
 import { parseWishDetails, type WishDetailsInput } from '../../src/wishlist/domain/WishDetails';
 import {
@@ -20,6 +20,8 @@ import {
 
 const birthday = wishlistIdOf('birthday');
 const christmas = wishlistIdOf('christmas');
+const anna = personIdOf('anna');
+const ben = personIdOf('ben');
 
 const ONLY_A_NAME: Omit<WishDetailsInput, 'name'> = {
   link: '',
@@ -33,11 +35,18 @@ function wishOf(input: WishDetailsInput, wishlistId: WishlistId, id: string): Wi
   if (!parsed.ok) {
     throw new Error(`Invalid test wish ${input.name}`);
   }
-  return Wish.create(wishIdOf(id), wishlistId, parsed.details);
+  return Wish.create(
+    { id: wishIdOf(id), wishlistId, details: parsed.details },
+    { me: anna, ownerId: anna },
+  );
 }
 
 function wishNamed(name: string, wishlistId: WishlistId = birthday, id = name): Wish {
   return wishOf({ ...ONLY_A_NAME, name }, wishlistId, id);
+}
+
+function withoutField(document: object, field: string): object {
+  return Object.fromEntries(Object.entries(document).filter(([key]) => key !== field));
 }
 
 function namesOf(wishes: readonly Wish[]): string[] {
@@ -87,7 +96,26 @@ describe('FirestoreWishRepository', () => {
       expect(restored?.details.description?.value).toBe('Größe M');
       expect(restored?.details.price?.cents).toBe(4999);
       expect(restored?.details.rating).toBe('essential');
-      expect(restored?.gifted).toBe(false);
+      expect(restored?.createdBy).toBe(anna);
+      expect(restored?.secret).toBe(false);
+      expect(restored?.giverId).toBeUndefined();
+      expect(restored?.received).toBe(false);
+      expect(restored?.removedByOwner).toBe(false);
+    });
+  });
+
+  it('restores the giver and the receipt', async () => {
+    const received = wishNamed('Helm')
+      .perform('gift', { me: ben, ownerId: anna })
+      .perform('receive', { me: anna, ownerId: anna });
+    let restored: Wish | undefined;
+    familyRepository().watch(wishIdOf('Helm'), (wish) => (restored = wish), ignoreFailure);
+
+    await familyRepository().save(received);
+
+    await eventually(() => {
+      expect(restored?.giverId).toBe(ben);
+      expect(restored?.received).toBe(true);
     });
   });
 
@@ -98,7 +126,14 @@ describe('FirestoreWishRepository', () => {
       const stored = await withoutRules(environment, async (firestore) =>
         (await getDoc(doc(firestore, WISHES_COLLECTION, 'b'))).data(),
       );
-      expect(stored).toEqual({ wishlistId: 'birthday', name: 'Buch', gifted: false });
+      expect(stored).toEqual({
+        wishlistId: 'birthday',
+        name: 'Buch',
+        createdBy: 'anna',
+        secret: false,
+        received: false,
+        removedByOwner: false,
+      });
     });
   });
 
@@ -165,7 +200,14 @@ describe('FirestoreWishRepository', () => {
   });
 
   it('skips documents that break a rule and keeps the others', async () => {
-    const valid = { wishlistId: 'birthday', name: 'Helm', gifted: false };
+    const valid = {
+      wishlistId: 'birthday',
+      name: 'Helm',
+      createdBy: 'anna',
+      secret: false,
+      received: false,
+      removedByOwner: false,
+    };
     await withoutRules(environment, async (firestore) => {
       const documents: Record<string, object> = {
         ok: valid,
@@ -174,7 +216,12 @@ describe('FirestoreWishRepository', () => {
         link: { ...valid, link: 'javascript:alert(1)' },
         rating: { ...valid, rating: 'sehr' },
         name: { ...valid, name: ' ' },
-        gifted: { ...valid, gifted: 'ja' },
+        legacy: { wishlistId: 'birthday', name: 'Helm', gifted: true },
+        createdBy: { ...valid, createdBy: '' },
+        giverId: { ...valid, giverId: '' },
+        received: { ...valid, received: 'ja' },
+        secret: withoutField(valid, 'secret'),
+        removedByOwner: withoutField(valid, 'removedByOwner'),
       };
       for (const [id, data] of Object.entries(documents)) {
         await setDoc(doc(firestore, WISHES_COLLECTION, id), data);

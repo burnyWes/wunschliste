@@ -5,9 +5,10 @@
   import { Watched } from '../../../shared/ui/watched.svelte';
   import type { WishlistId } from '../../domain/ids';
   import type { Person } from '../../domain/Person';
+  import { perspectiveOf } from '../../domain/Perspective';
   import type { Wish } from '../../domain/Wish';
   import type { Wishlist } from '../../domain/Wishlist';
-  import { wishesMatching, type WishFilter } from '../../domain/wishOrder';
+  import { viewOfWishes, type WishFilter } from '../../domain/wishView';
   import { useCurrentProfile } from './currentProfile.svelte';
   import LoadFailed from './LoadFailed.svelte';
   import NotFound from './NotFound.svelte';
@@ -15,6 +16,7 @@
   import { hashOf } from './wishlistAddresses';
   import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
+  import WishStateNotes from './WishStateNotes.svelte';
   import WishSummary from './WishSummary.svelte';
   import { LOAD_FAILED_MESSAGE } from './wishTexts';
 
@@ -25,13 +27,14 @@
     { value: 'fulfilled', label: 'Erfüllte Wünsche', emptyText: 'Noch keine erfüllten Wünsche.' },
   ];
 
-  const { watchWishlist, watchWishesOfWishlist, watchPerson } = useWishlistModule();
+  const { watchWishlist, watchWishesOfWishlist, watchPerson, watchPersons } = useWishlistModule();
   const profile = useCurrentProfile();
 
   const wishlist = new Watched<Wishlist>();
   let wishes = $state.raw<readonly Wish[]>();
   let haveWishesFailed = $state(false);
   let owner = $state.raw<Person>();
+  let persons = $state.raw<readonly Person[]>([]);
 
   $effect(() =>
     watchWishlist.execute(
@@ -60,10 +63,21 @@
     }
   });
 
+  $effect(() =>
+    watchPersons.execute(
+      (reported) => (persons = reported),
+      () => {},
+    ),
+  );
+
   $effect(() => wishlistFilterMemory.remember(wishlistId, filter));
 
   const createWishHash = $derived(hashOf({ page: 'createWish', wishlistId }));
-  const shownWishes = $derived(wishes && wishesMatching(wishes, filter));
+  const shownWishes = $derived(
+    wishes &&
+      wishlist.value &&
+      viewOfWishes(wishes, perspectiveOf(wishlist.value, profile.me.id), filter).entries,
+  );
   const emptyText = $derived(FILTERS.find(({ value }) => value === filter)?.emptyText);
 
   function show(chosenFilter: WishFilter): void {
@@ -130,7 +144,8 @@
       {/if}
     {:else if shownWishes}
       <ul class="entry-list">
-        {#each shownWishes as wish (wish.id)}
+        {#each shownWishes as view (view.wish.id)}
+          {@const { wish } = view}
           <li>
             <button
               type="button"
@@ -139,6 +154,7 @@
               <span>
                 <span class="wish-name">{wish.details.name.value}</span>
                 <WishSummary details={wish.details} />
+                <WishStateNotes {view} {persons} variant="entry" />
               </span>
               <ChevronRight aria-hidden="true" size="1.25em" />
             </button>

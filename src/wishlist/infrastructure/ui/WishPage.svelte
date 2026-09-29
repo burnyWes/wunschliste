@@ -1,27 +1,51 @@
 <script lang="ts">
-  import { ExternalLink, Gift, Pencil, Undo2 } from '@lucide/svelte';
+  import { Check, ExternalLink, Gift, Pencil, Undo2 } from '@lucide/svelte';
+  import type { Component } from 'svelte';
   import { announce } from '../../../shared/ui/announcements.svelte';
   import ActionBar from '../../../shared/ui/ActionBar.svelte';
   import { navigateTo } from '../../../shared/ui/navigation';
   import PageHeader from '../../../shared/ui/PageHeader.svelte';
   import { Watched } from '../../../shared/ui/watched.svelte';
   import type { WishId } from '../../domain/ids';
+  import type { Person } from '../../domain/Person';
+  import { perspectiveOf } from '../../domain/Perspective';
   import type { Wish } from '../../domain/Wish';
+  import type { WishAction } from '../../domain/wishActions';
   import type { Wishlist } from '../../domain/Wishlist';
+  import { viewOfWish } from '../../domain/wishView';
+  import { useCurrentProfile } from './currentProfile.svelte';
   import LoadFailed from './LoadFailed.svelte';
   import NotFound from './NotFound.svelte';
   import { hashOf } from './wishlistAddresses';
   import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
+  import WishStateNotes from './WishStateNotes.svelte';
   import WishSummary from './WishSummary.svelte';
-  import { GIFT_TAKEN_BACK_ANNOUNCEMENT, WISH_GIFTED_ANNOUNCEMENT } from './wishTexts';
+  import { WISH_ACTION_ANNOUNCEMENTS, WISH_ACTION_LABELS } from './wishTexts';
 
   let { wishId }: { wishId: WishId } = $props();
 
-  const { watchWish, watchWishlist, giftWish, takeBackGift } = useWishlistModule();
+  const WISH_ACTION_ICONS: Record<
+    WishAction,
+    Component<{ 'aria-hidden': 'true'; size: string }>
+  > = {
+    gift: Gift,
+    takeBackGift: Undo2,
+    receive: Check,
+    undoReceive: Undo2,
+    handOver: Check,
+    undoHandOver: Undo2,
+  };
+
+  const { watchWish, watchWishlist, watchPersons, changeWishState } = useWishlistModule();
+  const profile = useCurrentProfile();
 
   const wish = new Watched<Wish>();
   const wishlist = new Watched<Wishlist>();
+  let persons = $state.raw<readonly Person[]>([]);
+  let editButton = $state<HTMLButtonElement>();
+  let stateButton = $state<HTMLButtonElement>();
+  let focusesStateButtonOnChange = false;
 
   $effect(() =>
     watchWish.execute(
@@ -43,14 +67,30 @@
     }
   });
 
-  async function toggleGift(currentWish: Wish): Promise<void> {
-    if (currentWish.gifted) {
-      await takeBackGift.execute(currentWish.id);
-      announce(GIFT_TAKEN_BACK_ANNOUNCEMENT);
-    } else {
-      await giftWish.execute(currentWish.id);
-      announce(WISH_GIFTED_ANNOUNCEMENT);
+  $effect(() =>
+    watchPersons.execute(
+      (reported) => (persons = reported),
+      () => {},
+    ),
+  );
+
+  const view = $derived(
+    wish.value &&
+      wishlist.value &&
+      viewOfWish(wish.value, perspectiveOf(wishlist.value, profile.me.id)),
+  );
+
+  $effect(() => {
+    if (view && focusesStateButtonOnChange) {
+      focusesStateButtonOnChange = false;
+      (stateButton ?? editButton)?.focus();
     }
+  });
+
+  async function perform(action: WishAction): Promise<void> {
+    focusesStateButtonOnChange = true;
+    await changeWishState.execute(wishId, profile.me.id, action);
+    announce(WISH_ACTION_ANNOUNCEMENTS[action]);
   }
 
   const backToWishlist = $derived(
@@ -61,15 +101,27 @@
   );
 </script>
 
+{#snippet actionLabel(action: WishAction)}
+  {@const Icon = WISH_ACTION_ICONS[action]}
+  <Icon aria-hidden="true" size="1.25em" />
+  {WISH_ACTION_LABELS[action]}
+{/snippet}
+
 {#if wish.status === 'failed' || wishlist.status === 'failed'}
   <LoadFailed />
-{:else if wish.value && wishlist.status !== 'loading'}
-  {@const { name, link, description } = wish.value.details}
+{:else if view}
+  {@const { name, link, description } = view.wish.details}
+  {@const { primaryAction, secondaryAction } = view}
   <div class="page">
     <PageHeader heading={name.value} back={backToWishlist} />
-    <p><WishSummary details={wish.value.details} /></p>
-    {#if wish.value.gifted}
-      <p class="fulfilled">Erfüllt</p>
+    <WishStateNotes {view} {persons} variant="page" />
+    <p><WishSummary details={view.wish.details} /></p>
+    {#if secondaryAction}
+      <div class="button-row">
+        <button class="button" type="button" onclick={() => perform(secondaryAction)}>
+          {@render actionLabel(secondaryAction)}
+        </button>
+      </div>
     {/if}
     {#if link}
       <div class="button-row">
@@ -83,30 +135,30 @@
     {/if}
     <ActionBar>
       <button
+        bind:this={editButton}
         type="button"
         class="button"
         onclick={() => navigateTo(hashOf({ page: 'editWish', wishId }))}
       >
         <Pencil aria-hidden="true" size="1.25em" /> Bearbeiten
       </button>
-      <button class="button" type="button" onclick={() => wish.value && toggleGift(wish.value)}>
-        {#if wish.value.gifted}
-          <Undo2 aria-hidden="true" size="1.25em" /> Schenken zurücknehmen
-        {:else}
-          <Gift aria-hidden="true" size="1.25em" /> Schenken
-        {/if}
-      </button>
+      {#if primaryAction}
+        <button
+          bind:this={stateButton}
+          class="button"
+          type="button"
+          onclick={() => perform(primaryAction)}
+        >
+          {@render actionLabel(primaryAction)}
+        </button>
+      {/if}
     </ActionBar>
   </div>
-{:else if wish.status === 'missing'}
+{:else if wish.status === 'missing' || wishlist.status === 'missing'}
   <NotFound message="Diesen Wunsch gibt es nicht mehr." />
 {/if}
 
 <style>
-  .fulfilled {
-    font-weight: 700;
-  }
-
   .description {
     white-space: pre-line;
     overflow-wrap: anywhere;

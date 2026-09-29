@@ -19,7 +19,10 @@ async function signedInDevice(browser: Browser, baseURL: string | undefined): Pr
 }
 
 test.beforeEach(async () => {
-  await seed({ wishlists: [{ id: 'birthday', name: 'Geburtstag', ownerId: 'anna' }] });
+  await seed({
+    persons: [{ id: 'ben', name: 'Ben' }],
+    wishlists: [{ id: 'birthday', name: 'Geburtstag', ownerId: 'ben' }],
+  });
 });
 
 test('points out the missing connection and hides the notice once back online', async ({
@@ -56,7 +59,7 @@ test('keeps working offline and syncs once back online', async ({ browser, baseU
 
   await deviceA.getByRole('button', { name: 'Schenken', exact: true }).click();
 
-  await expectAnnouncement(deviceA, 'Als erfüllt markiert.');
+  await expectAnnouncement(deviceA, 'Als geschenkt markiert.');
   await expect(mainButton(deviceB, /^Fahrradhelm/)).toHaveCount(0);
 
   await deviceA.context().setOffline(false);

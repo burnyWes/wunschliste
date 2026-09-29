@@ -1,31 +1,25 @@
 import { describe, expect, it } from 'vitest';
-import { wishIdOf, wishlistIdOf } from '../domain/ids';
+import { personIdOf, wishIdOf } from '../domain/ids';
 import { Name } from '../domain/Name';
 import { requireValid } from '../domain/parsed';
-import { Wish, WishNotFound } from '../domain/Wish';
+import { WishNotFound } from '../domain/Wish';
 import { EditWish } from './EditWish';
 import { InMemoryWishRepository } from './fakes/InMemoryWishRepository';
+import { wishNamed } from './fakes/wishNamed';
 
-const helmet = { name: requireValid(Name.parse('Fahrradhelm')) };
 const tent = { name: requireValid(Name.parse('Zelt')) };
 
 describe('EditWish', () => {
   it('saves the new details and keeps the gift state', async () => {
     const wishes = new InMemoryWishRepository();
-    await wishes.save(
-      Wish.restore({
-        id: wishIdOf('w'),
-        wishlistId: wishlistIdOf('l'),
-        details: helmet,
-        gifted: true,
-      }),
-    );
+    await wishes.save(wishNamed('Helm', { giverId: personIdOf('ben'), received: true }));
 
-    await new EditWish(wishes).execute(wishIdOf('w'), tent);
+    await new EditWish(wishes).execute(wishIdOf('Helm'), tent);
 
-    const edited = await wishes.get(wishIdOf('w'));
+    const edited = await wishes.get(wishIdOf('Helm'));
     expect(edited?.details).toBe(tent);
-    expect(edited?.gifted).toBe(true);
+    expect(edited?.giverId).toBe('ben');
+    expect(edited?.received).toBe(true);
   });
 
   it('refuses an unknown wish', async () => {

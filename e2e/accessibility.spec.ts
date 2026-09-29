@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { createAccount, FAMILY, seed, STRANGER, type SeedData } from './emulators';
+import { createAccount, FAMILY, seed, STRANGER, type SeedData, wishRecord } from './emulators';
 import { expect, submitSignIn, test, type Page } from './fixtures';
 
 const WCAG_21_AA = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
@@ -23,7 +23,7 @@ const wishlistsOfSeveralOwners: SeedData = {
 const wishlistWithWishes: SeedData = {
   wishlists: twoWishlists.wishlists,
   wishes: [
-    {
+    wishRecord({
       id: 'helmet',
       wishlistId: 'birthday',
       name: 'Fahrradhelm',
@@ -31,9 +31,8 @@ const wishlistWithWishes: SeedData = {
       description: 'Größe M,\ngern in Dunkelblau.',
       priceInCents: 4999,
       rating: 'essential',
-      gifted: false,
-    },
-    { id: 'book', wishlistId: 'birthday', name: 'Buch', priceInCents: 1200, gifted: false },
+    }),
+    wishRecord({ id: 'book', wishlistId: 'birthday', name: 'Buch', priceInCents: 1200 }),
   ],
 };
 
@@ -41,7 +40,37 @@ const wishlistWithGiftedWish: SeedData = {
   wishlists: twoWishlists.wishlists,
   wishes: [
     ...(wishlistWithWishes.wishes ?? []),
-    { id: 'tent', wishlistId: 'birthday', name: 'Zelt', rating: 'nice', gifted: true },
+    wishRecord({
+      id: 'tent',
+      wishlistId: 'birthday',
+      name: 'Zelt',
+      rating: 'nice',
+      received: true,
+    }),
+  ],
+};
+
+const giftsInWishlistOfBen: SeedData = {
+  persons: [
+    { id: 'ben', name: 'Ben' },
+    { id: 'oma', name: 'Oma' },
+  ],
+  wishlists: [{ id: 'easter', name: 'Ostern', ownerId: 'ben' }],
+  wishes: [
+    wishRecord({
+      id: 'kite',
+      wishlistId: 'easter',
+      name: 'Drachen',
+      createdBy: 'ben',
+      giverId: 'anna',
+    }),
+    wishRecord({
+      id: 'lamp',
+      wishlistId: 'easter',
+      name: 'Lampe',
+      createdBy: 'ben',
+      giverId: 'oma',
+    }),
   ],
 };
 
@@ -145,6 +174,18 @@ const pages: CheckedPage[] = [
     path: './#/wunsch/helmet',
     heading: 'Fahrradhelm',
     data: wishlistWithWishes,
+  },
+  {
+    name: 'wish gifted by me',
+    path: './#/wunsch/kite',
+    heading: 'Drachen',
+    data: giftsInWishlistOfBen,
+  },
+  {
+    name: 'wish gifted by someone else',
+    path: './#/wunsch/lamp',
+    heading: 'Lampe',
+    data: giftsInWishlistOfBen,
   },
   {
     name: 'create wish with problems',

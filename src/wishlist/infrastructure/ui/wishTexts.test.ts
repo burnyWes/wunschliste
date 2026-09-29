@@ -4,12 +4,14 @@ import { parseWishDetails } from '../../domain/WishDetails';
 import { Price } from '../../domain/Price';
 import {
   DESCRIPTION_PROBLEM_MESSAGES,
-  GIFT_TAKEN_BACK_ANNOUNCEMENT,
   SAVED_ANNOUNCEMENT,
   WISH_CREATED_ANNOUNCEMENT,
-  WISH_GIFTED_ANNOUNCEMENT,
+  WISH_ACTION_ANNOUNCEMENTS,
+  WISH_ACTION_LABELS,
   WISHLIST_CREATED_ANNOUNCEMENT,
   formatPrice,
+  fulfilledNote,
+  giverNote,
   LINK_PROBLEM_MESSAGES,
   NAME_FORM_PROBLEM_MESSAGES,
   NAME_PROBLEM_MESSAGES,
@@ -85,8 +87,17 @@ describe('announcements', () => {
     expect(WISHLIST_CREATED_ANNOUNCEMENT).toBe('Wunschliste erstellt.');
     expect(WISH_CREATED_ANNOUNCEMENT).toBe('Wunsch erstellt.');
     expect(SAVED_ANNOUNCEMENT).toBe('Gespeichert.');
-    expect(WISH_GIFTED_ANNOUNCEMENT).toBe('Als erfüllt markiert.');
-    expect(GIFT_TAKEN_BACK_ANNOUNCEMENT).toBe('Wieder offen.');
+  });
+
+  it('reports each change of the wish state', () => {
+    expect(WISH_ACTION_ANNOUNCEMENTS).toEqual({
+      gift: 'Als geschenkt markiert.',
+      takeBackGift: 'Schenken zurückgenommen.',
+      receive: 'Als erhalten markiert.',
+      undoReceive: 'Wieder offen.',
+      handOver: 'Übergabe vermerkt.',
+      undoHandOver: 'Übergabe zurückgenommen.',
+    });
   });
 
   it('names the deleted wishlist', () => {
@@ -95,6 +106,28 @@ describe('announcements', () => {
 
   it('names the deleted wish', () => {
     expect(wishDeletedAnnouncement('Fahrradhelm')).toBe('Wunsch „Fahrradhelm“ gelöscht.');
+  });
+});
+
+describe('wish state', () => {
+  it('names the button of each change', () => {
+    expect(WISH_ACTION_LABELS).toEqual({
+      gift: 'Schenken',
+      takeBackGift: 'Schenken zurücknehmen',
+      receive: 'Erhalten',
+      undoReceive: 'Erhalten zurücknehmen',
+      handOver: 'Übergeben',
+      undoHandOver: 'Übergabe zurücknehmen',
+    });
+  });
+
+  it('names the giver of a fulfilled wish', () => {
+    expect(fulfilledNote('Ben')).toBe('Erfüllt – von Ben');
+    expect(giverNote('Ben')).toBe('von Ben');
+  });
+
+  it('leaves out an unknown giver', () => {
+    expect(fulfilledNote(undefined)).toBe('Erfüllt');
   });
 });
 

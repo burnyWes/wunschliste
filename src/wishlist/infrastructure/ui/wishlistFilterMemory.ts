@@ -1,5 +1,5 @@
 import type { WishlistId } from '../../domain/ids';
-import type { WishFilter } from '../../domain/wishOrder';
+import type { WishFilter } from '../../domain/wishView';
 import { hashOf } from './wishlistAddresses';
 
 export class WishlistFilterMemory {

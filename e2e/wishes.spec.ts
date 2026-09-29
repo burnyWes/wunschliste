@@ -1,5 +1,5 @@
 import { expect, test, type Page } from './fixtures';
-import { seed, storedWishes, type WishRecord } from './emulators';
+import { seed, storedWishes, type WishRecord, wishRecord } from './emulators';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
 const field = (page: Page, name: string) => page.getByRole('textbox', { name, exact: true });
@@ -65,16 +65,15 @@ test('points out every problem and focuses the name', async ({ page }) => {
 
 test.describe('with wishes of different ratings', () => {
   const wishes: WishRecord[] = [
-    { id: 'book', wishlistId: 'birthday', name: 'Buch', gifted: false },
-    { id: 'tent', wishlistId: 'birthday', name: 'Zelt', rating: 'nice', gifted: false },
-    {
+    wishRecord({ id: 'book', wishlistId: 'birthday', name: 'Buch' }),
+    wishRecord({ id: 'tent', wishlistId: 'birthday', name: 'Zelt', rating: 'nice' }),
+    wishRecord({
       id: 'helmet',
       wishlistId: 'birthday',
       name: 'Fahrradhelm',
       rating: 'essential',
       priceInCents: 4999,
-      gifted: false,
-    },
+    }),
   ];
 
   test.beforeEach(async () => {

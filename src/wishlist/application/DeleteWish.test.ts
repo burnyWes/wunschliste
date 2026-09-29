@@ -1,20 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { wishIdOf, wishlistIdOf } from '../domain/ids';
-import { Name } from '../domain/Name';
-import { requireValid } from '../domain/parsed';
-import { Wish } from '../domain/Wish';
+import { wishIdOf } from '../domain/ids';
 import { DeleteWish } from './DeleteWish';
 import { InMemoryWishRepository } from './fakes/InMemoryWishRepository';
+import { wishNamed } from './fakes/wishNamed';
 
 describe('DeleteWish', () => {
   it('removes the wish', async () => {
     const wishes = new InMemoryWishRepository();
-    await wishes.save(
-      Wish.create(wishIdOf('w'), wishlistIdOf('l'), { name: requireValid(Name.parse('Zelt')) }),
-    );
+    await wishes.save(wishNamed('Zelt'));
 
-    await new DeleteWish(wishes).execute(wishIdOf('w'));
+    await new DeleteWish(wishes).execute(wishIdOf('Zelt'));
 
-    expect(await wishes.get(wishIdOf('w'))).toBeUndefined();
+    expect(await wishes.get(wishIdOf('Zelt'))).toBeUndefined();
   });
 });

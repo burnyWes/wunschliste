@@ -1,6 +1,6 @@
 import { expect, test, type Page } from './fixtures';
 import { expectAnnouncement } from './announcement';
-import { seed, storedWishes, storedWishlists, type SeedData } from './emulators';
+import { seed, storedWishes, storedWishlists, type SeedData, wishRecord } from './emulators';
 import { historyLength } from './history';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
@@ -13,16 +13,15 @@ const data: SeedData = {
     { id: 'christmas', name: 'Weihnachten', ownerId: 'anna' },
   ],
   wishes: [
-    {
+    wishRecord({
       id: 'helmet',
       wishlistId: 'birthday',
       name: 'Fahrradhelm',
       priceInCents: 4999,
       rating: 'essential',
-      gifted: false,
-    },
-    { id: 'book', wishlistId: 'birthday', name: 'Buch', gifted: false },
-    { id: 'sledge', wishlistId: 'christmas', name: 'Schlitten', gifted: false },
+    }),
+    wishRecord({ id: 'book', wishlistId: 'birthday', name: 'Buch' }),
+    wishRecord({ id: 'sledge', wishlistId: 'christmas', name: 'Schlitten' }),
   ],
 };
 

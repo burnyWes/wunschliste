@@ -1,5 +1,5 @@
 import { expect, test, type Page } from './fixtures';
-import { seed } from './emulators';
+import { seed, wishRecord } from './emulators';
 import { historyLength } from './history';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
@@ -8,8 +8,8 @@ test.beforeEach(async () => {
   await seed({
     wishlists: [{ id: 'birthday', name: 'Geburtstag', ownerId: 'anna' }],
     wishes: [
-      { id: 'helmet', wishlistId: 'birthday', name: 'Fahrradhelm', gifted: false },
-      { id: 'tent', wishlistId: 'birthday', name: 'Zelt', gifted: true },
+      wishRecord({ id: 'helmet', wishlistId: 'birthday', name: 'Fahrradhelm' }),
+      wishRecord({ id: 'tent', wishlistId: 'birthday', name: 'Zelt', received: true }),
     ],
   });
 });

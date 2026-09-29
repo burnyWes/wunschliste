@@ -1,19 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { wishIdOf, wishlistIdOf, type WishlistId } from '../domain/ids';
-import { Name } from '../domain/Name';
-import { requireValid } from '../domain/parsed';
-import { Wish } from '../domain/Wish';
+import type { Wish } from '../domain/Wish';
 import { DeleteWishlist } from './DeleteWishlist';
 import { InMemoryWishlistRepository } from './fakes/InMemoryWishlistRepository';
 import { InMemoryWishRepository } from './fakes/InMemoryWishRepository';
 import { wishlistNamed } from './fakes/wishlistNamed';
+import { wishNamed } from './fakes/wishNamed';
 
-const nameOf = (raw: string) => requireValid(Name.parse(raw));
 const birthday = wishlistIdOf('birthday');
 const christmas = wishlistIdOf('christmas');
 
 function wish(id: string, wishlistId: WishlistId): Wish {
-  return Wish.create(wishIdOf(id), wishlistId, { name: nameOf(id) });
+  return wishNamed(id, { wishlistId });
 }
 
 describe('DeleteWishlist', () => {

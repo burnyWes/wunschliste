@@ -1,5 +1,5 @@
 import { Description } from '../../domain/Description';
-import { wishIdOf, wishlistIdOf } from '../../domain/ids';
+import { personIdOf, wishIdOf, wishlistIdOf } from '../../domain/ids';
 import { Name } from '../../domain/Name';
 import { valid } from '../../domain/parsed';
 import { Price } from '../../domain/Price';
@@ -16,11 +16,19 @@ export type WishDocument = {
   description?: string;
   priceInCents?: number;
   rating?: Rating;
-  gifted: boolean;
+  createdBy: string;
+  secret: boolean;
+  giverId?: string;
+  received: boolean;
+  removedByOwner: boolean;
 };
 
 function isOptional(value: unknown, type: 'string' | 'number'): boolean {
   return value === undefined || typeof value === type;
+}
+
+function isPersonReference(value: unknown): value is string {
+  return typeof value === 'string' && value !== '';
 }
 
 function isWishDocument(candidate: unknown): candidate is WishDocument {
@@ -32,7 +40,11 @@ function isWishDocument(candidate: unknown): candidate is WishDocument {
     isOptional(candidate.description, 'string') &&
     isOptional(candidate.priceInCents, 'number') &&
     (candidate.rating === undefined || isRating(candidate.rating)) &&
-    typeof candidate.gifted === 'boolean'
+    isPersonReference(candidate.createdBy) &&
+    typeof candidate.secret === 'boolean' &&
+    (candidate.giverId === undefined || isPersonReference(candidate.giverId)) &&
+    typeof candidate.received === 'boolean' &&
+    typeof candidate.removedByOwner === 'boolean'
   );
 }
 
@@ -54,7 +66,8 @@ function detailsOf(document: WishDocument): WishDetails | undefined {
   };
 }
 
-export function toWishDocument({ wishlistId, details, gifted }: Wish): WishDocument {
+export function toWishDocument(wish: Wish): WishDocument {
+  const { wishlistId, details } = wish;
   return {
     wishlistId,
     name: details.name.value,
@@ -62,7 +75,11 @@ export function toWishDocument({ wishlistId, details, gifted }: Wish): WishDocum
     ...(details.description && { description: details.description.value }),
     ...(details.price && { priceInCents: details.price.cents }),
     ...(details.rating && { rating: details.rating }),
-    gifted,
+    createdBy: wish.createdBy,
+    secret: wish.secret,
+    ...(wish.giverId && { giverId: wish.giverId }),
+    received: wish.received,
+    removedByOwner: wish.removedByOwner,
   };
 }
 
@@ -77,7 +94,11 @@ export function wishFromDocument(id: string, data: unknown): Wish | undefined {
       id: wishIdOf(id),
       wishlistId: wishlistIdOf(data.wishlistId),
       details,
-      gifted: data.gifted,
+      createdBy: personIdOf(data.createdBy),
+      secret: data.secret,
+      giverId: data.giverId === undefined ? undefined : personIdOf(data.giverId),
+      received: data.received,
+      removedByOwner: data.removedByOwner,
     })
   );
 }
