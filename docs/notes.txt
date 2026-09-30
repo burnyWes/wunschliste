@@ -81,3 +81,5 @@ m TypeScript auf 7 anheben, sobald typescript-eslint und svelte-check es unterst
 m Produktionsbuild: Firebase-Werte auf Plausibilität prüfen (API-Key beginnt mit AIza, App-ID hat die Form 1:…:web:…),
 damit vertauschte Werte schon in der Pipeline auffallen
 m jede Seite mit Zurück-Button versehen
+- Wunsch wiederholen möglich machen
+- Wunsch in andere Liste kopieren/ausschneiden

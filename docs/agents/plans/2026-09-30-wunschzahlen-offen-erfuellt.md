@@ -5,7 +5,7 @@ branch: main
 story: WL-009
 topic: "Anzahl offener und erfüllter Wünsche in der Wunschliste und in der Übersicht"
 tags: [plan, wishlist, wish, overview, filter, firestore, ui]
-status: ready
+status: done
 ---
 
 # PLAN: WL-009 — Anzahl offener und erfüllter Wünsche
@@ -379,13 +379,13 @@ Abhängigkeiten: Phase 1 (`countWishes`).
 
 **Manuelle Verifikation**:
 
-- [ ] Auf dem iPhone mit VoiceOver: Die Filterknöpfe werden als „Noch offen 3, ausgewählt,
+- [x] Auf dem iPhone mit VoiceOver: Die Filterknöpfe werden als „Noch offen 3, ausgewählt,
   Taste“ bzw. „Erfüllt 5, Taste“ angesagt. Die Zahl steht bei doppelter Schriftgröße
   sauber im Knopf.
-- [ ] Auf dem iPhone mit VoiceOver: Ein Übersichtseintrag wird als „Geburtstag, 3 offen,
+- [x] Auf dem iPhone mit VoiceOver: Ein Übersichtseintrag wird als „Geburtstag, 3 offen,
   5 erfüllt, Taste“ angesagt. Die Zeilen stehen bei sehr großer Schrift sauber
   untereinander.
-- [ ] Auf zwei Geräten: Wird auf dem einen geschenkt, ändern sich die Zahlen auf dem
+- [x] Auf zwei Geräten: Wird auf dem einen geschenkt, ändern sich die Zahlen auf dem
   anderen, in der Übersicht wie in der Liste.
 
 ## Notizen zur Umsetzung
