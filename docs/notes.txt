@@ -74,6 +74,7 @@ x "Offene Wünsche"-Button und "Erfüllte Wünsche"-Button umbennenen "Noch offe
   x Die Buttons sollen nebeneinander und nicht übereinander sein.
 x Einstellungen-Seite: Alles was mit Person zu tun hat auf eine Unterseite
 x Wunsch wiederholen möglich machen
+x Wunsch in andere Liste kopieren/ausschneiden
 ----------------------------------------------------------------------------------------------------------------------------------
 TODO 
 ----------------------------------------------------------------------------------------------------------------------------------
@@ -82,4 +83,3 @@ m Bilder zu Wünschen (Firebase Storage, Upload)
 m TypeScript auf 7 anheben, sobald typescript-eslint und svelte-check es unterstützen
 m Produktionsbuild: Firebase-Werte auf Plausibilität prüfen (API-Key beginnt mit AIza, App-ID hat die Form 1:…:web:…),
 damit vertauschte Werte schon in der Pipeline auffallen
-- Wunsch in andere Liste kopieren/ausschneiden

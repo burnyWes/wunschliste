@@ -5,7 +5,7 @@ branch: main
 story: WL-011
 topic: "Wunsch in eine andere Wunschliste derselben Person verschieben"
 tags: [plan, wishlist, wish, move, ui, routing]
-status: ready
+status: done
 ---
 
 # PLAN: WL-011 — Wunsch in andere Liste verschieben
@@ -461,7 +461,7 @@ Dokumentation:
 - [x] `README.md`, im Absatz über die Felder eines Wunsches: „Ein Wunsch lässt sich in
   eine andere Liste derselben Person verschieben. Dabei ändert sich nur `wishlistId`,
   der übrige Zustand bleibt erhalten. Gelöschte Listen sind weder Ziel noch Quelle.“
-- [ ] `docs/notes.txt`: „Wunsch in andere Liste kopieren/ausschneiden“ auf `x` setzen und
+- [x] `docs/notes.txt`: „Wunsch in andere Liste kopieren/ausschneiden“ auf `x` setzen und
   ans Ende von DONE verschieben, erst nach der Geräteabnahme.
 
 **Automatisierte Verifikation**:
@@ -476,13 +476,13 @@ Dokumentation:
 
 **Manuelle Verifikation**:
 
-- [ ] Auf dem iPhone mit VoiceOver: Auf der Bearbeiten-Seite wird „In andere Liste
+- [x] Auf dem iPhone mit VoiceOver: Auf der Bearbeiten-Seite wird „In andere Liste
   verschieben“ als Taste vorgelesen. Auf der Unterseite liegt der Fokus auf „Wohin
   verschieben?“, und der Hinweis mit der aktuellen Liste sowie die Ziellisten sind der
   Reihe nach erreichbar.
-- [ ] Nach dem Verschieben wird „In „…“ verschoben.“ angesagt. Der Wunsch steht in der
+- [x] Nach dem Verschieben wird „In „…“ verschoben.“ angesagt. Der Wunsch steht in der
   neuen Liste und fehlt in der alten, auch auf einem zweiten Gerät.
-- [ ] Offline verschieben: Der Wunsch erscheint sofort in der neuen Liste und ist nach
+- [x] Offline verschieben: Der Wunsch erscheint sofort in der neuen Liste und ist nach
   der Wiederverbindung auf dem zweiten Gerät ebenfalls umgezogen.
 
 ## Notizen zur Umsetzung
