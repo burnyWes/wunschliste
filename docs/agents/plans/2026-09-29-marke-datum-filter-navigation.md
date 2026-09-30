@@ -5,7 +5,7 @@ branch: main
 story: WL-007
 topic: "Navigation mit Listen-Icon, Filterknöpfe nebeneinander, Marke / Hersteller und „gewünscht seit“"
 tags: [plan, wishlist, wish, navigation, filter, firestore, ui]
-status: in-progress
+status: done
 ---
 
 # PLAN: WL-007 — Listen-Icon, Filterknöpfe, Marke und „gewünscht seit“
@@ -262,9 +262,9 @@ Zeile mit gleich breiten Knöpfen.
 - [x] `npm test` läuft durch.
 
 **Manuelle Verifikation**:
-- [ ] Auf dem iPhone mit VoiceOver: Der Knopf in der Navigation wird als „Wunschlisten“
+- [x] Auf dem iPhone mit VoiceOver: Der Knopf in der Navigation wird als „Wunschlisten“
   angesagt, ohne Icon-Namen. Die Filter heißen „Noch offen, ausgewählt“ bzw. „Erfüllt“.
-- [ ] Auf dem iPhone mit sehr großer Schrift (Bedienungshilfen → Größerer Text) stehen die
+- [x] Auf dem iPhone mit sehr großer Schrift (Bedienungshilfen → Größerer Text) stehen die
   Filterknöpfe weiterhin nebeneinander.
 
 ### Phase 2: Marke / Hersteller
@@ -351,7 +351,7 @@ Listeneintrag, damit die Marke ohne „von“ nicht mit dem Schenkenden verwechs
 - [x] `npm run lint` und `npm test` laufen durch.
 
 **Manuelle Verifikation**:
-- [ ] Auf dem iPhone mit VoiceOver: Ein Wunsch mit Marke wird in der Liste als
+- [x] Auf dem iPhone mit VoiceOver: Ein Wunsch mit Marke wird in der Liste als
   „Fahrradhelm, Marke: Uvex, drei Sterne unbedingt …“ angesagt (die Sterne selbst sind
   stumm), auf der Detailseite als eigene Zeile „Marke: Uvex“. Ein erfüllter Eintrag sagt
   „geschenkt von …“.
@@ -472,10 +472,10 @@ Altbestand, angezeigt auf der Detailseite.
 - [x] `npm run lint` und `npm test` laufen durch.
 
 **Manuelle Verifikation**:
-- [ ] Nach dem Ausrollen auf dem iPhone: Ein vorhandener Wunsch zeigt „gewünscht seit
+- [x] Nach dem Ausrollen auf dem iPhone: Ein vorhandener Wunsch zeigt „gewünscht seit
   29. September 2026“, ein neu angelegter das heutige Datum. VoiceOver liest „gewünscht
   seit neunundzwanzigster September zweitausendsechsundzwanzig“ o. ä. verständlich vor.
-- [ ] Auf einem zweiten Gerät erscheint dasselbe Datum.
+- [x] Auf einem zweiten Gerät erscheint dasselbe Datum.
 
 ## Notizen zur Umsetzung
 
