@@ -9,6 +9,7 @@
   import EditPersonPage from './EditPersonPage.svelte';
   import EditWishlistPage from './EditWishlistPage.svelte';
   import EditWishPage from './EditWishPage.svelte';
+  import PersonsPage from './PersonsPage.svelte';
   import { PERSON_CREATED_ANNOUNCEMENT, profileChosenAnnouncement } from './personTexts';
   import { hashOf, type WishlistAddress } from './wishlistAddresses';
   import { useWishlistModule } from './wishlistModuleContext';
@@ -19,15 +20,16 @@
   let { address, settingsHash }: { address: WishlistAddress; settingsHash: string } = $props();
 
   const { chooseProfile } = useWishlistModule();
+  const personsHash = hashOf({ page: 'persons' });
 
   async function switchProfile(id: PersonId, name: string): Promise<void> {
     await chooseProfile.execute(id);
-    navigateTo(settingsHash);
+    navigateTo(personsHash);
     announce(profileChosenAnnouncement(name));
   }
 
   async function showCreatedPerson(): Promise<void> {
-    navigateTo(settingsHash);
+    navigateTo(personsHash);
     announce(PERSON_CREATED_ANNOUNCEMENT);
   }
 </script>
@@ -46,14 +48,16 @@
   <WishPage wishId={address.wishId} />
 {:else if address.page === 'chooseProfile'}
   <ChooseProfilePage
-    back={{ label: 'Einstellungen', hash: settingsHash }}
+    back={{ label: 'Personen', hash: personsHash }}
     onchoose={(person) => switchProfile(person.id, person.name.value)}
     oncreate={() => navigateTo(hashOf({ page: 'createPerson' }))}
   />
 {:else if address.page === 'createPerson'}
-  <CreatePersonPage oncreated={showCreatedPerson} oncancel={() => navigateTo(settingsHash)} />
+  <CreatePersonPage oncreated={showCreatedPerson} oncancel={() => navigateTo(personsHash)} />
 {:else if address.page === 'editPerson'}
-  <EditPersonPage personId={address.personId} {settingsHash} />
+  <EditPersonPage personId={address.personId} />
+{:else if address.page === 'persons'}
+  <PersonsPage {settingsHash} />
 {:else}
   <EditWishPage wishId={address.wishId} />
 {/if}

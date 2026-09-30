@@ -11,6 +11,7 @@ describe('resolveRoute', () => {
     ['#/', { page: 'wishlists' }],
     ['#/einstellungen', { page: 'settings' }],
     ['#/quatsch', { page: 'wishlists' }],
+    ['#/personen', { page: 'persons' }],
     ['#/liste/a', { page: 'wishlist', wishlistId: wishlistIdOf('a'), filter: 'open' }],
   ])('resolves %j', (hash, route) => {
     expect(resolveRoute(hash)).toEqual(route);
@@ -54,6 +55,7 @@ describe('mainPageOf', () => {
     [{ page: 'chooseProfile' }, undefined],
     [{ page: 'createPerson' }, undefined],
     [{ page: 'editPerson', personId: personIdOf('ben') }, undefined],
+    [{ page: 'persons' }, undefined],
   ])('gives %j the main page %s', (route, mainPage) => {
     expect(mainPageOf(route)).toBe(mainPage);
   });

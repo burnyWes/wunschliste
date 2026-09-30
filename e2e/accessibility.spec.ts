@@ -162,9 +162,15 @@ type CheckedPage = {
 const pages: CheckedPage[] = [
   { name: 'empty overview', path: './', heading: 'Wunschlisten' },
   {
-    name: 'settings with persons',
+    name: 'settings',
     path: './#/einstellungen',
     heading: 'Einstellungen',
+    data: wishlistsOfSeveralOwners,
+  },
+  {
+    name: 'persons',
+    path: './#/personen',
+    heading: 'Personen',
     data: wishlistsOfSeveralOwners,
   },
   {

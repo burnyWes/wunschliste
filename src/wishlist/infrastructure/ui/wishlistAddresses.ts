@@ -18,7 +18,8 @@ export type WishlistAddress =
   | { page: 'editWish'; wishId: WishId }
   | { page: 'chooseProfile' }
   | { page: 'createPerson' }
-  | { page: 'editPerson'; personId: PersonId };
+  | { page: 'editPerson'; personId: PersonId }
+  | { page: 'persons' };
 
 type AddressPattern = {
   pattern: RegExp;
@@ -60,6 +61,7 @@ const addressPatterns: readonly AddressPattern[] = [
     pattern: new RegExp(`^#/person/${ID}/bearbeiten$`),
     toAddress: (id) => ({ page: 'editPerson', personId: personIdOf(id) }),
   },
+  { pattern: /^#\/personen$/, toAddress: () => ({ page: 'persons' }) },
 ];
 
 export function parseWishlistAddress(hash: string): WishlistAddress | undefined {
@@ -96,5 +98,7 @@ export function hashOf(address: WishlistAddress): string {
       return '#/person/neu';
     case 'editPerson':
       return `#/person/${address.personId}/bearbeiten`;
+    case 'persons':
+      return '#/personen';
   }
 }

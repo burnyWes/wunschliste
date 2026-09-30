@@ -4,7 +4,7 @@ import { chooseProfile, expect, test, type Page } from './fixtures';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
 const nameField = (page: Page) => page.getByRole('textbox', { name: 'Name' });
-const personsSection = (page: Page) => page.getByRole('region', { name: 'Personen' });
+const personsSection = (page: Page) => page.getByRole('region', { name: 'Alle Personen' });
 const personEntry = (page: Page, name: string) =>
   personsSection(page).getByRole('button', { name, exact: true });
 
@@ -21,9 +21,9 @@ test.beforeEach(async () => {
   });
 });
 
-async function openSettings(page: Page): Promise<void> {
-  await page.goto('./#/einstellungen');
-  await expect(pageHeading(page, 'Einstellungen')).toBeVisible();
+async function openPersons(page: Page): Promise<void> {
+  await page.goto('./#/personen');
+  await expect(pageHeading(page, 'Personen')).toBeVisible();
 }
 
 async function deletePersonNamed(page: Page, name: string): Promise<void> {
@@ -34,38 +34,55 @@ async function deletePersonNamed(page: Page, name: string): Promise<void> {
   await page.getByRole('dialog').getByRole('button', { name: 'Löschen' }).click();
 }
 
-test('shows who uses the device and all persons in the settings', async ({ page }) => {
-  await openSettings(page);
+test('shows who uses the device in the settings and leads to the persons', async ({ page }) => {
+  await page.goto('./#/einstellungen');
+  await expect(pageHeading(page, 'Einstellungen')).toBeVisible();
+
+  await expect(personsSection(page)).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Wechseln' })).toHaveCount(0);
+  await page.getByRole('button', { name: /^Personen\s*Ich bin Anna$/ }).click();
+
+  await expect(page).toHaveURL(/#\/personen$/);
+  await expect(pageHeading(page, 'Personen')).toBeFocused();
+  await expect(page.getByRole('navigation', { name: 'Hauptnavigation' })).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Zurück zu Einstellungen' }).click();
+
+  await expect(pageHeading(page, 'Einstellungen')).toBeFocused();
+});
+
+test('shows who uses the device and all persons on the persons page', async ({ page }) => {
+  await openPersons(page);
 
   await expect(page.getByText('Ich bin Anna')).toBeVisible();
   await expect(personsSection(page).getByRole('listitem')).toHaveText(['Anna', 'Ben', 'Oma']);
 });
 
-test('switches the profile and goes back to the settings', async ({ page }) => {
-  await openSettings(page);
+test('switches the profile and goes back to the persons', async ({ page }) => {
+  await openPersons(page);
 
   await page.getByRole('button', { name: 'Wechseln' }).click();
 
   await expect(pageHeading(page, 'Wer bist du?')).toBeFocused();
   await expect(page).toHaveURL(/#\/wer-bist-du$/);
-  await expect(page.getByRole('button', { name: 'Zurück zu Einstellungen' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Zurück zu Personen' })).toBeVisible();
 
   await page.getByRole('main').getByRole('button', { name: 'Ben', exact: true }).click();
 
-  await expect(pageHeading(page, 'Einstellungen')).toBeFocused();
+  await expect(pageHeading(page, 'Personen')).toBeFocused();
   await expect(page.getByText('Ich bin Ben')).toBeVisible();
   await expectAnnouncement(page, 'Du bist Ben.');
 });
 
 test('creates a person without changing the profile', async ({ page }) => {
-  await openSettings(page);
+  await openPersons(page);
 
   await page.getByRole('button', { name: 'Person erstellen' }).click();
   await expect(pageHeading(page, 'Person erstellen')).toBeVisible();
   await nameField(page).fill('Lea');
   await page.getByRole('button', { name: 'Erstellen' }).click();
 
-  await expect(pageHeading(page, 'Einstellungen')).toBeFocused();
+  await expect(pageHeading(page, 'Personen')).toBeFocused();
   await expectAnnouncement(page, 'Person erstellt.');
   await expect(personsSection(page).getByRole('listitem')).toHaveText([
     'Anna',
@@ -76,8 +93,28 @@ test('creates a person without changing the profile', async ({ page }) => {
   await expect(page.getByText('Ich bin Anna')).toBeVisible();
 });
 
+test('goes back to the persons when cancelling the creation', async ({ page }) => {
+  await openPersons(page);
+
+  await page.getByRole('button', { name: 'Person erstellen' }).click();
+  await expect(pageHeading(page, 'Person erstellen')).toBeVisible();
+  await page.getByRole('button', { name: 'Abbrechen' }).click();
+
+  await expect(pageHeading(page, 'Personen')).toBeFocused();
+});
+
+test('leads from editing a person back to the persons', async ({ page }) => {
+  await openPersons(page);
+  await personEntry(page, 'Ben').click();
+  await expect(pageHeading(page, 'Person bearbeiten')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Zurück zu Personen' }).click();
+
+  await expect(pageHeading(page, 'Personen')).toBeFocused();
+});
+
 test('renames a person and refuses a name that is taken', async ({ page }) => {
-  await openSettings(page);
+  await openPersons(page);
   await personEntry(page, 'Ben').click();
   await expect(pageHeading(page, 'Person bearbeiten')).toBeVisible();
 
@@ -90,13 +127,13 @@ test('renames a person and refuses a name that is taken', async ({ page }) => {
   await nameField(page).fill('Benjamin');
   await page.getByRole('button', { name: 'Speichern' }).click();
 
-  await expect(pageHeading(page, 'Einstellungen')).toBeFocused();
+  await expect(pageHeading(page, 'Personen')).toBeFocused();
   await expectAnnouncement(page, 'Gespeichert.');
   await expect(personEntry(page, 'Benjamin')).toBeVisible();
 });
 
 test('keeps a person who still owns wishlists', async ({ page }) => {
-  await openSettings(page);
+  await openPersons(page);
 
   await personEntry(page, 'Oma').click();
 
@@ -109,24 +146,24 @@ test('keeps a person who still owns wishlists', async ({ page }) => {
 });
 
 test('deletes a person without wishlists after confirming', async ({ page }) => {
-  await openSettings(page);
+  await openPersons(page);
 
   await deletePersonNamed(page, 'Ben');
 
-  await expect(pageHeading(page, 'Einstellungen')).toBeFocused();
+  await expect(pageHeading(page, 'Personen')).toBeFocused();
   await expectAnnouncement(page, 'Person „Ben“ gelöscht.');
   await expect(personsSection(page).getByRole('listitem')).toHaveText(['Anna', 'Oma']);
 });
 
 test('asks who uses the device after deleting the own person', async ({ page }) => {
-  await openSettings(page);
+  await openPersons(page);
 
   await deletePersonNamed(page, 'Anna');
 
   await expect(pageHeading(page, 'Wer bist du?')).toBeFocused();
-  await expect(page).toHaveURL(/#\/einstellungen$/);
+  await expect(page).toHaveURL(/#\/personen$/);
   await chooseProfile(page, 'Ben');
-  await expect(pageHeading(page, 'Einstellungen')).toBeFocused();
+  await expect(pageHeading(page, 'Personen')).toBeFocused();
   await expect(page.getByText('Ich bin Ben')).toBeVisible();
 });
 
@@ -134,7 +171,7 @@ test('asks who uses the device when another tab deletes the own person', async (
   page,
   context,
 }) => {
-  await openSettings(page);
+  await openPersons(page);
   const otherTab = await context.newPage();
   await otherTab.goto('./#/person/anna/bearbeiten');
   await expect(pageHeading(otherTab, 'Person bearbeiten')).toBeVisible();

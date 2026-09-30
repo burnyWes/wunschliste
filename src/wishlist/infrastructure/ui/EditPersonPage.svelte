@@ -19,13 +19,15 @@
     personDeletionMessage,
     personNotDeletableRightNowHint,
   } from './personTexts';
+  import { hashOf } from './wishlistAddresses';
   import { useWishlistModule } from './wishlistModuleContext';
   import { SAVED_ANNOUNCEMENT } from './wishTexts';
 
-  let { personId, settingsHash }: { personId: PersonId; settingsHash: string } = $props();
+  let { personId }: { personId: PersonId } = $props();
 
   const { watchPerson, watchWishlistsOwnedBy, renamePerson, deletePerson } = useWishlistModule();
   const profile = useCurrentProfile();
+  const personsHash = hashOf({ page: 'persons' });
 
   const person = new Watched<Person>();
   let ownedWishlists = $state.raw<readonly Wishlist[]>();
@@ -63,7 +65,7 @@
       }
       throw error;
     }
-    navigateTo(settingsHash);
+    navigateTo(personsHash);
     announce(SAVED_ANNOUNCEMENT);
   }
 
@@ -79,7 +81,7 @@
       }
       throw error;
     }
-    navigateTo(settingsHash);
+    navigateTo(personsHash);
     announce(personDeletedAnnouncement(deletedName));
   }
 </script>
@@ -89,7 +91,7 @@
 {:else if person.value}
   <NameForm
     heading="Person bearbeiten"
-    back={{ label: 'Einstellungen', hash: settingsHash }}
+    back={{ label: 'Personen', hash: personsHash }}
     fieldId="person-name"
     initialName={person.value.name.value}
     onsubmit={save}
@@ -122,7 +124,7 @@
       <button class="button" type="submit"
         ><Save aria-hidden="true" size="1.25em" /> Speichern</button
       >
-      <button class="button" type="button" onclick={() => navigateTo(settingsHash)}>
+      <button class="button" type="button" onclick={() => navigateTo(personsHash)}>
         <X aria-hidden="true" size="1.25em" /> Abbrechen
       </button>
     {/snippet}
