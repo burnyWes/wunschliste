@@ -5,7 +5,7 @@ branch: main
 story: WL-008
 topic: "Personen und „Ich wechseln“ auf eine eigene Unterseite der Einstellungen"
 tags: [plan, wishlist, person, settings, routing, ui]
-status: in-progress
+status: done
 ---
 
 # PLAN: WL-008 — Personen auf eigener Unterseite
@@ -243,7 +243,7 @@ Rücksprünge nur zusammen ein benutzbares Ergebnis ergeben.
 - [x] `e2e/accessibility.spec.ts`: In `pages` nach „settings with persons“ den Eintrag
   `{ name: 'persons', path: './#/personen', heading: 'Personen', data: wishlistsOfSeveralOwners }`
   aufnehmen. „settings with persons“ in „settings“ umbenennen und `data` behalten.
-- [ ] `docs/notes.txt`: Den Eintrag „m Einstellungen-Seite: Alles was mit Person zu tun hat
+- [x] `docs/notes.txt`: Den Eintrag „m Einstellungen-Seite: Alles was mit Person zu tun hat
   auf eine Unterseite“ nach Abnahme auf `x` setzen und unverändert nach DONE verschieben.
 
 **Automatisierte Verifikation**:
@@ -266,10 +266,10 @@ Rücksprünge nur zusammen ein benutzbares Ergebnis ergeben.
 
 **Manuelle Verifikation**:
 
-- [ ] Auf dem iPhone mit VoiceOver: Der Eintrag in den Einstellungen wird verständlich als
+- [x] Auf dem iPhone mit VoiceOver: Der Eintrag in den Einstellungen wird verständlich als
   „Personen, Ich bin <Name>, Taste“ angesagt. Die beiden Zeilen stehen sauber
   untereinander, auch bei sehr großer Schrift.
-- [ ] Auf dem iPhone mit VoiceOver: Nach „Wechseln“ und Auswahl landet der Fokus auf
+- [x] Auf dem iPhone mit VoiceOver: Nach „Wechseln“ und Auswahl landet der Fokus auf
   „Personen“, und „Du bist <Name>.“ wird angesagt.
 
 ## Notizen zur Umsetzung
