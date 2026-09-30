@@ -5,7 +5,7 @@ branch: main
 story: WL-010
 topic: "Wiederkehrende Wünsche, die mehrmals geschenkt werden können"
 tags: [plan, wishlist, wish, gifting, wishform, firestore, ui]
-status: ready
+status: done
 ---
 
 # PLAN: WL-010 — Wiederkehrende Wünsche
@@ -346,7 +346,7 @@ Oberfläche:
 - [x] `npm run build` läuft durch.
 
 **Manuelle Verifikation**:
-- [ ] Auf dem iPhone mit VoiceOver: Der Haken „Mehrmals schenkbar“ wird mit Hinweis
+- [x] Auf dem iPhone mit VoiceOver: Der Haken „Mehrmals schenkbar“ wird mit Hinweis
   vorgelesen. Gesperrt wird er als „abgeblendet“ angesagt, und der Grund ist hörbar.
 
 ### Phase 2: Mehrfach schenken und zurücknehmen
@@ -449,10 +449,10 @@ Oberfläche:
 - [x] `npm run test:architecture`, `npm run lint` und `npm run build` laufen durch.
 
 **Manuelle Verifikation**:
-- [ ] Auf dem iPhone mit zwei Profilen: Eine Person schenkt einen wiederholbaren Wunsch
+- [x] Auf dem iPhone mit zwei Profilen: Eine Person schenkt einen wiederholbaren Wunsch
   zweimal. Das andere Gerät zeigt nach dem Abgleich „2-mal geschenkt“ unter
   „Noch offen“ und unter „Erfüllt“, und die Zahlen in der Übersicht stimmen.
-- [ ] VoiceOver liest „3-mal geschenkt – von Anna, Ben“ ohne das Symbol vor.
+- [x] VoiceOver liest „3-mal geschenkt – von Anna, Ben“ ohne das Symbol vor.
 
 ## Notizen zur Umsetzung
 
