@@ -96,3 +96,26 @@ test('updates the counts in the overview when a wish is given elsewhere', async 
 
   await expect(overviewEntry(page, 'Weihnachten')).toContainText('2 offen · 2 erfüllt');
 });
+
+test('counts a gifted repeatable wish as open and as fulfilled', async ({ page }) => {
+  await seed({
+    wishlists: [{ id: 'sweets', name: 'Naschen', ownerId: 'ben' }],
+    wishes: [
+      wishRecord({
+        id: 'chocolate',
+        wishlistId: 'sweets',
+        name: 'Schokolade',
+        createdBy: 'ben',
+        repeatable: true,
+        gifts: [{ recordedBy: 'anna' }],
+      }),
+    ],
+  });
+  await page.goto('./#/liste/sweets');
+
+  await expect(filterButton(page, 'Noch offen 1')).toBeVisible();
+  await expect(filterButton(page, 'Erfüllt 1')).toBeVisible();
+
+  await page.goto('./');
+  await expect(overviewEntry(page, 'Naschen')).toContainText('1 offen · 1 erfüllt');
+});

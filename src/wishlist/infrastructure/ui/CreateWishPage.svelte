@@ -5,6 +5,7 @@
   import type { WishlistId } from '../../domain/ids';
   import type { Person } from '../../domain/Person';
   import { perspectiveOf } from '../../domain/Perspective';
+  import type { WishTraits } from '../../domain/Wish';
   import type { WishDetails } from '../../domain/WishDetails';
   import type { Wishlist } from '../../domain/Wishlist';
   import LoadFailed from './LoadFailed.svelte';
@@ -49,8 +50,8 @@
   );
   const isWishlistOfSomeoneElse = $derived(ownerId !== undefined && ownerId !== profile.me.id);
 
-  async function create(details: WishDetails, secret: boolean): Promise<void> {
-    const wishId = await createWish.execute(wishlistId, details, secret, profile.me.id);
+  async function create(details: WishDetails, traits: WishTraits): Promise<void> {
+    const wishId = await createWish.execute(wishlistId, details, traits, profile.me.id);
     navigateTo(hashOf({ page: 'wish', wishId }));
     announce(WISH_CREATED_ANNOUNCEMENT);
   }
@@ -63,6 +64,7 @@
     secret={isWishlistOfSomeoneElse
       ? { initial: true, hint: secretHint(owner?.name.value ?? 'Die Besitzerin') }
       : undefined}
+    repeatable={{ initial: false, locked: false }}
     cancelTarget={wishlistFilterMemory.hashOf(wishlistId)}
     onsubmit={create}
   />

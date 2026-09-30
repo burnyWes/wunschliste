@@ -12,6 +12,8 @@ import { SequentialIdGenerator } from './fakes/SequentialIdGenerator';
 import { removedWishlistNamed, wishlistNamed } from './fakes/wishlistNamed';
 
 const helmet = { name: requireValid(Name.parse('Fahrradhelm')) };
+const plainTraits = { secret: false, repeatable: false };
+const secretTraits = { secret: true, repeatable: false };
 const ben = personIdOf('ben');
 const piDay = CalendarDate.of(2027, 3, 14);
 
@@ -33,7 +35,7 @@ describe('CreateWish', () => {
   it('saves an open wish on the wishlist and returns its id', async () => {
     const { wishes, birthday, createWish } = await setUp();
 
-    const id = await createWish.execute(birthday.id, helmet, false, ben);
+    const id = await createWish.execute(birthday.id, helmet, plainTraits, ben);
 
     const saved = await wishes.get(id);
     expect(id).toBe('id-1');
@@ -47,15 +49,28 @@ describe('CreateWish', () => {
   it('keeps the wish secret in the wishlist of someone else', async () => {
     const { wishes, birthday, createWish } = await setUp();
 
-    const id = await createWish.execute(birthday.id, helmet, true, ben);
+    const id = await createWish.execute(birthday.id, helmet, secretTraits, ben);
 
     expect((await wishes.get(id))?.secret).toBe(true);
+  });
+
+  it('saves a repeatable wish', async () => {
+    const { wishes, birthday, createWish } = await setUp();
+
+    const id = await createWish.execute(
+      birthday.id,
+      helmet,
+      { secret: false, repeatable: true },
+      ben,
+    );
+
+    expect((await wishes.get(id))?.repeatable).toBe(true);
   });
 
   it('remembers me as the creator', async () => {
     const { wishes, birthday, createWish } = await setUp();
 
-    const id = await createWish.execute(birthday.id, helmet, false, ben);
+    const id = await createWish.execute(birthday.id, helmet, plainTraits, ben);
 
     expect((await wishes.get(id))?.createdBy).toBe(ben);
   });
@@ -63,7 +78,7 @@ describe('CreateWish', () => {
   it('remembers the day the wish was created', async () => {
     const { wishes, birthday, createWish } = await setUp();
 
-    const id = await createWish.execute(birthday.id, helmet, false, ben);
+    const id = await createWish.execute(birthday.id, helmet, plainTraits, ben);
 
     expect((await wishes.get(id))?.createdOn).toEqual(piDay);
   });
@@ -73,15 +88,15 @@ describe('CreateWish', () => {
     await wishlists.save(removedWishlistNamed('Geburtstag', 'b'));
 
     await expect(
-      createWish.execute(wishlistIdOf('b'), helmet, false, personIdOf('anna')),
+      createWish.execute(wishlistIdOf('b'), helmet, plainTraits, personIdOf('anna')),
     ).rejects.toThrow(WishlistNotFound);
   });
 
   it('refuses an unknown wishlist', async () => {
     const { createWish } = await setUp();
 
-    await expect(createWish.execute(wishlistIdOf('unknown'), helmet, false, ben)).rejects.toThrow(
-      WishlistNotFound,
-    );
+    await expect(
+      createWish.execute(wishlistIdOf('unknown'), helmet, plainTraits, ben),
+    ).rejects.toThrow(WishlistNotFound);
   });
 });

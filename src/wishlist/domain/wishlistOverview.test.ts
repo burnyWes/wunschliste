@@ -30,6 +30,8 @@ function wishIn(wishlist: Wishlist, name: string, state: Partial<RestoredWish> =
     giverId: undefined,
     received: false,
     removedByOwner: false,
+    repeatable: false,
+    gifts: [],
     ...state,
   });
 }
@@ -129,6 +131,7 @@ describe('groupWishlistsByOwner', () => {
       wishIn(birthday, 'Helm'),
       wishIn(birthday, 'Konzert', { secret: true, createdBy: ben.id }),
       wishIn(easter, 'Buch', { giverId: anna.id }),
+      wishIn(easter, 'Schokolade', { repeatable: true, gifts: [{ recordedBy: anna.id }] }),
     ];
 
     const groups = groupWishlistsByOwner([birthday, easter, empty], persons, wishes, anna.id);
@@ -140,7 +143,7 @@ describe('groupWishlistsByOwner', () => {
     ).toEqual([
       ['Geburtstag', { open: 1, fulfilled: 0 }],
       ['Leer', { open: 0, fulfilled: 0 }],
-      ['Ostern', { open: 0, fulfilled: 1 }],
+      ['Ostern', { open: 1, fulfilled: 2 }],
     ]);
   });
 });

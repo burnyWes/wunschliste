@@ -6,16 +6,24 @@ import { requireValid } from './parsed';
 import type { Perspective } from './Perspective';
 import { Price } from './Price';
 import {
+  canChangeRepeatability,
   OwnerCannotKeepSecrets,
+  RepeatabilityLocked,
   Wish,
+  WishCannotBeSecretAndRepeatable,
   WishActionNotAllowed,
   WishCannotBecomeSecret,
   WishHiddenFromOwner,
   type RestoredWish,
   type WishRemoval,
+  type WishTraits,
 } from './Wish';
 
 const helmet = { name: requireValid(Name.parse('Fahrradhelm')) };
+
+const plainTraits: WishTraits = { secret: false, repeatable: false };
+const secretTraits: WishTraits = { secret: true, repeatable: false };
+const repeatableTraits: WishTraits = { secret: false, repeatable: true };
 
 const createdOn = CalendarDate.of(2026, 10, 1);
 
@@ -38,6 +46,8 @@ function annasWish(state: Partial<RestoredWish> = {}): Wish {
     giverId: undefined,
     received: false,
     removedByOwner: false,
+    repeatable: false,
+    gifts: [],
     ...state,
   });
 }
@@ -49,7 +59,7 @@ describe('Wish', () => {
         id: wishIdOf('w'),
         wishlistId: wishlistIdOf('l'),
         details: helmet,
-        secret: false,
+        traits: plainTraits,
         createdOn,
       },
       asBen,
@@ -69,7 +79,7 @@ describe('Wish', () => {
         id: wishIdOf('w'),
         wishlistId: wishlistIdOf('l'),
         details: helmet,
-        secret: true,
+        traits: secretTraits,
         createdOn,
       },
       asBen,
@@ -85,7 +95,7 @@ describe('Wish', () => {
           id: wishIdOf('w'),
           wishlistId: wishlistIdOf('l'),
           details: helmet,
-          secret: true,
+          traits: secretTraits,
           createdOn,
         },
         asAnna,
@@ -97,7 +107,7 @@ describe('Wish', () => {
     const wish = annasWish({ giverId: ben, received: true });
     const editedDetails = { ...helmet, price: requireValid(Price.ofCents(4999)) };
 
-    const edited = wish.edit(editedDetails, false, asAnna);
+    const edited = wish.edit(editedDetails, plainTraits, asAnna);
 
     expect(edited.details).toBe(editedDetails);
     expect(edited.id).toBe('w');
@@ -121,25 +131,92 @@ describe('Wish', () => {
     const secret = annasWish({ secret: true, createdBy: ben });
 
     it('lets the secret be revealed', () => {
-      expect(secret.edit(helmet, false, asBen).secret).toBe(false);
+      expect(secret.edit(helmet, plainTraits, asBen).secret).toBe(false);
     });
 
     it('keeps a secret', () => {
-      expect(secret.edit(helmet, true, asOma).secret).toBe(true);
+      expect(secret.edit(helmet, secretTraits, asOma).secret).toBe(true);
     });
 
     it('never turns a normal wish into a secret', () => {
-      expect(() => annasWish().edit(helmet, true, asBen)).toThrow(WishCannotBecomeSecret);
+      expect(() => annasWish().edit(helmet, secretTraits, asBen)).toThrow(WishCannotBecomeSecret);
     });
 
     it('keeps the owner from editing a secret she cannot see', () => {
-      expect(() => secret.edit(helmet, true, asAnna)).toThrow(WishHiddenFromOwner);
+      expect(() => secret.edit(helmet, secretTraits, asAnna)).toThrow(WishHiddenFromOwner);
     });
 
     it('lets the owner edit a secret wish once it has been handed over', () => {
       const handedOver = annasWish({ secret: true, createdBy: ben, giverId: ben, received: true });
 
-      expect(handedOver.edit(helmet, true, asAnna).details).toBe(helmet);
+      expect(handedOver.edit(helmet, secretTraits, asAnna).details).toBe(helmet);
+    });
+  });
+
+  describe('repeatability', () => {
+    function newWish(traits: WishTraits, perspective: Perspective): Wish {
+      return Wish.create(
+        { id: wishIdOf('w'), wishlistId: wishlistIdOf('l'), details: helmet, traits, createdOn },
+        perspective,
+      );
+    }
+
+    it('is created repeatable without gifts', () => {
+      const wish = newWish(repeatableTraits, asAnna);
+
+      expect(wish.repeatable).toBe(true);
+      expect(wish.gifts).toEqual([]);
+    });
+
+    it('is created not repeatable by default traits', () => {
+      expect(newWish(plainTraits, asAnna).repeatable).toBe(false);
+    });
+
+    it('cannot be created secret and repeatable', () => {
+      expect(() => newWish({ secret: true, repeatable: true }, asBen)).toThrow(
+        WishCannotBeSecretAndRepeatable,
+      );
+    });
+
+    it('turns an untouched wish repeatable and back', () => {
+      const repeatable = annasWish().edit(helmet, repeatableTraits, asAnna);
+
+      expect(repeatable.repeatable).toBe(true);
+      expect(repeatable.edit(helmet, plainTraits, asAnna).repeatable).toBe(false);
+    });
+
+    it('cannot be edited secret and repeatable', () => {
+      const secret = annasWish({ secret: true, createdBy: ben });
+
+      expect(() => secret.edit(helmet, { secret: true, repeatable: true }, asBen)).toThrow(
+        WishCannotBeSecretAndRepeatable,
+      );
+    });
+
+    it.each([
+      ['a gifted wish', { giverId: ben }],
+      ['a received wish', { received: true }],
+    ] as const)('cannot turn %s repeatable', (_, state) => {
+      expect(() => annasWish(state).edit(helmet, repeatableTraits, asAnna)).toThrow(
+        RepeatabilityLocked,
+      );
+    });
+
+    it('cannot turn a repeatable wish with gifts back', () => {
+      const gifted = annasWish({ repeatable: true, gifts: [{ recordedBy: ben }] });
+
+      expect(() => gifted.edit(helmet, plainTraits, asAnna)).toThrow(RepeatabilityLocked);
+      expect(gifted.edit(helmet, repeatableTraits, asAnna).gifts).toEqual([{ recordedBy: ben }]);
+    });
+
+    it.each([
+      ['an untouched wish', {}, true],
+      ['a gifted wish', { giverId: ben }, false],
+      ['a received wish', { received: true }, false],
+      ['a repeatable wish with a gift', { repeatable: true, gifts: [{ recordedBy: ben }] }, false],
+      ['a repeatable wish without gifts', { repeatable: true }, true],
+    ] as const)('decides whether %s can change its repeatability', (_, state, expected) => {
+      expect(canChangeRepeatability(annasWish(state))).toBe(expected);
     });
   });
 
@@ -202,7 +279,9 @@ describe('Wish', () => {
     const hiddenWishlist: Perspective = { ...asAnna, wishlistIsHidden: true };
 
     expect(annasWish().isHiddenFrom(hiddenWishlist)).toBe(true);
-    expect(() => annasWish().edit(helmet, false, hiddenWishlist)).toThrow(WishHiddenFromOwner);
+    expect(() => annasWish().edit(helmet, plainTraits, hiddenWishlist)).toThrow(
+      WishHiddenFromOwner,
+    );
   });
 
   describe('removeFor', () => {
@@ -240,6 +319,62 @@ describe('Wish', () => {
       expect(() => removalOf({ giverId: ben, removedByOwner: true }, asAnna)).toThrow(
         WishHiddenFromOwner,
       );
+    });
+  });
+
+  describe('perform on a repeatable wish', () => {
+    const giftsOf = (wish: Wish) => wish.gifts.map(({ recordedBy }) => recordedBy);
+
+    it('records every gift, even twice by the same person', () => {
+      const gifted = annasWish({ repeatable: true })
+        .perform('gift', asBen)
+        .perform('gift', asOma)
+        .perform('gift', asBen);
+
+      expect(giftsOf(gifted)).toEqual([ben, oma, ben]);
+      expect(gifted.giverId).toBeUndefined();
+      expect(gifted.received).toBe(false);
+    });
+
+    it('records a receipt of the owner', () => {
+      const received = annasWish({ repeatable: true }).perform('receive', asAnna);
+
+      expect(giftsOf(received)).toEqual([anna]);
+      expect(received.received).toBe(false);
+    });
+
+    it('takes back only my latest gift', () => {
+      const gifted = annasWish({
+        repeatable: true,
+        gifts: [{ recordedBy: ben }, { recordedBy: oma }, { recordedBy: ben }],
+      });
+
+      expect(giftsOf(gifted.perform('takeBackGift', asBen))).toEqual([ben, oma]);
+    });
+
+    it('lets the owner undo only her latest receipt', () => {
+      const received = annasWish({
+        repeatable: true,
+        gifts: [{ recordedBy: anna }, { recordedBy: ben }],
+      });
+
+      expect(giftsOf(received.perform('undoReceive', asAnna))).toEqual([ben]);
+    });
+
+    it.each([
+      ['a repeatable wish cannot be handed over', 'handOver', asBen],
+      ['Oma cannot take back a gift she never made', 'takeBackGift', asOma],
+    ] as const)('refuses when %s', (_, action, perspective) => {
+      const gifted = annasWish({ repeatable: true, gifts: [{ recordedBy: ben }] });
+
+      expect(() => gifted.perform(action, perspective)).toThrow(WishActionNotAllowed);
+    });
+
+    it('knows who recorded a gift', () => {
+      const gifted = annasWish({ repeatable: true, gifts: [{ recordedBy: ben }] });
+
+      expect(gifted.hasGiftRecordedBy(ben)).toBe(true);
+      expect(gifted.hasGiftRecordedBy(oma)).toBe(false);
     });
   });
 

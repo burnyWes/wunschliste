@@ -7,7 +7,7 @@ import {
   type WishlistId,
 } from '../domain/ids';
 import { perspectiveOf } from '../domain/Perspective';
-import { Wish } from '../domain/Wish';
+import { Wish, type WishTraits } from '../domain/Wish';
 import type { WishDetails } from '../domain/WishDetails';
 import { WishlistNotFound } from '../domain/Wishlist';
 import type { WishlistRepository } from '../domain/WishlistRepository';
@@ -24,7 +24,7 @@ export class CreateWish {
   async execute(
     wishlistId: WishlistId,
     details: WishDetails,
-    secret: boolean,
+    traits: WishTraits,
     me: PersonId,
   ): Promise<WishId> {
     const wishlist = await this.wishlists.get(wishlistId);
@@ -38,7 +38,7 @@ export class CreateWish {
         id: wishIdOf(this.ids.next()),
         wishlistId,
         details,
-        secret,
+        traits,
         createdOn: this.clock.today(),
       },
       perspective,

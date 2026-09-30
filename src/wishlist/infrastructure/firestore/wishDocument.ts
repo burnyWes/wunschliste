@@ -25,7 +25,11 @@ export type WishDocument = {
   giverId?: string;
   received: boolean;
   removedByOwner: boolean;
+  repeatable?: boolean;
+  gifts?: RepeatedGiftDocument[];
 };
+
+type RepeatedGiftDocument = { recordedBy: string };
 
 function isOptional(value: unknown, type: 'string' | 'number'): boolean {
   return value === undefined || typeof value === type;
@@ -33,6 +37,14 @@ function isOptional(value: unknown, type: 'string' | 'number'): boolean {
 
 function isPersonReference(value: unknown): value is string {
   return typeof value === 'string' && value !== '';
+}
+
+function isRepeatedGiftDocument(candidate: unknown): candidate is RepeatedGiftDocument {
+  return isObject(candidate) && isPersonReference(candidate.recordedBy);
+}
+
+function isOptionalGiftList(value: unknown): boolean {
+  return value === undefined || (Array.isArray(value) && value.every(isRepeatedGiftDocument));
 }
 
 function isWishDocument(candidate: unknown): candidate is WishDocument {
@@ -50,7 +62,9 @@ function isWishDocument(candidate: unknown): candidate is WishDocument {
     typeof candidate.secret === 'boolean' &&
     (candidate.giverId === undefined || isPersonReference(candidate.giverId)) &&
     typeof candidate.received === 'boolean' &&
-    typeof candidate.removedByOwner === 'boolean'
+    typeof candidate.removedByOwner === 'boolean' &&
+    (candidate.repeatable === undefined || typeof candidate.repeatable === 'boolean') &&
+    isOptionalGiftList(candidate.gifts)
   );
 }
 
@@ -100,6 +114,10 @@ export function toWishDocument(wish: Wish): WishDocument {
     ...(wish.giverId && { giverId: wish.giverId }),
     received: wish.received,
     removedByOwner: wish.removedByOwner,
+    repeatable: wish.repeatable,
+    ...(wish.gifts.length > 0 && {
+      gifts: wish.gifts.map(({ recordedBy }) => ({ recordedBy })),
+    }),
   };
 }
 
@@ -122,6 +140,8 @@ export function wishFromDocument(id: string, data: unknown): Wish | undefined {
       giverId: data.giverId === undefined ? undefined : personIdOf(data.giverId),
       received: data.received,
       removedByOwner: data.removedByOwner,
+      repeatable: data.repeatable ?? false,
+      gifts: (data.gifts ?? []).map(({ recordedBy }) => ({ recordedBy: personIdOf(recordedBy) })),
     })
   );
 }

@@ -44,7 +44,7 @@ function wishOf(input: WishDetailsInput, wishlistId: WishlistId, id: string): Wi
       id: wishIdOf(id),
       wishlistId,
       details: parsed.details,
-      secret: false,
+      traits: { secret: false, repeatable: false },
       createdOn: firstOfOctober,
     },
     { me: anna, ownerId: anna, wishlistIsHidden: false },
@@ -138,7 +138,7 @@ describe('FirestoreWishRepository', () => {
         id: wishIdOf('Konzert'),
         wishlistId: birthday,
         details: { name: wishNamed('Konzert').details.name },
-        secret: true,
+        traits: { secret: true, repeatable: false },
         createdOn: firstOfOctober,
       },
       { me: ben, ownerId: anna, wishlistIsHidden: false },
@@ -151,6 +151,23 @@ describe('FirestoreWishRepository', () => {
     await eventually(() => {
       expect(restored?.secret).toBe(true);
       expect(restored?.createdBy).toBe(ben);
+    });
+  });
+
+  it('restores a repeatable wish with its gifts in order', async () => {
+    const chocolate = Wish.restore({
+      ...wishNamed('Schokolade'),
+      repeatable: true,
+      gifts: [{ recordedBy: ben }, { recordedBy: anna }],
+    });
+    let restored: Wish | undefined;
+    familyRepository().watch(wishIdOf('Schokolade'), (wish) => (restored = wish), ignoreFailure);
+
+    await familyRepository().save(chocolate);
+
+    await eventually(() => {
+      expect(restored?.repeatable).toBe(true);
+      expect(restored?.gifts).toEqual([{ recordedBy: ben }, { recordedBy: anna }]);
     });
   });
 
@@ -169,6 +186,7 @@ describe('FirestoreWishRepository', () => {
         secret: false,
         received: false,
         removedByOwner: false,
+        repeatable: false,
       });
     });
   });
@@ -189,6 +207,8 @@ describe('FirestoreWishRepository', () => {
     const restored = await familyRepository().get(wishIdOf('earlier'));
 
     expect(restored?.createdOn).toEqual(CREATION_DATE_OF_EARLIER_WISHES);
+    expect(restored?.repeatable).toBe(false);
+    expect(restored?.gifts).toEqual([]);
     expect(CREATION_DATE_OF_EARLIER_WISHES.isoString).toBe('2026-09-29');
     const stored = await withoutRules(environment, async (firestore) =>
       (await getDoc(doc(firestore, WISHES_COLLECTION, 'earlier'))).data(),

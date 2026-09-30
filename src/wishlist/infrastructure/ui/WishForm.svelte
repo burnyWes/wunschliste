@@ -15,6 +15,7 @@
     type WishDetailsInput,
     type WishDetailsProblems,
   } from '../../domain/WishDetails';
+  import type { WishTraits } from '../../domain/Wish';
   import {
     BRAND_PROBLEM_MESSAGES,
     DESCRIPTION_PROBLEM_MESSAGES,
@@ -22,11 +23,18 @@
     NAME_PROBLEM_MESSAGES,
     PRICE_PROBLEM_MESSAGES,
     ratingLabel,
+    REPEATABILITY_LOCKED_HINT,
+    REPEATABLE_EXCLUDED_BY_SECRET_HINT,
+    REPEATABLE_HINT,
+    REPEATABLE_LABEL,
+    SECRET_EXCLUDED_BY_REPEATABLE_HINT,
   } from './wishTexts';
 
   type RatingChoice = Rating | 'none';
 
   type SecretChoice = { initial: boolean; hint: string };
+
+  type RepeatableChoice = { initial: boolean; locked: boolean };
 
   let {
     heading,
@@ -34,6 +42,7 @@
     cancelTarget,
     focusesName = false,
     secret,
+    repeatable,
     onsubmit,
     extra,
   }: {
@@ -42,7 +51,8 @@
     cancelTarget: string;
     focusesName?: boolean;
     secret?: SecretChoice;
-    onsubmit: (details: WishDetails, secret: boolean) => Promise<void>;
+    repeatable: RepeatableChoice;
+    onsubmit: (details: WishDetails, traits: WishTraits) => Promise<void>;
     extra?: Snippet;
   } = $props();
 
@@ -69,6 +79,7 @@
   let price = $state(start.price);
   let ratingChoice = $state<RatingChoice>(start.rating ?? 'none');
   let isSecret = $state(untrack(() => secret?.initial) ?? false);
+  let isRepeatable = $state(untrack(() => repeatable.initial));
   let problems = $state<WishDetailsProblems>({});
 
   let nameField: TextField;
@@ -76,6 +87,14 @@
   let linkField: TextField;
   let descriptionField: TextField;
   let priceField: TextField;
+
+  const isRepeatableDisabled = $derived(repeatable.locked || isSecret);
+
+  const repeatableHint = $derived.by(() => {
+    if (repeatable.locked) return REPEATABILITY_LOCKED_HINT;
+    if (isSecret) return REPEATABLE_EXCLUDED_BY_SECRET_HINT;
+    return REPEATABLE_HINT;
+  });
 
   onMount(() => {
     if (focusesName && takePageFocusRequest()) {
@@ -109,7 +128,10 @@
       return;
     }
     problems = {};
-    await onsubmit(parsed.details, secret !== undefined && isSecret);
+    await onsubmit(parsed.details, {
+      secret: secret !== undefined && isSecret,
+      repeatable: isRepeatable,
+    });
   }
 </script>
 
@@ -173,9 +195,17 @@
       id="wish-secret"
       label="Geheim"
       bind:checked={isSecret}
-      description={secret.hint}
+      disabled={isRepeatable}
+      description={isRepeatable ? SECRET_EXCLUDED_BY_REPEATABLE_HINT : secret.hint}
     />
   {/if}
+  <CheckOption
+    id="wish-repeatable"
+    label={REPEATABLE_LABEL}
+    bind:checked={isRepeatable}
+    disabled={isRepeatableDisabled}
+    description={repeatableHint}
+  />
   {@render extra?.()}
   <ActionBar>
     <button class="button" type="submit"><Save aria-hidden="true" size="1.25em" /> Speichern</button

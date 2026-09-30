@@ -17,6 +17,7 @@ import {
   FINAL_DELETION_LABEL,
   giverNote,
   removedByOwnerNote,
+  repeatedGiftsNote,
   wishlistRemovedByOwnerMessage,
   wishRemovedByOwnerMessage,
   secretHint,
@@ -225,5 +226,16 @@ describe('wishedSinceNote', () => {
     [CalendarDate.of(2027, 1, 1), 'gewünscht seit 1. Januar 2027'],
   ])('names the day %o in words', (date, note) => {
     expect(wishedSinceNote(date)).toBe(note);
+  });
+});
+
+describe('repeatedGiftsNote', () => {
+  it.each([
+    [0, [], 'mehrmals schenkbar'],
+    [1, [], '1-mal geschenkt'],
+    [3, [], '3-mal geschenkt'],
+    [3, ['Anna', 'Ben'], '3-mal geschenkt – von Anna, Ben'],
+  ] as const)('describes %i gifts by %j', (count, giverNames, expected) => {
+    expect(repeatedGiftsNote(count, giverNames)).toBe(expected);
   });
 });

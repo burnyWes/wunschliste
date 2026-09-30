@@ -48,6 +48,8 @@ function wishOf(state: Partial<RestoredWish>): Wish {
     giverId: undefined,
     received: false,
     removedByOwner: false,
+    repeatable: false,
+    gifts: [],
     ...state,
   });
 }

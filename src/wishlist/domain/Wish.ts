@@ -4,6 +4,10 @@ import { isOwner, type Perspective } from './Perspective';
 import { allowedWishActions, type WishAction } from './wishActions';
 import type { WishDetails } from './WishDetails';
 
+export type RepeatedGift = { readonly recordedBy: PersonId };
+
+export type WishTraits = { readonly secret: boolean; readonly repeatable: boolean };
+
 export type RestoredWish = {
   id: WishId;
   wishlistId: WishlistId;
@@ -14,19 +18,41 @@ export type RestoredWish = {
   giverId: PersonId | undefined;
   received: boolean;
   removedByOwner: boolean;
+  repeatable: boolean;
+  gifts: readonly RepeatedGift[];
 };
 
 export type NewWish = {
   id: WishId;
   wishlistId: WishlistId;
   details: WishDetails;
-  secret: boolean;
+  traits: WishTraits;
   createdOn: CalendarDate;
 };
 
 export type WishRemoval = { kind: 'delete' } | { kind: 'hideFromOwner'; wish: Wish };
 
 type WishChange = Partial<Pick<RestoredWish, 'giverId' | 'received'>>;
+
+type RepeatedGiftChange = (gifts: readonly RepeatedGift[], me: PersonId) => RepeatedGift[];
+
+function withGiftBy(gifts: readonly RepeatedGift[], me: PersonId): RepeatedGift[] {
+  return [...gifts, { recordedBy: me }];
+}
+
+function withoutLatestGiftBy(gifts: readonly RepeatedGift[], me: PersonId): RepeatedGift[] {
+  const latestOwnGift = gifts.map(({ recordedBy }) => recordedBy).lastIndexOf(me);
+  return gifts.filter((_, index) => index !== latestOwnGift);
+}
+
+const REPEATED_GIFT_CHANGE_BY_ACTION: Record<WishAction, RepeatedGiftChange> = {
+  gift: withGiftBy,
+  takeBackGift: withoutLatestGiftBy,
+  receive: withGiftBy,
+  undoReceive: withoutLatestGiftBy,
+  handOver: withGiftBy,
+  undoHandOver: withoutLatestGiftBy,
+};
 
 const CHANGE_BY_ACTION: Record<WishAction, (perspective: Perspective) => WishChange> = {
   gift: ({ me }) => ({ giverId: me }),
@@ -47,6 +73,8 @@ export class Wish {
   readonly giverId: PersonId | undefined;
   readonly received: boolean;
   readonly removedByOwner: boolean;
+  readonly repeatable: boolean;
+  readonly gifts: readonly RepeatedGift[];
 
   private constructor(state: RestoredWish) {
     this.id = state.id;
@@ -58,13 +86,16 @@ export class Wish {
     this.giverId = state.giverId;
     this.received = state.received;
     this.removedByOwner = state.removedByOwner;
+    this.repeatable = state.repeatable;
+    this.gifts = state.gifts;
   }
 
   static create(
-    { id, wishlistId, details, secret, createdOn }: NewWish,
+    { id, wishlistId, details, traits, createdOn }: NewWish,
     perspective: Perspective,
   ): Wish {
-    if (secret && isOwner(perspective)) {
+    ensureCompatible(id, traits);
+    if (traits.secret && isOwner(perspective)) {
       throw new OwnerCannotKeepSecrets(id);
     }
     return new Wish({
@@ -73,10 +104,12 @@ export class Wish {
       details,
       createdOn,
       createdBy: perspective.me,
-      secret,
+      secret: traits.secret,
       giverId: undefined,
       received: false,
       removedByOwner: false,
+      repeatable: traits.repeatable,
+      gifts: [],
     });
   }
 
@@ -110,14 +143,18 @@ export class Wish {
     return { kind: 'delete' };
   }
 
-  edit(details: WishDetails, secret: boolean, perspective: Perspective): Wish {
+  edit(details: WishDetails, { secret, repeatable }: WishTraits, perspective: Perspective): Wish {
     if (this.isHiddenFrom(perspective)) {
       throw new WishHiddenFromOwner(this.id);
     }
+    ensureCompatible(this.id, { secret, repeatable });
     if (secret && !this.secret) {
       throw new WishCannotBecomeSecret(this.id);
     }
-    return this.#changed({ details, secret });
+    if (repeatable !== this.repeatable && !canChangeRepeatability(this)) {
+      throw new RepeatabilityLocked(this.id);
+    }
+    return this.#changed({ details, secret, repeatable });
   }
 
   perform(action: WishAction, perspective: Perspective): Wish {
@@ -125,7 +162,16 @@ export class Wish {
     if (action !== primary && action !== secondary) {
       throw new WishActionNotAllowed(this.id, action);
     }
+    if (this.repeatable) {
+      return this.#changed({
+        gifts: REPEATED_GIFT_CHANGE_BY_ACTION[action](this.gifts, perspective.me),
+      });
+    }
     return this.#changed(CHANGE_BY_ACTION[action](perspective));
+  }
+
+  hasGiftRecordedBy(personId: PersonId): boolean {
+    return this.gifts.some(({ recordedBy }) => recordedBy === personId);
   }
 
   #changed(change: Partial<RestoredWish>): Wish {
@@ -139,9 +185,21 @@ export class Wish {
       giverId: this.giverId,
       received: this.received,
       removedByOwner: this.removedByOwner,
+      repeatable: this.repeatable,
+      gifts: this.gifts,
       ...change,
     });
   }
+}
+
+function ensureCompatible(id: WishId, { secret, repeatable }: WishTraits): void {
+  if (secret && repeatable) {
+    throw new WishCannotBeSecretAndRepeatable(id);
+  }
+}
+
+export function canChangeRepeatability(wish: Wish): boolean {
+  return wish.giverId === undefined && !wish.received && wish.gifts.length === 0;
 }
 
 export class WishNotFound extends Error {
@@ -179,5 +237,19 @@ export class WishHiddenFromOwner extends Error {
   constructor(readonly wishId: WishId) {
     super(`The wish ${wishId} is hidden from the owner.`);
     this.name = 'WishHiddenFromOwner';
+  }
+}
+
+export class WishCannotBeSecretAndRepeatable extends Error {
+  constructor(readonly wishId: WishId) {
+    super(`The wish ${wishId} cannot be secret and repeatable at once.`);
+    this.name = 'WishCannotBeSecretAndRepeatable';
+  }
+}
+
+export class RepeatabilityLocked extends Error {
+  constructor(readonly wishId: WishId) {
+    super(`The wish ${wishId} was already gifted and cannot change its repeatability.`);
+    this.name = 'RepeatabilityLocked';
   }
 }

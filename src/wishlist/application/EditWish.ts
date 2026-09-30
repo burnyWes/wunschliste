@@ -1,6 +1,6 @@
 import type { PersonId, WishId } from '../domain/ids';
 import { perspectiveOf } from '../domain/Perspective';
-import { WishNotFound } from '../domain/Wish';
+import { WishNotFound, type WishTraits } from '../domain/Wish';
 import type { WishDetails } from '../domain/WishDetails';
 import { WishlistNotFound } from '../domain/Wishlist';
 import type { WishlistRepository } from '../domain/WishlistRepository';
@@ -12,7 +12,7 @@ export class EditWish {
     private readonly wishlists: WishlistRepository,
   ) {}
 
-  async execute(id: WishId, details: WishDetails, secret: boolean, me: PersonId): Promise<void> {
+  async execute(id: WishId, details: WishDetails, traits: WishTraits, me: PersonId): Promise<void> {
     const wish = await this.wishes.get(id);
     if (wish === undefined) {
       throw new WishNotFound(id);
@@ -23,6 +23,6 @@ export class EditWish {
     }
     const perspective = perspectiveOf(wishlist, me);
     wishlist.ensureVisibleTo(perspective);
-    await this.wishes.save(wish.edit(details, secret, perspective));
+    await this.wishes.save(wish.edit(details, traits, perspective));
   }
 }

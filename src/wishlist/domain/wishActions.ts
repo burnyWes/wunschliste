@@ -22,9 +22,19 @@ function allowedForGiver(wish: Wish): AllowedWishActions {
     : { primary: 'handOver', secondary: 'takeBackGift' };
 }
 
+function allowedForRepeatable(wish: Wish, perspective: Perspective): AllowedWishActions {
+  const hasOwnGift = wish.hasGiftRecordedBy(perspective.me);
+  return isOwner(perspective)
+    ? { primary: 'receive', ...(hasOwnGift && { secondary: 'undoReceive' }) }
+    : { primary: 'gift', ...(hasOwnGift && { secondary: 'takeBackGift' }) };
+}
+
 export function allowedWishActions(wish: Wish, perspective: Perspective): AllowedWishActions {
   if (wish.isHiddenFrom(perspective)) {
     return {};
+  }
+  if (wish.repeatable) {
+    return allowedForRepeatable(wish, perspective);
   }
   if (isOwner(perspective)) {
     return allowedForOwner(wish);

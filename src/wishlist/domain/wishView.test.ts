@@ -1,6 +1,6 @@
 import { CalendarDate } from './CalendarDate';
 import { describe, expect, it } from 'vitest';
-import { personIdOf, wishIdOf, wishlistIdOf } from './ids';
+import { personIdOf, wishIdOf, wishlistIdOf, type PersonId } from './ids';
 import { Name } from './Name';
 import { requireValid } from './parsed';
 import type { Perspective } from './Perspective';
@@ -27,6 +27,8 @@ function annasWish(name: string, state: Partial<RestoredWish> = {}, rating?: Rat
     giverId: undefined,
     received: false,
     removedByOwner: false,
+    repeatable: false,
+    gifts: [],
     ...state,
   });
 }
@@ -42,19 +44,20 @@ describe('viewOfWish', () => {
     expect(viewOfWish(wish, asOma)).toEqual({
       wish,
       visibility: 'shown',
-      status: 'open',
+      listedUnder: ['open'],
       giverId: undefined,
       secretCreatorId: undefined,
       removedByOwner: false,
       primaryAction: 'gift',
       secondaryAction: undefined,
+      repeatedGifts: undefined,
     });
   });
 
   it('keeps the gift of Ben from Anna', () => {
     const view = viewOfWish(annasWish('Helm', { giverId: ben }), asAnna);
 
-    expect(view.status).toBe('open');
+    expect(view.listedUnder).toEqual(['open']);
     expect(view.giverId).toBeUndefined();
     expect(view.primaryAction).toBe('receive');
   });
@@ -62,7 +65,7 @@ describe('viewOfWish', () => {
   it('shows the gift of Ben to Oma as fulfilled by Ben', () => {
     const view = viewOfWish(annasWish('Helm', { giverId: ben }), asOma);
 
-    expect(view.status).toBe('fulfilled');
+    expect(view.listedUnder).toEqual(['fulfilled']);
     expect(view.giverId).toBe(ben);
     expect(view.primaryAction).toBeUndefined();
   });
@@ -70,7 +73,7 @@ describe('viewOfWish', () => {
   it('shows Anna the giver once she has received the wish', () => {
     const view = viewOfWish(annasWish('Helm', { giverId: ben, received: true }), asAnna);
 
-    expect(view.status).toBe('fulfilled');
+    expect(view.listedUnder).toEqual(['fulfilled']);
     expect(view.giverId).toBe(ben);
     expect(view.primaryAction).toBe('undoReceive');
   });
@@ -78,8 +81,14 @@ describe('viewOfWish', () => {
   it('shows a wish received without giver as fulfilled without giver', () => {
     const wish = annasWish('Helm', { received: true });
 
-    expect(viewOfWish(wish, asAnna)).toMatchObject({ status: 'fulfilled', giverId: undefined });
-    expect(viewOfWish(wish, asBen)).toMatchObject({ status: 'fulfilled', giverId: undefined });
+    expect(viewOfWish(wish, asAnna)).toMatchObject({
+      listedUnder: ['fulfilled'],
+      giverId: undefined,
+    });
+    expect(viewOfWish(wish, asBen)).toMatchObject({
+      listedUnder: ['fulfilled'],
+      giverId: undefined,
+    });
   });
 });
 
@@ -97,7 +106,7 @@ describe('viewOfWish for secret wishes', () => {
   it('names the creator to everyone else', () => {
     expect(viewOfWish(secret, asOma)).toMatchObject({
       visibility: 'shown',
-      status: 'open',
+      listedUnder: ['open'],
       secretCreatorId: ben,
       primaryAction: 'gift',
     });
@@ -114,12 +123,13 @@ describe('viewOfWish for secret wishes', () => {
     expect(viewOfWish(handedOver, asAnna)).toEqual({
       wish: handedOver,
       visibility: 'shown',
-      status: 'fulfilled',
+      listedUnder: ['fulfilled'],
       giverId: ben,
       secretCreatorId: undefined,
       removedByOwner: false,
       primaryAction: undefined,
       secondaryAction: undefined,
+      repeatedGifts: undefined,
     });
   });
 });
@@ -143,7 +153,7 @@ describe('viewOfWish for wishes removed by the owner', () => {
   it('shows everyone else the removal with the usual actions', () => {
     expect(viewOfWish(removed, asBen)).toMatchObject({
       visibility: 'shown',
-      status: 'fulfilled',
+      listedUnder: ['fulfilled'],
       removedByOwner: true,
       primaryAction: 'takeBackGift',
     });
@@ -254,5 +264,48 @@ describe('countWishes', () => {
 
   it('counts nothing without wishes', () => {
     expect(countWishes([], asAnna)).toEqual({ open: 0, fulfilled: 0 });
+  });
+});
+
+describe('repeatable wishes', () => {
+  const gifted = (...recordedBy: PersonId[]) =>
+    annasWish('Schokolade', {
+      repeatable: true,
+      gifts: recordedBy.map((person) => ({ recordedBy: person })),
+    });
+
+  it('lists a repeatable wish without gifts only as open', () => {
+    expect(viewOfWish(gifted(), asOma)).toMatchObject({
+      listedUnder: ['open'],
+      repeatedGifts: { count: 0, giverIds: [] },
+    });
+  });
+
+  it.each([
+    ['the owner', asAnna],
+    ['everyone else', asOma],
+  ] as const)('lists a gifted repeatable wish as open and fulfilled for %s', (_, perspective) => {
+    expect(viewOfWish(gifted(ben), perspective).listedUnder).toEqual(['open', 'fulfilled']);
+  });
+
+  it('names every giver once in the order of the first gift, without the owner', () => {
+    expect(viewOfWish(gifted(oma, anna, ben, oma), asAnna).repeatedGifts).toEqual({
+      count: 4,
+      giverIds: [oma, ben],
+    });
+  });
+
+  it('shows the repeatable wish under both filters', () => {
+    const wishes = [gifted(ben), annasWish('Helm')];
+
+    expect(namesOf(viewOfWishes(wishes, asOma, 'open').entries)).toEqual(['Helm', 'Schokolade']);
+    expect(namesOf(viewOfWishes(wishes, asOma, 'fulfilled').entries)).toEqual(['Schokolade']);
+  });
+
+  it('counts a gifted repeatable wish as open and as fulfilled', () => {
+    expect(countWishes([gifted(ben), gifted(), annasWish('Helm')], asAnna)).toEqual({
+      open: 3,
+      fulfilled: 1,
+    });
   });
 });

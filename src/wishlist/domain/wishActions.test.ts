@@ -1,6 +1,6 @@
 import { CalendarDate } from './CalendarDate';
 import { describe, expect, it } from 'vitest';
-import { personIdOf, wishIdOf, wishlistIdOf } from './ids';
+import { personIdOf, wishIdOf, wishlistIdOf, type PersonId } from './ids';
 import { Name } from './Name';
 import { requireValid } from './parsed';
 import type { Perspective } from './Perspective';
@@ -26,6 +26,8 @@ function annasWish(state: Partial<RestoredWish> = {}): Wish {
     giverId: undefined,
     received: false,
     removedByOwner: false,
+    repeatable: false,
+    gifts: [],
     ...state,
   });
 }
@@ -68,5 +70,43 @@ describe('allowedWishActions', () => {
     ],
   ] as const)('offers %s', (_, perspective, state, expected) => {
     expect(allowedWishActions(annasWish(state), perspective)).toEqual(expected);
+  });
+
+  describe('for a repeatable wish', () => {
+    const repeatable = (recordedBy: readonly PersonId[] = []) =>
+      annasWish({ repeatable: true, gifts: recordedBy.map((person) => ({ recordedBy: person })) });
+
+    it('lets everyone else gift it again and again', () => {
+      expect(allowedWishActions(repeatable(), asBen)).toEqual({ primary: 'gift' });
+      expect(allowedWishActions(repeatable([oma]), asBen)).toEqual({ primary: 'gift' });
+    });
+
+    it('lets a giver take back an own gift among the gifts of others', () => {
+      expect(allowedWishActions(repeatable([oma, ben, oma]), asBen)).toEqual({
+        primary: 'gift',
+        secondary: 'takeBackGift',
+      });
+    });
+
+    it('lets the owner receive it again and again', () => {
+      expect(allowedWishActions(repeatable([ben]), asAnna)).toEqual({ primary: 'receive' });
+    });
+
+    it('lets the owner undo her own receipt', () => {
+      expect(allowedWishActions(repeatable([ben, anna]), asAnna)).toEqual({
+        primary: 'receive',
+        secondary: 'undoReceive',
+      });
+    });
+
+    it('offers nothing in a wishlist hidden from the owner', () => {
+      expect(allowedWishActions(repeatable(), { ...asAnna, wishlistIsHidden: true })).toEqual({});
+    });
+
+    it('offers the owner nothing once she removed it', () => {
+      const removed = annasWish({ repeatable: true, removedByOwner: true });
+
+      expect(allowedWishActions(removed, asAnna)).toEqual({});
+    });
   });
 });

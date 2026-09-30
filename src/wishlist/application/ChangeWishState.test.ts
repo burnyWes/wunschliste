@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { personIdOf, wishIdOf, wishlistIdOf } from '../domain/ids';
+import { perspectiveOf } from '../domain/Perspective';
 import { WishActionNotAllowed, WishNotFound } from '../domain/Wish';
+import { allowedWishActions } from '../domain/wishActions';
 import { WishlistNotFound } from '../domain/Wishlist';
 import { ChangeWishState } from './ChangeWishState';
 import { InMemoryWishlistRepository } from './fakes/InMemoryWishlistRepository';
@@ -35,6 +37,20 @@ describe('ChangeWishState', () => {
     await changeWishState.execute(helmet, anna, 'receive');
 
     expect((await wishes.get(helmet))?.received).toBe(true);
+  });
+
+  it('records a gift of a repeatable wish and keeps it open for more gifts', async () => {
+    const { wishes, wishlists, changeWishState } = await setUp();
+    await wishes.save(wishNamed('Schokolade', { repeatable: true }));
+
+    await changeWishState.execute(wishIdOf('Schokolade'), ben, 'gift');
+
+    const gifted = await wishes.get(wishIdOf('Schokolade'));
+    const wishlist = await wishlists.get(wishlistIdOf('birthday'));
+    expect(gifted?.gifts).toEqual([{ recordedBy: ben }]);
+    expect(
+      gifted && wishlist && allowedWishActions(gifted, perspectiveOf(wishlist, ben)).primary,
+    ).toBe('gift');
   });
 
   it('refuses an action that is not allowed and saves nothing', async () => {

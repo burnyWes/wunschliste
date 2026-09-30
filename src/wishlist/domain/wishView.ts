@@ -8,15 +8,18 @@ export type WishFilter = 'open' | 'fulfilled';
 
 export type WishVisibility = 'shown' | 'surprise' | 'hidden';
 
+export type RepeatedGiftsView = { count: number; giverIds: readonly PersonId[] };
+
 export type WishView = {
   wish: Wish;
   visibility: WishVisibility;
-  status: WishFilter;
+  listedUnder: readonly WishFilter[];
   giverId?: PersonId;
   secretCreatorId?: PersonId;
   removedByOwner: boolean;
   primaryAction?: WishAction;
   secondaryAction?: WishAction;
+  repeatedGifts?: RepeatedGiftsView;
 };
 
 export type WishesView = { entries: WishView[]; surpriseCount: number };
@@ -26,6 +29,23 @@ function isFulfilledFor(wish: Wish, perspective: Perspective): boolean {
     return wish.received;
   }
   return wish.received || wish.giverId !== undefined;
+}
+
+function listedUnderFor(wish: Wish, perspective: Perspective): readonly WishFilter[] {
+  if (wish.repeatable) {
+    return wish.gifts.length > 0 ? ['open', 'fulfilled'] : ['open'];
+  }
+  return [isFulfilledFor(wish, perspective) ? 'fulfilled' : 'open'];
+}
+
+function repeatedGiftsOf(wish: Wish, perspective: Perspective): RepeatedGiftsView | undefined {
+  if (!wish.repeatable) {
+    return undefined;
+  }
+  const giverIds = wish.gifts
+    .map(({ recordedBy }) => recordedBy)
+    .filter((personId) => personId !== perspective.ownerId);
+  return { count: wish.gifts.length, giverIds: [...new Set(giverIds)] };
 }
 
 function giverShownTo(wish: Wish, perspective: Perspective): PersonId | undefined {
@@ -49,12 +69,13 @@ export function viewOfWish(wish: Wish, perspective: Perspective): WishView {
   return {
     wish,
     visibility: visibilityFor(wish, perspective),
-    status: isFulfilledFor(wish, perspective) ? 'fulfilled' : 'open',
+    listedUnder: listedUnderFor(wish, perspective),
     giverId: giverShownTo(wish, perspective),
     secretCreatorId: secretCreatorShownTo(wish, perspective),
     removedByOwner: wish.removedByOwner,
     primaryAction: primary,
     secondaryAction: secondary,
+    repeatedGifts: repeatedGiftsOf(wish, perspective),
   };
 }
 
@@ -67,7 +88,9 @@ export function viewOfWishes(
   const surpriseCount =
     filter === 'open' ? views.filter(({ visibility }) => visibility === 'surprise').length : 0;
   return {
-    entries: views.filter(({ visibility, status }) => visibility === 'shown' && status === filter),
+    entries: views.filter(
+      ({ visibility, listedUnder }) => visibility === 'shown' && listedUnder.includes(filter),
+    ),
     surpriseCount,
   };
 }
@@ -79,12 +102,11 @@ export function visibleWishCount(wishes: readonly Wish[], perspective: Perspecti
 export type WishCounts = { readonly open: number; readonly fulfilled: number };
 
 export function countWishes(wishes: readonly Wish[], perspective: Perspective): WishCounts {
-  const shownStatuses = wishes
+  const shownListings = wishes
     .map((wish) => viewOfWish(wish, perspective))
     .filter(({ visibility }) => visibility === 'shown')
-    .map(({ status }) => status);
-  return {
-    open: shownStatuses.filter((status) => status === 'open').length,
-    fulfilled: shownStatuses.filter((status) => status === 'fulfilled').length,
-  };
+    .map(({ listedUnder }) => listedUnder);
+  const countListedUnder = (filter: WishFilter) =>
+    shownListings.filter((listedUnder) => listedUnder.includes(filter)).length;
+  return { open: countListedUnder('open'), fulfilled: countListedUnder('fulfilled') };
 }

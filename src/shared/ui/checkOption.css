@@ -29,3 +29,8 @@ input:focus-visible + .check-option__box {
   outline: 0.1875rem solid var(--color-outline);
   outline-offset: 0.25rem;
 }
+
+.check-option:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

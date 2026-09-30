@@ -15,6 +15,8 @@ export function wishNamed(name: string, state: Partial<RestoredWish> = {}): Wish
     giverId: undefined,
     received: false,
     removedByOwner: false,
+    repeatable: false,
+    gifts: [],
     ...state,
   });
 }

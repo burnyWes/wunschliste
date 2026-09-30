@@ -6,7 +6,14 @@
     label,
     checked = $bindable(),
     description,
-  }: { id: string; label: string; checked: boolean; description?: string } = $props();
+    disabled = false,
+  }: {
+    id: string;
+    label: string;
+    checked: boolean;
+    description?: string;
+    disabled?: boolean;
+  } = $props();
 </script>
 
 <div class="check-field">
@@ -17,6 +24,7 @@
       class="visually-hidden"
       type="checkbox"
       bind:checked
+      {disabled}
       aria-describedby={description && `${id}-description`}
     />
     <span class="check-option__box" aria-hidden="true">

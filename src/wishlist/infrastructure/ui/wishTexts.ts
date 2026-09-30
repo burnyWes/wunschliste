@@ -123,6 +123,25 @@ export function secretNote(creatorName?: string): string {
   return creatorName === undefined ? 'Geheim' : `Geheim – von ${creatorName}`;
 }
 
+export const REPEATABLE_LABEL = 'Mehrmals schenkbar';
+
+export const REPEATABLE_HINT = 'Kann immer wieder geschenkt werden, z. B. Süßigkeiten.';
+
+export const REPEATABLE_EXCLUDED_BY_SECRET_HINT = 'Nicht zusammen mit „Geheim“ möglich.';
+
+export const SECRET_EXCLUDED_BY_REPEATABLE_HINT =
+  'Nicht zusammen mit „Mehrmals schenkbar“ möglich.';
+
+export const REPEATABILITY_LOCKED_HINT = 'Bereits geschenkt – erst zurücknehmen.';
+
+export function repeatedGiftsNote(count: number, giverNames: readonly string[]): string {
+  if (count === 0) {
+    return 'mehrmals schenkbar';
+  }
+  const gifted = `${count}-mal geschenkt`;
+  return giverNames.length === 0 ? gifted : `${gifted} – von ${giverNames.join(', ')}`;
+}
+
 export function secretHint(ownerName: string): string {
   return `${ownerName} sieht nur „Überraschung“.`;
 }

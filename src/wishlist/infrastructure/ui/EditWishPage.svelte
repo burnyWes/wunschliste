@@ -7,7 +7,7 @@
   import type { WishId } from '../../domain/ids';
   import type { Person } from '../../domain/Person';
   import { perspectiveOf } from '../../domain/Perspective';
-  import type { Wish } from '../../domain/Wish';
+  import { canChangeRepeatability, type Wish, type WishTraits } from '../../domain/Wish';
   import type { WishDetails } from '../../domain/WishDetails';
   import type { Wishlist } from '../../domain/Wishlist';
   import { viewOfWish } from '../../domain/wishView';
@@ -83,8 +83,8 @@
 
   const wishHash = $derived(hashOf({ page: 'wish', wishId }));
 
-  async function save(details: WishDetails, secret: boolean): Promise<void> {
-    await editWish.execute(wishId, details, secret, profile.me.id);
+  async function save(details: WishDetails, traits: WishTraits): Promise<void> {
+    await editWish.execute(wishId, details, traits, profile.me.id);
     navigateTo(wishHash);
     announce(SAVED_ANNOUNCEMENT);
   }
@@ -108,6 +108,10 @@
     secret={view.wish.secret
       ? { initial: true, hint: secretHint(owner?.name.value ?? 'Die Besitzerin') }
       : undefined}
+    repeatable={{
+      initial: view.wish.repeatable,
+      locked: !canChangeRepeatability(view.wish),
+    }}
     cancelTarget={wishHash}
     onsubmit={save}
   >

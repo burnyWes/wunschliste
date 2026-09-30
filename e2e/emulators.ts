@@ -29,6 +29,8 @@ export type WishRecord = {
   giverId?: string;
   received: boolean;
   removedByOwner: boolean;
+  repeatable?: boolean;
+  gifts?: { recordedBy: string }[];
 };
 
 type WishRecordDefaults = 'createdBy' | 'secret' | 'received' | 'removedByOwner';
