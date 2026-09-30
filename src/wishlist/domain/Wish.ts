@@ -157,6 +157,13 @@ export class Wish {
     return this.#changed({ details, secret, repeatable });
   }
 
+  moveTo(wishlistId: WishlistId, perspective: Perspective): Wish {
+    if (this.isHiddenFrom(perspective)) {
+      throw new WishHiddenFromOwner(this.id);
+    }
+    return this.#changed({ wishlistId });
+  }
+
   perform(action: WishAction, perspective: Perspective): Wish {
     const { primary, secondary } = allowedWishActions(this, perspective);
     if (action !== primary && action !== secondary) {

@@ -151,6 +151,19 @@ async function submitWrongPassword(page: Page): Promise<void> {
   await expect(page.getByRole('alert')).toHaveText('E-Mail oder Passwort stimmt nicht.');
 }
 
+const singleWishlistWithWish: SeedData = {
+  wishlists: [{ id: 'birthday', name: 'Geburtstag 2027', ownerId: 'anna' }],
+  wishes: [wishRecord({ id: 'helmet', wishlistId: 'birthday', name: 'Fahrradhelm' })],
+};
+
+async function waitForMoveTargets(page: Page): Promise<void> {
+  await expect(page.getByRole('main').getByRole('listitem')).toHaveText(['Weihnachten']);
+}
+
+async function waitForMissingMoveTarget(page: Page): Promise<void> {
+  await expect(page.getByText('Keine andere Liste vorhanden.')).toBeVisible();
+}
+
 type CheckedPage = {
   name: string;
   path: string;
@@ -329,6 +342,20 @@ const pages: CheckedPage[] = [
     path: './#/wunsch/helmet/bearbeiten',
     heading: 'Wunsch bearbeiten',
     data: wishlistWithWishes,
+  },
+  {
+    name: 'move wish',
+    path: './#/wunsch/helmet/verschieben',
+    heading: 'Wohin verschieben?',
+    data: wishlistWithWishes,
+    prepare: waitForMoveTargets,
+  },
+  {
+    name: 'move wish without target',
+    path: './#/wunsch/helmet/verschieben',
+    heading: 'Wohin verschieben?',
+    data: singleWishlistWithWish,
+    prepare: waitForMissingMoveTarget,
   },
 ];
 

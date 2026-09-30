@@ -9,6 +9,7 @@
   import EditPersonPage from './EditPersonPage.svelte';
   import EditWishlistPage from './EditWishlistPage.svelte';
   import EditWishPage from './EditWishPage.svelte';
+  import MoveWishPage from './MoveWishPage.svelte';
   import PersonsPage from './PersonsPage.svelte';
   import { PERSON_CREATED_ANNOUNCEMENT, profileChosenAnnouncement } from './personTexts';
   import { hashOf, type WishlistAddress } from './wishlistAddresses';
@@ -58,6 +59,8 @@
   <EditPersonPage personId={address.personId} />
 {:else if address.page === 'persons'}
   <PersonsPage {settingsHash} />
+{:else if address.page === 'moveWish'}
+  <MoveWishPage wishId={address.wishId} />
 {:else}
   <EditWishPage wishId={address.wishId} />
 {/if}

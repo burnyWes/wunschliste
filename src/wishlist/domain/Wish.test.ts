@@ -440,3 +440,35 @@ describe('Wish', () => {
     });
   });
 });
+
+describe('Wish.moveTo', () => {
+  const christmas = wishlistIdOf('christmas');
+
+  it('changes only the wishlist', () => {
+    const wish = annasWish({
+      giverId: ben,
+      received: true,
+      removedByOwner: true,
+      repeatable: true,
+      gifts: [{ recordedBy: ben }],
+    });
+
+    const moved = wish.moveTo(christmas, asBen);
+
+    expect(moved.wishlistId).toBe(christmas);
+    expect({ ...moved, wishlistId: wish.wishlistId }).toEqual({ ...wish });
+  });
+
+  it('keeps a secret wish secret when someone else moves it', () => {
+    const secret = annasWish({ secret: true, createdBy: ben });
+
+    expect(secret.moveTo(christmas, asOma).secret).toBe(true);
+  });
+
+  it.each([
+    ['a secret wish', annasWish({ secret: true, createdBy: ben })],
+    ['a wish she removed', annasWish({ removedByOwner: true })],
+  ])('keeps the owner from moving %s', (_, wish) => {
+    expect(() => wish.moveTo(christmas, asAnna)).toThrow(WishHiddenFromOwner);
+  });
+});

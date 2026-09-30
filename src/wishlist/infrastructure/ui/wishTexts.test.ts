@@ -34,6 +34,8 @@ import {
   wishDeletionMessage,
   wishDetailsInputOf,
   wishedSinceNote,
+  wishLocationNote,
+  wishMovedAnnouncement,
   wishlistDeletedAnnouncement,
   wishlistDeletionMessage,
 } from './wishTexts';
@@ -122,6 +124,16 @@ describe('announcements', () => {
 
   it('names the deleted wish', () => {
     expect(wishDeletedAnnouncement('Fahrradhelm')).toBe('Wunsch „Fahrradhelm“ gelöscht.');
+  });
+
+  it('names the wishlist a wish was moved to', () => {
+    expect(wishMovedAnnouncement('Weihnachten')).toBe('In „Weihnachten“ verschoben.');
+  });
+});
+
+describe('moving a wish', () => {
+  it('tells which wishlist the wish is in', () => {
+    expect(wishLocationNote('Lego Zug', 'Geburtstag')).toBe('„Lego Zug“ liegt in „Geburtstag“.');
   });
 });
 

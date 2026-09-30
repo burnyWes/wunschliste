@@ -176,6 +176,20 @@ export function wishDeletedAnnouncement(name: string): string {
   return `Wunsch „${name}“ gelöscht.`;
 }
 
+export const MOVE_WISH_LABEL = 'In andere Liste verschieben';
+
+export const MOVE_WISH_HEADING = 'Wohin verschieben?';
+
+export const NO_MOVE_TARGET_MESSAGE = 'Keine andere Liste vorhanden.';
+
+export function wishLocationNote(wishName: string, wishlistName: string): string {
+  return `„${wishName}“ liegt in „${wishlistName}“.`;
+}
+
+export function wishMovedAnnouncement(wishlistName: string): string {
+  return `In „${wishlistName}“ verschoben.`;
+}
+
 function priceInputOf(price: Price): string {
   return (price.cents / CENTS_PER_EURO).toFixed(2).replace('.', ',');
 }

@@ -14,6 +14,7 @@ const addresses: [string, WishlistAddress][] = [
   ['#/liste/abc-1/wunsch/neu', { page: 'createWish', wishlistId }],
   ['#/wunsch/w-1', { page: 'wish', wishId }],
   ['#/wunsch/w-1/bearbeiten', { page: 'editWish', wishId }],
+  ['#/wunsch/w-1/verschieben', { page: 'moveWish', wishId }],
   ['#/wer-bist-du', { page: 'chooseProfile' }],
   ['#/person/neu', { page: 'createPerson' }],
   ['#/person/p-1/bearbeiten', { page: 'editPerson', personId: personIdOf('p-1') }],
@@ -33,6 +34,7 @@ describe('parseWishlistAddress', () => {
     '#/liste/abc-1/unbekannt',
     '#/person/p-1',
     '#/personen/x',
+    '#/wunsch/w-1/unbekannt',
   ])('rejects %j', (hash) => {
     expect(parseWishlistAddress(hash)).toBeUndefined();
   });

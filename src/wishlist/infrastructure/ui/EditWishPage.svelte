@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Trash2 } from '@lucide/svelte';
+  import { ArrowRightLeft, Trash2 } from '@lucide/svelte';
   import { announce } from '../../../shared/ui/announcements.svelte';
   import ConfirmDialog from '../../../shared/ui/ConfirmDialog.svelte';
   import { navigateTo } from '../../../shared/ui/navigation';
@@ -10,6 +10,7 @@
   import { canChangeRepeatability, type Wish, type WishTraits } from '../../domain/Wish';
   import type { WishDetails } from '../../domain/WishDetails';
   import type { Wishlist } from '../../domain/Wishlist';
+  import { moveTargetsOf } from '../../domain/wishMove';
   import { viewOfWish } from '../../domain/wishView';
   import { useCurrentProfile } from './currentProfile.svelte';
   import LoadFailed from './LoadFailed.svelte';
@@ -19,6 +20,7 @@
   import { useWishlistModule } from './wishlistModuleContext';
   import WishForm from './WishForm.svelte';
   import {
+    MOVE_WISH_LABEL,
     SAVED_ANNOUNCEMENT,
     secretHint,
     wishDeletedAnnouncement,
@@ -28,12 +30,14 @@
 
   let { wishId }: { wishId: WishId } = $props();
 
-  const { watchWish, watchWishlist, watchPerson, editWish, deleteWish } = useWishlistModule();
+  const { watchWish, watchWishlist, watchWishlistsOwnedBy, watchPerson, editWish, deleteWish } =
+    useWishlistModule();
   const profile = useCurrentProfile();
 
   const wish = new Watched<Wish>();
   const wishlist = new Watched<Wishlist>();
   let owner = $state.raw<Person>();
+  let ownedWishlists = $state.raw<readonly Wishlist[]>();
   let isDeleting = $state(false);
   let deletionDialog = $state<ConfirmDialog>();
 
@@ -68,6 +72,20 @@
       );
     }
   });
+
+  $effect(() => {
+    if (ownerId !== undefined) {
+      return watchWishlistsOwnedBy.execute(
+        ownerId,
+        (reported) => (ownedWishlists = reported),
+        () => {},
+      );
+    }
+  });
+
+  const moveTargets = $derived(
+    wishlist.value ? moveTargetsOf(wishlist.value, ownedWishlists ?? []) : [],
+  );
 
   const view = $derived(
     wish.value &&
@@ -116,6 +134,18 @@
     onsubmit={save}
   >
     {#snippet extra()}
+      {#if moveTargets.length > 0}
+        <div class="button-row">
+          <button
+            class="button"
+            type="button"
+            onclick={() => navigateTo(hashOf({ page: 'moveWish', wishId }))}
+          >
+            <ArrowRightLeft aria-hidden="true" size="1.25em" />
+            {MOVE_WISH_LABEL}
+          </button>
+        </div>
+      {/if}
       <div class="button-row">
         <button
           class="button"

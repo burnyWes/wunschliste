@@ -161,6 +161,9 @@ Ein Wunsch trägt `createdBy` (wer ihn angelegt hat), `secret` (Geheim-Eintrag),
 `giverId` (wer ihn schenkt), `received` (erhalten bzw. übergeben) und `removedByOwner`
 (nur für die Besitzerin gelöscht). Wunschlisten tragen ebenfalls `removedByOwner`; fehlt
 das Feld, gilt es als `false`. Dokumente in `wishes` ohne diese Felder werden ignoriert.
+Ein Wunsch lässt sich in eine andere Liste derselben Person verschieben. Dabei ändert sich
+nur `wishlistId`, der übrige Zustand bleibt erhalten. Gelöschte Listen sind weder Ziel noch
+Quelle.
 
 Die Geheimhaltung ist Ehrensache: Technisch kann jede Person mit dem Familienzugang alle
 Daten lesen. Die App zeigt der Besitzerin nur nicht, was für sie geheim ist.

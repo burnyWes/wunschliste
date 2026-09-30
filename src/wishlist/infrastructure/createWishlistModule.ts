@@ -9,6 +9,7 @@ import { DeleteWish } from '../application/DeleteWish';
 import { DeleteWishlist } from '../application/DeleteWishlist';
 import { EditWish } from '../application/EditWish';
 import { ForgetProfile } from '../application/ForgetProfile';
+import { MoveWish } from '../application/MoveWish';
 import { RenamePerson } from '../application/RenamePerson';
 import { RenameWishlist } from '../application/RenameWishlist';
 import { WatchCurrentPerson } from '../application/WatchCurrentPerson';
@@ -62,6 +63,7 @@ export function createWishlistModule({
     watchWishesOfWishlist: new WatchWishesOfWishlist(wishes),
     watchWish: new WatchWish(wishes),
     editWish: new EditWish(wishes, wishlists),
+    moveWish: new MoveWish(wishes, wishlists),
     deleteWish: new DeleteWish(wishes, wishlists),
     changeWishState: new ChangeWishState(wishes, wishlists),
   };
