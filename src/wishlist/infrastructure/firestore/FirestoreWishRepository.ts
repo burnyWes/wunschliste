@@ -38,16 +38,16 @@ export class FirestoreWishRepository implements WishRepository {
     this.#onProblem = onProblem;
   }
 
+  watchAll(onChange: (wishes: readonly Wish[]) => void, onFailure: () => void): Unsubscribe {
+    return this.#watchWishesIn(this.#allWishes(), onChange, onFailure);
+  }
+
   watchByWishlist(
     wishlistId: WishlistId,
     onChange: (wishes: readonly Wish[]) => void,
     onFailure: () => void,
   ): Unsubscribe {
-    return onSnapshot(
-      this.#wishesOf(wishlistId),
-      (snapshot) => onChange(snapshot.docs.map(wishIn).filter((wish) => wish !== undefined)),
-      reportedFailure(onFailure, this.#onProblem),
-    );
+    return this.#watchWishesIn(this.#wishesOf(wishlistId), onChange, onFailure);
   }
 
   watch(
@@ -91,11 +91,24 @@ export class FirestoreWishRepository implements WishRepository {
     observedWrite(batch.commit(), this.#onProblem);
   }
 
-  #wishesOf(wishlistId: WishlistId): Query {
-    return query(
-      collection(this.#firestore, WISHES_COLLECTION),
-      where('wishlistId', '==', wishlistId),
+  #watchWishesIn(
+    wishes: Query,
+    onChange: (wishes: readonly Wish[]) => void,
+    onFailure: () => void,
+  ): Unsubscribe {
+    return onSnapshot(
+      wishes,
+      (snapshot) => onChange(snapshot.docs.map(wishIn).filter((wish) => wish !== undefined)),
+      reportedFailure(onFailure, this.#onProblem),
     );
+  }
+
+  #allWishes(): Query {
+    return collection(this.#firestore, WISHES_COLLECTION);
+  }
+
+  #wishesOf(wishlistId: WishlistId): Query {
+    return query(this.#allWishes(), where('wishlistId', '==', wishlistId));
   }
 
   #reference(id: WishId): DocumentReference {

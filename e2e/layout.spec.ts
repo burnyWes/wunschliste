@@ -90,8 +90,8 @@ test('keeps both filter buttons side by side with equal width, even with doubled
 }) => {
   await seed({ wishlists: [{ id: 'b', name: 'Geburtstag', ownerId: 'anna' }] });
   await page.goto('./#/liste/b');
-  const openFilter = page.getByRole('button', { name: 'Noch offen', exact: true });
-  const fulfilledFilter = page.getByRole('button', { name: 'Erfüllt', exact: true });
+  const openFilter = page.getByRole('button', { name: /^Noch offen( \d+)?$/ });
+  const fulfilledFilter = page.getByRole('button', { name: /^Erfüllt( \d+)?$/ });
   await expect(openFilter).toBeVisible();
 
   for (const fontSize of ['100%', '200%']) {

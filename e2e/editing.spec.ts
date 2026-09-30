@@ -42,7 +42,7 @@ test('renames a wishlist and goes back to it', async ({ page }) => {
   await page.getByRole('button', { name: 'Zurück zu Wunschlisten' }).click();
 
   await expect(pageHeading(page, 'Wunschlisten')).toBeVisible();
-  await expect(page.getByRole('main').getByRole('listitem')).toHaveText([
+  await expect(page.getByRole('main').locator('.wishlist-name')).toHaveText([
     'Weihnachten',
     'Zeltlager',
   ]);
@@ -89,7 +89,7 @@ test('asks before deleting a wishlist with its wishes', async ({ page }) => {
   await dialog(page).getByRole('button', { name: 'Löschen' }).click();
 
   await expect(pageHeading(page, 'Wunschlisten')).toBeVisible();
-  await expect(page.getByRole('main').getByRole('listitem')).toHaveText(['Weihnachten']);
+  await expect(page.getByRole('main').locator('.wishlist-name')).toHaveText(['Weihnachten']);
   await expect.poll(async () => (await storedWishes()).map(({ id }) => id)).toEqual(['sledge']);
   expect(await historyLength(page)).toBe(startLength);
 });

@@ -211,6 +211,20 @@ describe('FirestoreWishRepository', () => {
     expect(reports.flat()).not.toContain('Schlitten');
   });
 
+  it('reports the wishes of all wishlists, at once and after each save and delete', async () => {
+    const repository = familyRepository();
+    const reports: string[][] = [];
+    repository.watchAll((wishes) => reports.push(namesOf(wishes)), ignoreFailure);
+    await eventually(() => expect(reports).toEqual([[]]));
+
+    await repository.save(wishNamed('Helm'));
+    await repository.save(wishNamed('Schlitten', christmas));
+    await eventually(() => expect(reports.at(-1)).toEqual(['Helm', 'Schlitten']));
+    await repository.delete(wishIdOf('Helm'));
+
+    await eventually(() => expect(reports.at(-1)).toEqual(['Schlitten']));
+  });
+
   it('reports a single wish and its removal', async () => {
     const repository = familyRepository();
     const reports: (string | undefined)[] = [];

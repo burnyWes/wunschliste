@@ -5,6 +5,7 @@ import type { Wish } from './Wish';
 export type WishesOfWishlist = { wishes: readonly Wish[]; confirmed: boolean };
 
 export interface WishRepository {
+  watchAll(onChange: (wishes: readonly Wish[]) => void, onFailure: () => void): Unsubscribe;
   watchByWishlist(
     wishlistId: WishlistId,
     onChange: (wishes: readonly Wish[]) => void,

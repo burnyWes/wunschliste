@@ -4,7 +4,8 @@ import { seed, wishRecord } from './emulators';
 import { historyLength } from './history';
 
 const pageHeading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name });
-const filterButton = (page: Page, name: string) => page.getByRole('button', { name, exact: true });
+const filterButton = (page: Page, name: string) =>
+  page.getByRole('button', { name: new RegExp(`^${name}( \\d+)?$`) });
 const wishLink = (page: Page, name: string) =>
   page.getByRole('main').getByRole('button', { name: new RegExp(`^${name}`) });
 const actionBarButtons = (page: Page) => page.locator('.action-bar').getByRole('button');

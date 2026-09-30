@@ -6,6 +6,7 @@ import type { Price, PriceProblem } from '../../domain/Price';
 import type { Rating } from '../../domain/Rating';
 import type { WishAction } from '../../domain/wishActions';
 import type { WishDetails, WishDetailsInput } from '../../domain/WishDetails';
+import type { WishCounts } from '../../domain/wishView';
 import type { WishLinkProblem } from '../../domain/WishLink';
 
 export const NAME_PROBLEM_MESSAGES: Record<NameProblem, string> = {
@@ -142,6 +143,10 @@ export const FINAL_DELETION_LABEL = 'Endgültig löschen';
 
 export function surpriseLine(count: number): string {
   return count === 1 ? '1 Überraschung' : `${count} Überraschungen`;
+}
+
+export function wishCountsLine({ open, fulfilled }: WishCounts): string {
+  return `${open} offen · ${fulfilled} erfüllt`;
 }
 
 export function wishlistDeletedAnnouncement(name: string): string {

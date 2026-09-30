@@ -45,7 +45,7 @@ test('shows the changes of one device on another without reloading', async ({
   await deviceA.getByRole('button', { name: 'Schenken', exact: true }).click();
 
   await expect(mainButton(deviceB, /^Fahrradhelm/)).toHaveCount(0);
-  await deviceB.getByRole('button', { name: 'Erfüllt', exact: true }).click();
+  await deviceB.getByRole('button', { name: /^Erfüllt( \d+)?$/ }).click();
   await expect(mainButton(deviceB, /^Fahrradhelm/)).toBeVisible();
 
   await deviceA.context().close();

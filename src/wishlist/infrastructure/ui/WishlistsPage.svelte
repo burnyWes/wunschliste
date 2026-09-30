@@ -8,7 +8,7 @@
   import { hashOf } from './wishlistAddresses';
   import { wishlistFilterMemory } from './wishlistFilterMemory';
   import { useWishlistModule } from './wishlistModuleContext';
-  import { LOAD_FAILED_MESSAGE, removedByOwnerNote } from './wishTexts';
+  import { LOAD_FAILED_MESSAGE, removedByOwnerNote, wishCountsLine } from './wishTexts';
 
   const { watchWishlistOverview } = useWishlistModule();
   const profile = useCurrentProfile();
@@ -56,7 +56,7 @@
       <section aria-labelledby="{id}-group-{index}">
         <h2 id="{id}-group-{index}">{ownerGroupHeading(group)}</h2>
         <ul class="entry-list">
-          {#each group.wishlists as wishlist (wishlist.id)}
+          {#each group.entries as { wishlist, wishCounts } (wishlist.id)}
             <li>
               <button
                 type="button"
@@ -64,6 +64,7 @@
               >
                 <span>
                   <span class="wishlist-name">{wishlist.name.value}</span>
+                  <span class="note">{wishCountsLine(wishCounts)}</span>
                   {#if wishlist.removedByOwner}
                     <span class="note">
                       <span aria-hidden="true">⚠</span>

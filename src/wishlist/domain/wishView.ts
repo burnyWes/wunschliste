@@ -75,3 +75,16 @@ export function viewOfWishes(
 export function visibleWishCount(wishes: readonly Wish[], perspective: Perspective): number {
   return wishes.filter((wish) => visibilityFor(wish, perspective) === 'shown').length;
 }
+
+export type WishCounts = { readonly open: number; readonly fulfilled: number };
+
+export function countWishes(wishes: readonly Wish[], perspective: Perspective): WishCounts {
+  const shownStatuses = wishes
+    .map((wish) => viewOfWish(wish, perspective))
+    .filter(({ visibility }) => visibility === 'shown')
+    .map(({ status }) => status);
+  return {
+    open: shownStatuses.filter((status) => status === 'open').length,
+    fulfilled: shownStatuses.filter((status) => status === 'fulfilled').length,
+  };
+}

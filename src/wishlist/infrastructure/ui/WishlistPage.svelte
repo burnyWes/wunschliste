@@ -10,7 +10,12 @@
   import { perspectiveOf } from '../../domain/Perspective';
   import type { Wish } from '../../domain/Wish';
   import type { Wishlist } from '../../domain/Wishlist';
-  import { viewOfWishes, visibleWishCount, type WishFilter } from '../../domain/wishView';
+  import {
+    countWishes,
+    viewOfWishes,
+    visibleWishCount,
+    type WishFilter,
+  } from '../../domain/wishView';
   import { useCurrentProfile } from './currentProfile.svelte';
   import LoadFailed from './LoadFailed.svelte';
   import NotFound from './NotFound.svelte';
@@ -85,6 +90,7 @@
   const perspective = $derived(wishlist.value && perspectiveOf(wishlist.value, profile.me.id));
   const createWishHash = $derived(hashOf({ page: 'createWish', wishlistId }));
   const wishesView = $derived(wishes && perspective && viewOfWishes(wishes, perspective, filter));
+  const wishCounts = $derived(wishes && perspective && countWishes(wishes, perspective));
   const emptyText = $derived(FILTERS.find(({ value }) => value === filter)?.emptyText);
 
   async function deleteForGood(): Promise<void> {
@@ -170,6 +176,9 @@
         >
           <Icon aria-hidden="true" size="1.25em" />
           {label}
+          {#if wishCounts}
+            <span class="count">{wishCounts[value]}</span>
+          {/if}
         </button>
       {/each}
     </div>
@@ -230,6 +239,11 @@
     flex: 1 1 0;
     min-width: 0;
     overflow-wrap: anywhere;
+  }
+
+  .count {
+    margin-inline-start: 0.5em;
+    font-variant-numeric: tabular-nums;
   }
 
   .owner {

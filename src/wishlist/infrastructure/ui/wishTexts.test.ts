@@ -22,6 +22,7 @@ import {
   secretHint,
   secretNote,
   surpriseLine,
+  wishCountsLine,
   LINK_PROBLEM_MESSAGES,
   NAME_FORM_PROBLEM_MESSAGES,
   NAME_PROBLEM_MESSAGES,
@@ -158,6 +159,16 @@ describe('wish state', () => {
     [2, '2 Überraschungen'],
   ])('counts %i surprises', (count, line) => {
     expect(surpriseLine(count)).toBe(line);
+  });
+});
+
+describe('wishCountsLine', () => {
+  it.each([
+    [{ open: 3, fulfilled: 5 }, '3 offen · 5 erfüllt'],
+    [{ open: 0, fulfilled: 0 }, '0 offen · 0 erfüllt'],
+    [{ open: 1, fulfilled: 1 }, '1 offen · 1 erfüllt'],
+  ])('names the counts %o', (wishCounts, line) => {
+    expect(wishCountsLine(wishCounts)).toBe(line);
   });
 });
 

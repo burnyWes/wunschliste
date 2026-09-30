@@ -8,6 +8,10 @@ export class InMemoryWishRepository implements WishRepository {
   readonly #wishes = new ObservableMap<WishId, Wish>();
   #isServerReachable = true;
 
+  watchAll(onChange: (wishes: readonly Wish[]) => void, onFailure: () => void): Unsubscribe {
+    return this.#wishes.observe(() => onChange(this.#wishes.values()), onFailure);
+  }
+
   watchByWishlist(
     wishlistId: WishlistId,
     onChange: (wishes: readonly Wish[]) => void,

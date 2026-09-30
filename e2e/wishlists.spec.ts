@@ -72,12 +72,12 @@ test('keeps created wishlists after a restart', async ({ page }) => {
   await createWishlist(page, 'Geburtstag 2027');
   await page.getByRole('button', { name: 'Zurück zu Wunschlisten' }).click();
 
-  const wishlistLinks = page.getByRole('main').getByRole('listitem');
-  await expect(wishlistLinks).toHaveText(['Geburtstag 2027', 'Weihnachten']);
+  const wishlistNames = page.getByRole('main').locator('.wishlist-name');
+  await expect(wishlistNames).toHaveText(['Geburtstag 2027', 'Weihnachten']);
 
   await page.reload();
 
-  await expect(wishlistLinks).toHaveText(['Geburtstag 2027', 'Weihnachten']);
+  await expect(wishlistNames).toHaveText(['Geburtstag 2027', 'Weihnachten']);
 });
 
 test.describe('with several owners', () => {
@@ -107,14 +107,14 @@ test.describe('with several owners', () => {
       'Ben',
       'Unbekannt',
     ]);
-    await expect(groupNamed(page, 'Anna (ich)').getByRole('listitem')).toHaveText([
+    await expect(groupNamed(page, 'Anna (ich)').locator('.wishlist-name')).toHaveText([
       'Geburtstag 2027',
     ]);
-    await expect(groupNamed(page, 'Ben').getByRole('listitem')).toHaveText([
+    await expect(groupNamed(page, 'Ben').locator('.wishlist-name')).toHaveText([
       'Ostern',
       'Weihnachten',
     ]);
-    await expect(groupNamed(page, 'Unbekannt').getByRole('listitem')).toHaveText(['Zelten']);
+    await expect(groupNamed(page, 'Unbekannt').locator('.wishlist-name')).toHaveText(['Zelten']);
   });
 
   test('creates a wishlist for another person', async ({ page }) => {
@@ -129,7 +129,7 @@ test.describe('with several owners', () => {
     await expect(pageHeading(page, 'Nikolaus')).toBeVisible();
     await expect(page.getByText('für Oma')).toBeVisible();
     await page.getByRole('button', { name: 'Zurück zu Wunschlisten' }).click();
-    await expect(groupNamed(page, 'Oma').getByRole('listitem')).toHaveText(['Nikolaus']);
+    await expect(groupNamed(page, 'Oma').locator('.wishlist-name')).toHaveText(['Nikolaus']);
   });
 
   test('names the owner on the wishlist page', async ({ page }) => {
@@ -160,7 +160,7 @@ test('hides a person without wishlists and a wishlist without owner', async ({ p
   await expect(page.getByRole('main').getByRole('heading', { level: 2 })).toHaveText([
     'Anna (ich)',
   ]);
-  await expect(page.getByRole('main').getByRole('listitem')).toHaveText(['Geburtstag']);
+  await expect(page.getByRole('main').locator('.wishlist-name')).toHaveText(['Geburtstag']);
 });
 
 test('explains an unknown wishlist and leads to the overview', async ({ page }) => {

@@ -51,7 +51,7 @@ describe('owner texts', () => {
     [{ owner: anna, isMe: false }, 'Anna'],
     [{ owner: undefined, isMe: false }, 'Unbekannt'],
   ])('heads the group of %o as %s', (group, heading) => {
-    expect(ownerGroupHeading({ ...group, wishlists: [] })).toBe(heading);
+    expect(ownerGroupHeading({ ...group, entries: [] })).toBe(heading);
   });
 
   it('names the owner below the wishlist heading', () => {

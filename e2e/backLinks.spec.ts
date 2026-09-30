@@ -28,7 +28,7 @@ test('leads from a wish back to its wishlist without a new history entry', async
 
 test('keeps the filter of the wishlist', async ({ page }) => {
   await page.goto('./#/liste/birthday');
-  await page.getByRole('button', { name: 'Erfüllt', exact: true }).click();
+  await page.getByRole('button', { name: /^Erfüllt( \d+)?$/ }).click();
   await page.getByRole('button', { name: /^Zelt/ }).click();
 
   await page.getByRole('button', { name: 'Zurück zu Geburtstag' }).click();

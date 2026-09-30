@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { personIdOf, wishlistIdOf, type PersonId } from './ids';
+import { personIdOf, wishIdOf, wishlistIdOf, type PersonId } from './ids';
 import { Name } from './Name';
 import { requireValid } from './parsed';
 import { Person } from './Person';
+import { CalendarDate } from './CalendarDate';
+import { Wish, type RestoredWish } from './Wish';
 import { Wishlist } from './Wishlist';
 import { groupWishlistsByOwner, type WishlistGroup } from './wishlistOverview';
 
@@ -17,11 +19,26 @@ function wishlistOf(ownerId: PersonId, name: string): Wishlist {
   return Wishlist.create(wishlistIdOf(`${ownerId}-${name}`), nameOf(name), ownerId);
 }
 
+function wishIn(wishlist: Wishlist, name: string, state: Partial<RestoredWish> = {}): Wish {
+  return Wish.restore({
+    id: wishIdOf(`${wishlist.id}-${name}`),
+    wishlistId: wishlist.id,
+    details: { name: nameOf(name) },
+    createdOn: CalendarDate.of(2026, 9, 30),
+    createdBy: wishlist.ownerId,
+    secret: false,
+    giverId: undefined,
+    received: false,
+    removedByOwner: false,
+    ...state,
+  });
+}
+
 function summaryOf(groups: readonly WishlistGroup[]) {
-  return groups.map(({ owner, isMe, wishlists }) => ({
+  return groups.map(({ owner, isMe, entries }) => ({
     owner: owner?.name.value,
     isMe,
-    wishlists: wishlists.map((wishlist) => wishlist.name.value),
+    wishlists: entries.map(({ wishlist }) => wishlist.name.value),
   }));
 }
 
@@ -34,6 +51,7 @@ describe('groupWishlistsByOwner', () => {
         wishlistOf(ben.id, 'Weihnachten'),
       ],
       persons,
+      [],
       ben.id,
     );
 
@@ -48,6 +66,7 @@ describe('groupWishlistsByOwner', () => {
     const groups = groupWishlistsByOwner(
       [wishlistOf(anna.id, 'Weihnachten'), wishlistOf(anna.id, 'Ostern')],
       persons,
+      [],
       anna.id,
     );
 
@@ -57,7 +76,7 @@ describe('groupWishlistsByOwner', () => {
   });
 
   it('leaves out persons without wishlists', () => {
-    const groups = groupWishlistsByOwner([wishlistOf(grandma.id, 'Ostern')], persons, anna.id);
+    const groups = groupWishlistsByOwner([wishlistOf(grandma.id, 'Ostern')], persons, [], anna.id);
 
     expect(summaryOf(groups).map(({ owner }) => owner)).toEqual(['Oma']);
   });
@@ -70,6 +89,7 @@ describe('groupWishlistsByOwner', () => {
         wishlistOf(ben.id, 'Ostern'),
       ],
       persons,
+      [],
       anna.id,
     );
 
@@ -88,16 +108,39 @@ describe('groupWishlistsByOwner', () => {
     });
     const wishlists = [removed, wishlistOf(ben.id, 'Weihnachten')];
 
-    expect(summaryOf(groupWishlistsByOwner(wishlists, persons, anna.id))).toEqual([
+    expect(summaryOf(groupWishlistsByOwner(wishlists, persons, [], anna.id))).toEqual([
       { owner: 'Ben', isMe: false, wishlists: ['Weihnachten'] },
     ]);
-    expect(summaryOf(groupWishlistsByOwner(wishlists, persons, grandma.id))).toEqual([
+    expect(summaryOf(groupWishlistsByOwner(wishlists, persons, [], grandma.id))).toEqual([
       { owner: 'Anna', isMe: false, wishlists: ['Ostern'] },
       { owner: 'Ben', isMe: false, wishlists: ['Weihnachten'] },
     ]);
   });
 
   it('has no groups without wishlists', () => {
-    expect(groupWishlistsByOwner([], persons, anna.id)).toEqual([]);
+    expect(groupWishlistsByOwner([], persons, [], anna.id)).toEqual([]);
+  });
+
+  it('counts the wishes of each wishlist as I see them', () => {
+    const birthday = wishlistOf(anna.id, 'Geburtstag');
+    const easter = wishlistOf(ben.id, 'Ostern');
+    const empty = wishlistOf(ben.id, 'Leer');
+    const wishes = [
+      wishIn(birthday, 'Helm'),
+      wishIn(birthday, 'Konzert', { secret: true, createdBy: ben.id }),
+      wishIn(easter, 'Buch', { giverId: anna.id }),
+    ];
+
+    const groups = groupWishlistsByOwner([birthday, easter, empty], persons, wishes, anna.id);
+
+    expect(
+      groups.flatMap(({ entries }) =>
+        entries.map(({ wishlist, wishCounts }) => [wishlist.name.value, wishCounts]),
+      ),
+    ).toEqual([
+      ['Geburtstag', { open: 1, fulfilled: 0 }],
+      ['Leer', { open: 0, fulfilled: 0 }],
+      ['Ostern', { open: 0, fulfilled: 1 }],
+    ]);
   });
 });

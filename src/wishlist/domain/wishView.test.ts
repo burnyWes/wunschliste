@@ -6,7 +6,7 @@ import { requireValid } from './parsed';
 import type { Perspective } from './Perspective';
 import type { Rating } from './Rating';
 import { Wish, type RestoredWish } from './Wish';
-import { viewOfWish, viewOfWishes, visibleWishCount, type WishView } from './wishView';
+import { countWishes, viewOfWish, viewOfWishes, visibleWishCount, type WishView } from './wishView';
 
 const anna = personIdOf('anna');
 const ben = personIdOf('ben');
@@ -211,5 +211,48 @@ describe('viewOfWishes', () => {
 
   it('counts no surprises without secret wishes', () => {
     expect(viewOfWishes(wishes, asAnna, 'open').surpriseCount).toBe(0);
+  });
+});
+
+describe('countWishes', () => {
+  const wishes = [
+    annasWish('A'),
+    annasWish('B', { giverId: ben }),
+    annasWish('C', { giverId: ben, received: true }),
+  ];
+
+  it('counts open and fulfilled wishes as the owner sees them', () => {
+    expect(countWishes(wishes, asAnna)).toEqual({ open: 2, fulfilled: 1 });
+  });
+
+  it('counts a given wish as fulfilled for the others', () => {
+    expect(countWishes(wishes, asBen)).toEqual({ open: 1, fulfilled: 2 });
+  });
+
+  it('leaves out surprises for the owner but counts them for the others', () => {
+    const secret = [annasWish('Konzert', { secret: true, createdBy: ben })];
+
+    expect(countWishes(secret, asAnna)).toEqual({ open: 0, fulfilled: 0 });
+    expect(countWishes(secret, asBen)).toEqual({ open: 1, fulfilled: 0 });
+  });
+
+  it('leaves out wishes the owner removed only for the owner', () => {
+    const removed = [
+      annasWish('Helm', { removedByOwner: true, secret: true, createdBy: ben, giverId: ben }),
+    ];
+
+    expect(countWishes(removed, asAnna)).toEqual({ open: 0, fulfilled: 0 });
+    expect(countWishes(removed, asBen)).toEqual({ open: 0, fulfilled: 1 });
+  });
+
+  it('counts nothing when the wishlist is hidden', () => {
+    expect(countWishes(wishes, { ...asAnna, wishlistIsHidden: true })).toEqual({
+      open: 0,
+      fulfilled: 0,
+    });
+  });
+
+  it('counts nothing without wishes', () => {
+    expect(countWishes([], asAnna)).toEqual({ open: 0, fulfilled: 0 });
   });
 });

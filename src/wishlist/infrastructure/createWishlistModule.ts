@@ -53,7 +53,7 @@ export function createWishlistModule({
     forgetProfile: new ForgetProfile(profileStore),
     watchCurrentPerson: new WatchCurrentPerson(persons, profileStore),
     createWishlist: new CreateWishlist(wishlists, persons, idGenerator),
-    watchWishlistOverview: new WatchWishlistOverview(wishlists, persons),
+    watchWishlistOverview: new WatchWishlistOverview(wishlists, persons, wishes),
     watchWishlistsOwnedBy: new WatchWishlistsOwnedBy(wishlists),
     watchWishlist: new WatchWishlist(wishlists),
     renameWishlist: new RenameWishlist(wishlists),
