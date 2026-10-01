@@ -76,6 +76,7 @@ x Einstellungen-Seite: Alles was mit Person zu tun hat auf eine Unterseite
 x Wunsch wiederholen möglich machen
 x Wunsch in andere Liste kopieren/ausschneiden
 x Android: Statusleiste der installierten App folgt dem Farbschema
+x Android: Installieren-Knopf in den Einstellungen
 ----------------------------------------------------------------------------------------------------------------------------------
 TODO 
 ----------------------------------------------------------------------------------------------------------------------------------

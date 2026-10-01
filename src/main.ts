@@ -1,5 +1,6 @@
 import { mount } from 'svelte';
 import App from './app/App.svelte';
+import { installOffer } from './app/install/installOffer.svelte';
 import { applyColorScheme, loadColorScheme } from './app/theme/colorSchemeStorage';
 import './app/theme/colorSchemes.css';
 import './app/global.css';
@@ -20,5 +21,6 @@ function requireAppRoot(): HTMLElement {
 document.addEventListener('touchstart', () => {}, { passive: true });
 
 applyColorScheme(loadColorScheme());
+installOffer.follow(window);
 
 mount(App, { target: requireAppRoot() });
