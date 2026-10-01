@@ -21,4 +21,12 @@ export function saveColorScheme(scheme: ColorScheme): void {
 
 export function applyColorScheme(scheme: ColorScheme): void {
   document.documentElement.dataset.colorScheme = scheme;
+  tintSystemBarsWithBackground();
+}
+
+function tintSystemBarsWithBackground(): void {
+  const background = getComputedStyle(document.documentElement)
+    .getPropertyValue('--color-background')
+    .trim();
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', background);
 }

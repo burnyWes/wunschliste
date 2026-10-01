@@ -18,6 +18,17 @@ async function backgroundOf(page: Page, selector: string): Promise<string> {
     .evaluate((element) => getComputedStyle(element).backgroundColor);
 }
 
+async function systemBarColorOf(page: Page): Promise<string> {
+  return page.locator('meta[name="theme-color"]').evaluate((meta) => {
+    const probe = document.createElement('span');
+    probe.style.color = meta.getAttribute('content') ?? '';
+    document.body.append(probe);
+    const color = getComputedStyle(probe).color;
+    probe.remove();
+    return color;
+  });
+}
+
 test.beforeEach(async ({ page }) => {
   await page.goto('./#/einstellungen');
 });
@@ -69,6 +80,26 @@ for (const label of ['Hell', 'Invertiert']) {
     expect(await backgroundOf(page, '.status-bar-backdrop')).toBe(BLACK);
   });
 }
+
+for (const { label, background } of [
+  { label: 'Dunkel', background: BLACK },
+  { label: 'Hell', background: WHITE },
+  { label: 'Invertiert', background: WHITE },
+]) {
+  test(`tints the system bars with the background of the ${label} scheme`, async ({ page }) => {
+    await tapSchemeRow(page, label);
+
+    await expect.poll(() => systemBarColorOf(page)).toBe(background);
+  });
+}
+
+test('tints the system bars with the stored scheme after a restart', async ({ page }) => {
+  await tapSchemeRow(page, 'Hell');
+
+  await page.reload();
+
+  await expect.poll(() => systemBarColorOf(page)).toBe(WHITE);
+});
 
 test('switches the scheme with the arrow keys', async ({ page }) => {
   await schemeOption(page, 'Dunkel').focus();

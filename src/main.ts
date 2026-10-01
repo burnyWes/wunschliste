@@ -1,5 +1,6 @@
 import { mount } from 'svelte';
 import App from './app/App.svelte';
+import { applyColorScheme, loadColorScheme } from './app/theme/colorSchemeStorage';
 import './app/theme/colorSchemes.css';
 import './app/global.css';
 import './shared/ui/buttons.css';
@@ -17,5 +18,7 @@ function requireAppRoot(): HTMLElement {
 // iOS Safari only applies :active styles once a touch listener is registered, see
 // https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html
 document.addEventListener('touchstart', () => {}, { passive: true });
+
+applyColorScheme(loadColorScheme());
 
 mount(App, { target: requireAppRoot() });
